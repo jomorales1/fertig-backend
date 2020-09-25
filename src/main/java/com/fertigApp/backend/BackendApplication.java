@@ -1,4 +1,4 @@
-package com.fertigapp.backend;
+package com.fertigApp.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
