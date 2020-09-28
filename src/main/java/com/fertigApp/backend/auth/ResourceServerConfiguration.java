@@ -1,35 +1,31 @@
-package com.example.websecurityconfiguration.auth;
+package com.fertigApp.backend.auth;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @EnableResourceServer
 @RestController
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
-    @RequestMapping("/publica")
-    public String publico() {
-        return "Pagina Publica";
-    }
-    @RequestMapping("/privada")
-    public String privada() {
-        return "Pagina Privada";
-    }
-    @RequestMapping("/admin")
-    public String admin() {
-        return "Pagina Administrador";
-    }
+
+    private static final String[] publicResources = new String[]{"/registro/nuevo-usuario"};
+    private static final String[] userResources = new String[]{"/usuario/**"};
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/oauth/token","/oauth/authorize**","/publica");
+        http.authorizeRequests().antMatchers("/oauth/token","/oauth/authorize**","/publica"); //publica
+//        http.requestMatchers().antMatchers("/add");
 
-        http.requestMatchers().antMatchers("/privada")
+//        http.requestMatchers().antMatchers("/privada")
+//                .and().authorizeRequests()
+//                .antMatchers("/privada").access("hasRole('USER')")
+//                .and().requestMatchers().antMatchers("/admin")
+//                .and().authorizeRequests()
+//                .antMatchers("/admin").access("hasRole('ADMIN')");
+
+        http.requestMatchers().antMatchers("/all")
                 .and().authorizeRequests()
-                .antMatchers("/privada").access("hasRole('USER')")
-                .and().requestMatchers().antMatchers("/admin")
-                .and().authorizeRequests()
-                .antMatchers("/admin").access("hasRole('ADMIN')");
+                .antMatchers("/all").access("hasRole('USER')");
     }
 }

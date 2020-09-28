@@ -1,4 +1,4 @@
-package com.example.websecurityconfiguration.auth;
+package com.fertigApp.backend.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,7 +45,6 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
                 .authenticationManager(authenticationManager)
                 .tokenStore(tokenStore);
     }
-
 
     @Bean
     public TokenStore tokenStore() {

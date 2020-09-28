@@ -1,6 +1,8 @@
 package com.fertigApp.backend.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -13,6 +15,7 @@ public class Usuario implements Serializable {
 
 	private String nombre;
 
+	@JsonIgnore
 	private String password;
 	/*
 	@JsonIgnore

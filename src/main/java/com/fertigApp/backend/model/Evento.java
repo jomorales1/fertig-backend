@@ -1,4 +1,4 @@
-package com.fertigapp.backend.model;
+package com.fertigApp.backend.model;
 
 import javax.persistence.*;
 import java.io.Serializable;

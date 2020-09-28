@@ -1,4 +1,4 @@
-package com.fertigapp.backend.model;
+package com.fertigApp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

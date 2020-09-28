@@ -1,6 +1,6 @@
-package com.fertigapp.backend.repository;
+package com.fertigApp.backend.repository;
 
-import com.fertigapp.backend.model.Tarea;
+import com.fertigApp.backend.model.Tarea;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
