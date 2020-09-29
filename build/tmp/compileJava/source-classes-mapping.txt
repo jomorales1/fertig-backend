@@ -1,28 +1,32 @@
+com/fertigApp/backend/model/Evento.java
+ com.fertigApp.backend.model.Evento
+com/fertigApp/backend/controller/UsuarioController.java
+ com.fertigApp.backend.controller.UsuarioController
+com/fertigApp/backend/BackendApplication.java
+ com.fertigApp.backend.BackendApplication
+com/fertigApp/backend/controller/MainController.java
+ com.fertigApp.backend.controller.MainController
+com/fertigApp/backend/model/Tarea.java
+ com.fertigApp.backend.model.Tarea
 com/fertigApp/backend/repository/UsuarioRepository.java
  com.fertigApp.backend.repository.UsuarioRepository
-com/fertigApp/backend/model/Rutina.java
- com.fertigApp.backend.model.Rutina
-com/fertigApp/backend/auth/AuthorizacionServerConfiguration.java
- com.fertigApp.backend.auth.AuthorizacionServerConfiguration
-com/fertigApp/backend/model/Usuario.java
- com.fertigApp.backend.model.Usuario
-com/fertigApp/backend/model/Completada.java
- com.fertigApp.backend.model.Completada
 com/fertigApp/backend/repository/TareaRepository.java
  com.fertigApp.backend.repository.TareaRepository
 com/fertigApp/backend/repository/RutinaRepository.java
  com.fertigApp.backend.repository.RutinaRepository
-com/fertigApp/backend/model/Tarea.java
- com.fertigApp.backend.model.Tarea
-com/fertigApp/backend/repository/CompletadaRepository.java
- com.fertigApp.backend.repository.CompletadaRepository
 com/fertigApp/backend/repository/EventoRepository.java
  com.fertigApp.backend.repository.EventoRepository
-com/fertigApp/backend/model/Evento.java
- com.fertigApp.backend.model.Evento
-com/fertigApp/backend/controller/MainController.java
- com.fertigApp.backend.controller.MainController
+com/fertigApp/backend/repository/CompletadaRepository.java
+ com.fertigApp.backend.repository.CompletadaRepository
+com/fertigApp/backend/model/Rutina.java
+ com.fertigApp.backend.model.Rutina
+com/fertigApp/backend/model/Usuario.java
+ com.fertigApp.backend.model.Usuario
+com/fertigApp/backend/model/Completada.java
+ com.fertigApp.backend.model.Completada
+com/fertigApp/backend/auth/AuthorizacionServerConfiguration.java
+ com.fertigApp.backend.auth.AuthorizacionServerConfiguration
 com/fertigApp/backend/auth/ResourceServerConfiguration.java
  com.fertigApp.backend.auth.ResourceServerConfiguration
-com/fertigApp/backend/BackendApplication.java
- com.fertigApp.backend.BackendApplication
+com/fertigApp/backend/auth/WebSecurityConfiguration.java
+ com.fertigApp.backend.auth.WebSecurityConfiguration

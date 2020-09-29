@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity// This tells Hibernate to make a table out of this class
-@Table(name = "usuario", schema = "mydb")
+@Table(name = "users", schema = "mydb")
 public class Usuario implements Serializable {
 	@Id
 	private String correo;
@@ -17,6 +17,7 @@ public class Usuario implements Serializable {
 
 	@JsonIgnore
 	private String password;
+
 	/*
 	@JsonIgnore
 	@ManyToMany

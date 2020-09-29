@@ -32,7 +32,7 @@ public class MainController {
 	@RequestMapping("/publica")
 	public String publico() {
 		return "Pagina Publica";
-	}
+	}/*
 	@RequestMapping("/privada")
 	public String privada() {
 		return "Pagina Privada";
@@ -40,5 +40,5 @@ public class MainController {
 	@RequestMapping("/admin")
 	public String admin() {
 		return "Pagina Administrador";
-	}
+	}*/
 }
