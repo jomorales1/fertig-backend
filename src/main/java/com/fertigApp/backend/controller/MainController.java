@@ -3,6 +3,8 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,13 +16,17 @@ public class MainController {
 	private UsuarioRepository usuarioRepository;
 
 	@PostMapping(path="/add") // Map ONLY POST Requests
-	public @ResponseBody String addNewUsuario (@RequestParam String correo, @RequestParam String nombre, @RequestParam String password) {
+	public ResponseEntity<Void> addNewUsuario (@RequestParam String correo, @RequestParam String nombre, @RequestParam String password) {
+		if(usuarioRepository.existsById(correo)) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+
 		Usuario n = new Usuario();
 		n.setCorreo(correo);
 		n.setNombre(nombre);
 		n.setPassword(password);
 		usuarioRepository.save(n);
-		return "Saved";
+		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
 	@GetMapping(path="/all")
