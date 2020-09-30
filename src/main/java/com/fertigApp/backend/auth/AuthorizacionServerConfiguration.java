@@ -14,22 +14,50 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.InMemoryTokenStore;
 
+import javax.sql.DataSource;
+
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizacionServerConfiguration extends AuthorizationServerConfigurerAdapter {
     @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
+
     @Autowired
     private TokenStore tokenStore;
 
+    @Autowired
+    private DataSource dataSource;
+
+//    @Override
+//    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//        clients.inMemory()
+//                .withClient("cliente")
+//                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
+//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT","USER")
+//                .scopes("read","write")
+//                .autoApprove(true)
+//                .secret(passwordEncoder().encode("password"));
+//    }
+
+//    @Override
+//    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//        clients.inMemory()
+//                .withClient("cliente")
+//                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
+//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT","USER")
+//                .scopes("read","write")
+//                .autoApprove(true)
+//                .secret(passwordEncoder().encode("password"));
+//    }
+
     @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory()
+    public void configure(ClientDetailsServiceConfigurer client) throws Exception {
+        client.inMemory()
                 .withClient("cliente")
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT","USER")
-                .scopes("read","write")
+                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
+                .scopes("read", "write")
                 .autoApprove(true)
                 .secret(passwordEncoder().encode("password"));
     }
