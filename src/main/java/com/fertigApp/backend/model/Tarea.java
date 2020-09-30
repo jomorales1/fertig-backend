@@ -1,5 +1,8 @@
 package com.fertigApp.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import org.springframework.lang.Nullable;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -17,17 +20,18 @@ public class Tarea implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "usuario")
-    private Usuario usuario;
+    private Usuario usuarioT;
 
     private String nombre;
 
     private String descripcion;
 
-    private int prioridad;
+    private Integer prioridad;
 
     private String etiqueta;
 
-    private int estimacion;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer estimacion;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
@@ -41,7 +45,8 @@ public class Tarea implements Serializable {
 
     private int hecha;
 
-    private int recordatorio;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer recordatorio ;
 
     public int getId() {
         return id;
@@ -51,12 +56,12 @@ public class Tarea implements Serializable {
         this.id = id;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Usuario getUsuarioT() {
+        return usuarioT;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuario(Usuario usuarioT) {
+        this.usuarioT = usuarioT;
     }
 
     public String getNombre() {

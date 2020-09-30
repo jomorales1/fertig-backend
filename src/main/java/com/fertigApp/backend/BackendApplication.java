@@ -16,7 +16,7 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @SpringBootApplication
 //@EnableWebSecurity
-public class BackendApplication{// extends WebSecurityConfigurerAdapter {
+public class BackendApplication{ // extends WebSecurityConfigurerAdapter {
 
     public static void main(String[] args) {
         SpringApplication.run(BackendApplication.class, args);
@@ -46,17 +46,17 @@ public class BackendApplication{// extends WebSecurityConfigurerAdapter {
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
 //        http
-//                .csrf().disable();}
-////                .authorizeRequests()
-////                .antMatchers("/","/index","/webpublico").permitAll()
-////                .antMatchers("/webprivado").authenticated()
-////                .antMatchers("/webadmin").hasRole("ADMIN").and()
-////                .formLogin()
-////                .loginPage("/login")
-////                .permitAll()
-////                .and()
-////                .logout() // Metodo get pues he desabilitado CSRF
-////                .permitAll();
-////    }
+//                .csrf().disable()//;}
+//                .authorizeRequests()
+//                .antMatchers("/","/index","/webpublico").permitAll()
+//                .antMatchers("/webprivado").authenticated()
+//                .antMatchers("/webadmin").hasRole("ADMIN").and()
+//                .formLogin()
+//                .loginPage("/login")
+//                .permitAll()
+//                .and()
+//                .logout() // Metodo get pues he desabilitado CSRF
+//                .permitAll();
+//    }
 
 }
