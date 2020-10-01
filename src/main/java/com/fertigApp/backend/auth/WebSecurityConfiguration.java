@@ -86,7 +86,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //        return jdbcUserDetailsManager;
 //    }
 
-
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }

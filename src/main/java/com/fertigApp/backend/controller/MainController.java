@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController	// This means that this class is a Controller
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
-public class MainController {
+public class MainController {/*
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
@@ -31,7 +31,7 @@ public class MainController {
 
 
 	@PostMapping(path="/add") // Map ONLY POST Requests
-	public ResponseEntity<Void> addNewUsuario (@RequestParam String correo, @RequestParam String nombre, @RequestParam String password) {
+	public ResponseEntity<Void> addNewUsuario (@RequestParam String correo, @RequestParam String nombre, @RequestParam String password, @RequestParam String usuario) {
 	    if(usuarioRepository.existsById(correo)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
@@ -40,15 +40,16 @@ public class MainController {
 		n.setCorreo(correo);
 		n.setNombre(nombre);
 		n.setPassword(password);
+		n.setUsuario(usuario);
 		usuarioRepository.save(n);
         return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	@GetMapping(path="/all")
-	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
-		// This returns a JSON or XML with the usuarios
-		return usuarioRepository.findAll();
-	}
+//	@GetMapping(path="/all")
+//	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
+//		// This returns a JSON or XML with the usuarios
+//		return usuarioRepository.findAll();
+//	}
 
 	@GetMapping(path="/{usuario}/tareas")
 	public @ResponseBody List<Tarea> getTareasByUsuario(@PathVariable String usuario){
@@ -75,5 +76,5 @@ public class MainController {
 	@RequestMapping("/admin")
 	public String admin() {
 		return "Pagina Administrador";
-	}*/
+	}/**/
 }

@@ -10,7 +10,10 @@ import java.io.Serializable;
 @Entity// This tells Hibernate to make a table out of this class
 @Table(name = "usuario", schema = "mydb")
 public class Usuario implements Serializable {
+
 	@Id
+	private String usuario;
+
 	private String correo;
 
 	private String nombre;
@@ -54,5 +57,13 @@ public class Usuario implements Serializable {
 
 	public void setTareas(List<Tarea> tareas) {
 		this.tareas = tareas;
+	}
+
+	public String getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(String usuario) {
+		this.usuario = usuario;
 	}
 }
