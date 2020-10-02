@@ -36,14 +36,31 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //        auth.userDetailsService(jdbcUserDetailsManager()).passwordEncoder(passwordEncoder());
 //    }
 
-    @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
 
-        UserDetails user = User.builder().username("user").password(passwordEncoder().encode("secret")).
-                roles("USER").build();
-        return new InMemoryUserDetailsManager(user); //userAdmin
+    private UserDetailsService userDetailsService;
+
+//    @Bean
+//    @Override
+//    public UserDetailsService userDetailsService() {
+//        UserDetails user = User.builder().username("user").password(passwordEncoder().encode("secret")).
+//                roles("USER").build();
+//        return new InMemoryUserDetailsManager(user); //userAdmin
+//    }
+
+    public WebSecurityConfiguration( UserDetailsService userDetailsService ){
+        this.userDetailsService = userDetailsService;
     }
+
+    @Override
+    protected void configure( AuthenticationManagerBuilder builder ) throws Exception{
+        builder.userDetailsService( userDetailsService( ) ).passwordEncoder( passwordEncoder( ) );
+    }
+
+    @Override
+    protected UserDetailsService userDetailsService( ){
+        return userDetailsService;
+    }
+
     @Override
     public void configure(final WebSecurity web) {
         web.ignoring().antMatchers(HttpMethod.OPTIONS);
@@ -51,6 +68,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
 //        http.authorizeRequests()
 //                .antMatchers("/usuario/**").hasRole("USER")
 //                .anyRequest().authenticated()
@@ -85,7 +103,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //
 //        return jdbcUserDetailsManager;
 //    }
-
 
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
