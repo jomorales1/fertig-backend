@@ -10,6 +10,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController	// This means that this class is a Controller
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UsuarioController {
@@ -67,9 +69,11 @@ public class UsuarioController {
 		usuario.setUsuario(requestUsuario.getUsuario());
 		usuario.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
 
-		if(usuarioRepository.existsById(usuario.getCorreo())) {
+		if (usuarioRepository.existsById(usuario.getUsuario()))
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
+		List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findByCorreo(usuario.getCorreo());
+		if(!usuarios.isEmpty())
+			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		usuarioRepository.save(usuario);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
