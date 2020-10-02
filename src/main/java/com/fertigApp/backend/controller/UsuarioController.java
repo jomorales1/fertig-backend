@@ -6,6 +6,8 @@ import com.fertigApp.backend.requestModels.RequestUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,28 +22,30 @@ public class UsuarioController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@GetMapping(path="/users")
+	@GetMapping(path="/users/getAllUsers")
 	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
 		return usuarioRepository.findAll();
 	}
 
-	@GetMapping(path="/users/get/{user}")
-	public Usuario getUsuario(@PathVariable String user) {
+	@GetMapping(path="/users/get")
+	public Usuario getUsuario() {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try {
-			return usuarioRepository.findById(user).get();
+			return usuarioRepository.findById(userDetails.getUsername()).get();
 		} catch(java.util.NoSuchElementException ex){
 			return null;
 		}
 	}
 
-	@PutMapping(path="/users/update/{correo}")
-	public Usuario replaceUsuario(@PathVariable String correo, @RequestBody RequestUsuario requestUsuario) {
+	@PutMapping(path="/users/update")
+	public Usuario replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		Usuario user = new Usuario();
 		user.setCorreo(requestUsuario.getCorreo());
 		user.setNombre(requestUsuario.getNombre());
 		user.setUsuario(requestUsuario.getUsuario());
 		user.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
-		return usuarioRepository.findById(correo)
+		return usuarioRepository.findById(userDetails.getUsername())
 				.map(usuario -> {
 					usuario.setCorreo(user.getCorreo());
 					usuario.setNombre(user.getNombre());
@@ -74,10 +78,11 @@ public class UsuarioController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-	@DeleteMapping(path="/users/delete/{user}")
-	public boolean deleteUsuario(@PathVariable String user) {
+	@DeleteMapping(path="/users/delete/")
+	public boolean deleteUsuario() {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		try{
-			usuarioRepository.deleteById(user);
+			usuarioRepository.deleteById(userDetails.getUsername());
 			return true;
 		} catch(org.springframework.dao.EmptyResultDataAccessException ex){
 			return false;
