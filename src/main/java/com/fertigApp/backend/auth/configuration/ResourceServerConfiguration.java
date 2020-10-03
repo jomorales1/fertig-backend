@@ -1,4 +1,4 @@
-package com.fertigApp.backend.auth;
+package com.fertigApp.backend.auth.configuration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.oauth2.OAuth2AutoConfiguration;
@@ -24,8 +24,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     private static final String[] publicResources = new String[]{"/registro/nuevo-usuario"};
     private static final String[] userResources = new String[]{"/usuario/**"};
 
-//    @Autowired
-//    private DefaultTokenServices tokenService;
+    @Autowired
+    private DefaultTokenServices tokenService;
 
     @Autowired
     private TokenStore tokenStore;
@@ -50,16 +50,9 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
-        resources.tokenServices(tokenService());
+        resources.tokenServices(tokenService);
         resources.resourceId(null);
     }
 
-    @Bean
-    @Primary
-    public DefaultTokenServices tokenService() {
-        DefaultTokenServices tokenServices = new DefaultTokenServices();
-        tokenServices.setSupportRefreshToken(true);
-        tokenServices.setTokenStore(this.tokenStore);
-        return tokenServices;
-    }
+
 }

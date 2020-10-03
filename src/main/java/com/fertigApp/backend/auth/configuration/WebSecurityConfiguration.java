@@ -1,9 +1,12 @@
-package com.fertigApp.backend.auth;
+package com.fertigApp.backend.auth.configuration;
 
+import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,14 +22,21 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
-public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
-{
+public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 //    @Autowired
 //    public DataSource dataSource;
 //
@@ -37,29 +47,49 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //    }
 
 
-    private UserDetailsService userDetailsService;
+//    private UserDetailsService userDetailsService;
 
-//    @Bean
-//    @Override
-//    public UserDetailsService userDetailsService() {
+    private UserDetailsManager userDetailsManager;
+
+    @Bean
+    public UserDetailsManager userDetailsManager() {
+        userDetailsManager = new InMemoryUserDetailsManager();
+
+        for (Usuario usuario: usuarioRepository.findAll() ){
+            UserDetails user = User.builder().username(usuario.getUsuario()).password(usuario.getPassword()).
+                    roles("USER").build();
+            userDetailsManager.createUser(user);
+        }
+
+        return userDetailsManager;
+    }
+
+    @Bean
+    @Override
+    public UserDetailsService userDetailsService() {
+
 //        UserDetails user = User.builder().username("user").password(passwordEncoder().encode("secret")).
 //                roles("USER").build();
-//        return new InMemoryUserDetailsManager(user); //userAdmin
-//    }
-
-    public WebSecurityConfiguration( UserDetailsService userDetailsService ){
-        this.userDetailsService = userDetailsService;
+//        //UserDetails userAdmin=User.builder().username("admin").password(passwordEncoder().encode("secret")).
+//        //roles("ADMIN").build();
+        return userDetailsManager; //userAdmin
     }
+
+
+
+//    public WebSecurityConfiguration( UserDetailsService userDetailsService ){
+//        this.userDetailsService = userDetailsService;
+//    }
 
     @Override
     protected void configure( AuthenticationManagerBuilder builder ) throws Exception{
-        builder.userDetailsService( userDetailsService( ) ).passwordEncoder( passwordEncoder( ) );
+        builder.userDetailsService( userDetailsService( ) ).passwordEncoder(passwordEncoder);
     }
 
-    @Override
-    protected UserDetailsService userDetailsService( ){
-        return userDetailsService;
-    }
+//    @Override
+//    protected UserDetailsService userDetailsService( ){
+//        return userDetailsService;
+//    }
 
     @Override
     public void configure(final WebSecurity web) {
@@ -104,10 +134,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //        return jdbcUserDetailsManager;
 //    }
 
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 //    @Bean
 //    @Override
 //    public UserDetailsService userDetailsService() {
@@ -118,5 +144,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter
 //        //roles("ADMIN").build();
 //        return new InMemoryUserDetailsManager(user); //userAdmin
 //    }
+
 
 }

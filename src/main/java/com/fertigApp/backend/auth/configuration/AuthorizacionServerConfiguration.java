@@ -1,11 +1,13 @@
-package com.fertigApp.backend.auth;
+package com.fertigApp.backend.auth.configuration;
 
+//import com.fertigApp.backend.auth.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -31,11 +33,15 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
     @Autowired
     private TokenStore tokenStore;
 
+//    @Autowired
+//    private UserDetailsServiceImpl userDetailsService;
+
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
         endpoints
                 .tokenStore(this.tokenStore)
                 .authenticationManager(this.authenticationManager);
+                //.userDetailsService(userDetailsService);
     }
 
     @Override
@@ -44,12 +50,12 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
                 .inMemory()
                 .withClient("cliente")
                 .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT", "USER")
+                .authorities("USER")
                 .scopes("read", "write")
                 .resourceIds("rest_service")
-                .autoApprove(true)
-                .secret("password");
+                .secret("secret");
                 //.accessTokenValiditySeconds(24 * 365 * 60 * 60);
+                //.autoApprove(true)
     }
 
     @Bean
@@ -71,6 +77,15 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
             }
         };
         oauthServer.passwordEncoder(passwordEncoder);
+    }
+
+    @Bean
+    @Primary
+    public DefaultTokenServices tokenService() {
+        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        tokenServices.setSupportRefreshToken(true);
+        tokenServices.setTokenStore(this.tokenStore);
+        return tokenServices;
     }
 
 }
