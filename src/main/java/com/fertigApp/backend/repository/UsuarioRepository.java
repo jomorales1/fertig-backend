@@ -1,12 +1,14 @@
 package com.fertigApp.backend.repository;
 
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.repository.CrudRepository;
 
 import com.fertigApp.backend.model.Usuario;
+import org.springframework.stereotype.Repository;
 
-// This will be AUTO IMPLEMENTED by Spring into a Bean called userRepository
-// CRUD refers Create, Read, Update, Delete
-
+@Repository
 public interface UsuarioRepository extends CrudRepository<Usuario, String> {
+
+    Usuario findByUsuario(String usuario);
 
 }

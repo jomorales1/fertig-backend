@@ -9,5 +9,4 @@ import java.util.List;
 @Repository
 public interface TareaRepository extends CrudRepository<Tarea, Integer> {
 
-    public List<Tarea> findByUsuarioT(String usuarioT);
 }
