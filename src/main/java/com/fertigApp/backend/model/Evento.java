@@ -13,7 +13,7 @@ public class Evento implements Serializable {
         sequenceName = "public.evento_evento_id_seq", allocationSize = 1)
     @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_evento_generator")
     @Column(name="id_evento")
-    private int id;
+    private Integer id;
 
     @ManyToOne
     @JoinColumn(name = "usuario")
@@ -23,11 +23,11 @@ public class Evento implements Serializable {
 
     private String descripcion;
 
-    private int prioridad;
+    private Integer prioridad;
 
     private String etiqueta;
 
-    private int estimacion;
+    private Integer estimacion;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
@@ -39,7 +39,7 @@ public class Evento implements Serializable {
 
     private String recurrencia;
 
-    private int recordatorio;
+    private Integer recordatorio;
 
     public Evento() {
 

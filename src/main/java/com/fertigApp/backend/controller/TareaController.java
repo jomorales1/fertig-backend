@@ -4,6 +4,8 @@ import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.repository.TareaRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,21 +20,22 @@ public class TareaController {
         return this.tareaRepository.findAll();
     }
 
-    @GetMapping(path="/tasks/{user}/getTasks")
-    public Iterable<Tarea> getAllTareasByUsuario(@RequestParam String usuario) {
+    @GetMapping(path="/tasks/getTasks")
+    public Iterable<Tarea> getAllTareasByUsuario() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try {
-            return usuarioRepository.findById(usuario).get().getTareas();
+            return usuarioRepository.findById(userDetails.getUsername()).get().getTareas();
         } catch(java.util.NoSuchElementException ex){
             return null;
         }
     }
 
-    @GetMapping(path="/tasks/{user}/{id}")
+    @GetMapping(path="/tasks/getTask/{id}")
     public Tarea getTarea(@PathVariable Integer id) {
         return this.tareaRepository.findById(id).get();
     }
 
-    @PutMapping(path="/tasks/{user}/updateTask/{id}")
+    @PutMapping(path="/tasks/updateTask/{id}")
     public Tarea replaceTarea(@PathVariable Integer id, @RequestBody Tarea task) {
         return this.tareaRepository.findById(id)
                 .map(tarea -> {
@@ -52,7 +55,7 @@ public class TareaController {
         return "Saved";
     }
 
-    @DeleteMapping(path="/tasks/{user}/deleteTask/{id}")
+    @DeleteMapping(path="/tasks/deleteTask/{id}")
     public void deleteTarea(@RequestParam Integer id) {
         this.tareaRepository.deleteById(id);
     }

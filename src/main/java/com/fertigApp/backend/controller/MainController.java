@@ -11,6 +11,11 @@ import org.codehaus.jackson.map.ser.std.IterableSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,27 +34,36 @@ public class MainController {/*
 
 	private ObjectMapper objectMapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).setSerializationInclusion(JsonInclude.Include.NON_NULL);;
 
+	@Autowired
+	private UserDetailsManager userDetailsManager;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 
 	@PostMapping(path="/add") // Map ONLY POST Requests
-	public ResponseEntity<Void> addNewUsuario (@RequestParam String correo, @RequestParam String nombre, @RequestParam String password, @RequestParam String usuario) {
-	    if(usuarioRepository.existsById(correo)) {
+	public ResponseEntity<Void> addNewUsuario (@RequestParam String usuario,@RequestParam String correo, @RequestParam String nombre, @RequestParam String password) {
+	    if(usuarioRepository.existsById(usuario)) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
 		Usuario n = new Usuario();
+	    n.setUsuario(usuario);
 		n.setCorreo(correo);
 		n.setNombre(nombre);
 		n.setPassword(password);
-		n.setUsuario(usuario);
 		usuarioRepository.save(n);
+		UserDetails user = User.builder().username(usuario).password(passwordEncoder.encode(password)).
+				roles("USER").build();
+		userDetailsManager.createUser(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
-//	@GetMapping(path="/all")
-//	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
-//		// This returns a JSON or XML with the usuarios
-//		return usuarioRepository.findAll();
-//	}
+	@GetMapping(path="/all")
+	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
+		// This returns a JSON or XML with the usuarios
+		return usuarioRepository.findAll();
+	}
 
 	@GetMapping(path="/{usuario}/tareas")
 	public @ResponseBody List<Tarea> getTareasByUsuario(@PathVariable String usuario){
@@ -76,5 +90,5 @@ public class MainController {/*
 	@RequestMapping("/admin")
 	public String admin() {
 		return "Pagina Administrador";
-	}/**/
+	}*/
 }
