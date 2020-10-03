@@ -1,64 +1,29 @@
-package com.fertigApp.backend.model;
+package com.fertigApp.backend.requestModels;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
-@Table(name="evento", schema="mydb")
-public class Evento implements Serializable {
+public class RequestEvento implements Serializable {
 
-    @Id
-    @SequenceGenerator(name = "id_evento_generator",
-        sequenceName = "public.evento_evento_id_seq", allocationSize = 1)
-    @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_evento_generator")
-    @Column(name="id_evento")
-    private Integer id;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario")
-    private Usuario usuarioE;
-
+    private String usuario;
     private String nombre;
-
     private String descripcion;
-
     private Integer prioridad;
-
     private String etiqueta;
-
     private Integer estimacion;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_inicio")
     private Date fechaInicio;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_fin")
     private Date fechaFin;
-
     private String recurrencia;
-
     private Integer recordatorio;
 
-    public Evento() {
+    public RequestEvento() { };
 
+    public String getUsuario() {
+        return usuario;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Usuario getUsuario() {
-        return usuarioE;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuarioE = usuario;
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
 
     public String getNombre() {
@@ -77,11 +42,11 @@ public class Evento implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -93,11 +58,11 @@ public class Evento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
+    public Integer getEstimacion() {
         return estimacion;
     }
 
-    public void setEstimacion(int estimacion) {
+    public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
     }
 
@@ -125,11 +90,11 @@ public class Evento implements Serializable {
         this.recurrencia = recurrencia;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
 }

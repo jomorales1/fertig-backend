@@ -26,6 +26,11 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioT")
 	private List<Tarea> tareas;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "usuarioE")
+	private List<Evento> eventos;
+
+	public Usuario() { }
 
 	public String getCorreo() {
 		return correo;
@@ -65,5 +70,13 @@ public class Usuario implements Serializable {
 
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
+	}
+
+	public List<Evento> getEventos() {
+		return eventos;
+	}
+
+	public void setEventos(List<Evento> eventos) {
+		this.eventos = eventos;
 	}
 }
