@@ -26,7 +26,7 @@ public class UsuarioController {
 	@Autowired
 	private UserDetailsManager userDetailsManager;
 
-	@GetMapping(path="/users/getAllUsers")
+	@GetMapping(path="/users/getAllUsers") //Disponible como rol ADMIN
 	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
 		// This returns a JSON or XML with the usuarios
 		return usuarioRepository.findAll();
