@@ -21,8 +21,24 @@ import org.springframework.web.bind.annotation.RestController;
 //@RestController
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
-    private static final String[] publicResources = new String[]{"/oauth/token","/oauth/authorize**","/users/addUser"};
-    private static final String[] userResources = new String[]{"/tasks/getTasks","/users/get"};
+    private static final String[] publicResources = new String[]
+            {
+                    "/oauth/token",
+                    "/oauth/authorize**",
+                    "/users/addUser"
+            };
+
+    private static final String[] userResources = new String[]
+            {
+                    "/users/get",
+                    "/users/update",
+                    "/users/delete/",
+                    "/tasks/getTasks",
+                    "/tasks/getTask/**",
+                    "/tasks/updateTask/**",
+                    "/tasks/addTask",
+                    "/tasks/deleteTask/**"
+            };
 
     @Autowired
     private DefaultTokenServices tokenService;
