@@ -1,5 +1,5 @@
-com/fertigApp/backend/auth/ResourceServerConfiguration.java
- com.fertigApp.backend.auth.ResourceServerConfiguration
+com/fertigApp/backend/model/Tarea.java
+ com.fertigApp.backend.model.Tarea
 com/fertigApp/backend/controller/MainController.java
  com.fertigApp.backend.controller.MainController
 com/fertigApp/backend/BackendApplication.java
@@ -30,15 +30,15 @@ com/fertigApp/backend/model/Rutina.java
  com.fertigApp.backend.model.Rutina
 com/fertigApp/backend/model/Usuario.java
  com.fertigApp.backend.model.Usuario
+com/fertigApp/backend/model/Evento.java
+ com.fertigApp.backend.model.Evento
+com/fertigApp/backend/model/Completada.java
+ com.fertigApp.backend.model.Completada
+com/fertigApp/backend/controller/EventoController.java
+ com.fertigApp.backend.controller.EventoController
+com/fertigApp/backend/auth/ResourceServerConfiguration.java
+ com.fertigApp.backend.auth.ResourceServerConfiguration
 com/fertigApp/backend/controller/TareaController.java
  com.fertigApp.backend.controller.TareaController
 com/fertigApp/backend/controller/UsuarioController.java
  com.fertigApp.backend.controller.UsuarioController
-com/fertigApp/backend/controller/EventoController.java
- com.fertigApp.backend.controller.EventoController
-com/fertigApp/backend/model/Completada.java
- com.fertigApp.backend.model.Completada
-com/fertigApp/backend/model/Evento.java
- com.fertigApp.backend.model.Evento
-com/fertigApp/backend/model/Tarea.java
- com.fertigApp.backend.model.Tarea

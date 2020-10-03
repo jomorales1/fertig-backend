@@ -9,12 +9,28 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
-    private static final String[] publicResources = new String[]{"/registro/nuevo-usuario"};
-    private static final String[] userResources = new String[]{"/usuario/**"};
+    private static final String[] publicResources = new String[]
+            {
+                    "/oauth/token",
+                    "/oauth/authorize**",
+                    "/users/addUser"
+            };
+
+    private static final String[] userResources = new String[]
+            {
+                    "/users/get",
+                    "/users/update",
+                    "/users/delete/",
+                    "/tasks/getTasks",
+                    "/tasks/getTask/**",
+                    "/tasks/updateTask/**",
+                    "/tasks/addTask",
+                    "/tasks/deleteTask/**"
+            };
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().antMatchers("/oauth/token","/oauth/authorize**").permitAll(); //publica
+        http.authorizeRequests().antMatchers(publicResources).permitAll(); //publica
 //        http.requestMatchers().antMatchers("/add");
 
 //        http.requestMatchers().antMatchers("/privada")
@@ -24,8 +40,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
 //                .and().authorizeRequests()
 //                .antMatchers("/admin").access("hasRole('ADMIN')");
 
-        http.requestMatchers().antMatchers("/all")
+        http.requestMatchers().antMatchers(userResources)
                 .and().authorizeRequests()
-                .antMatchers("/all").access("hasRole('USER')");
+                .antMatchers(userResources).access("hasRole('USER')");
     }
 }

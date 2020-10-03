@@ -22,7 +22,7 @@ public class UsuarioController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@GetMapping(path="/users/getAllUsers")
+	@GetMapping(path="/users/getAllUsers") //Disponible como rol ADMIN
 	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
 		return usuarioRepository.findAll();
 	}
