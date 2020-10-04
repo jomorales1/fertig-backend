@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface UsuarioRepository extends CrudRepository<Usuario, String> {
     Iterable<Usuario> findByCorreo(String correo);
     Usuario findByUsuario(String usuario);
+    boolean existByCorreo(String correo);
 }
