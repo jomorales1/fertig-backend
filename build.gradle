@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '2.3.4.RELEASE'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
+    id "org.sonarqube" version "3.0"
 }
 
 group = 'com.FertigApp'
@@ -28,4 +29,11 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+sonarqube {
+  properties {
+    property "sonar.projectKey", "FertigApp_BackEnd"
+    property "sonar.organization", "fertigapp"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
 }
