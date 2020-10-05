@@ -19,8 +19,8 @@ public class Rutina implements Serializable {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "usuarioR")
-    private Usuario usuario;
+    @JoinColumn(name = "usuario")
+    private Usuario usuarioR;
 
     private String nombre;
 
@@ -57,11 +57,11 @@ public class Rutina implements Serializable {
     }
 
     public Usuario getUsuario() {
-        return usuario;
+        return usuarioR;
     }
 
     public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+        this.usuarioR = usuario;
     }
 
     public String getNombre() {
