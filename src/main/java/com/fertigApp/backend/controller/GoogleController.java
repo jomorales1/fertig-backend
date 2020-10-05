@@ -46,7 +46,7 @@ public class GoogleController {
                 if(!usuarioRepository.findByCorreo(email).iterator().hasNext()){
                     String name = email.substring(0, email.indexOf("@"));
                     String userName = name;
-                    while(usuarioRepository.existByCorreo(userName)){
+                    while(usuarioRepository.findByUsuario(userName) != null){
                         userName = name;
                         userName += String.valueOf(Math.abs(Math.random()));
                     }
