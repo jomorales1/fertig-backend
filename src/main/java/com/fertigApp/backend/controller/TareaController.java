@@ -3,6 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.repository.TareaRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
+import com.fertigApp.backend.requestModels.RequestTarea;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
  * la entidad "Tarea".
  * */
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 @RestController
 public class TareaController {
 
@@ -62,7 +66,21 @@ public class TareaController {
 
     // Método POST para agregar un registro en la tabla "tarea" de la DB.
     @PostMapping(path="/tasks/addTask")
-    public @ResponseBody String addNewTarea(@RequestBody Tarea tarea) {
+    public @ResponseBody String addNewTarea(@RequestBody RequestTarea requestTarea) {
+        Tarea tarea= new Tarea();
+        Logger.getGlobal().log(Level.INFO,SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        tarea.setUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
+        tarea.setDescripcion(requestTarea.getDescripcion());
+        tarea.setEstimacion(requestTarea.getEstimacion());
+        tarea.setEtiqueta(requestTarea.getEtiqueta());
+        tarea.setFechaFin(requestTarea.getFechaFin());
+        tarea.setFechaInicio(requestTarea.getFechaFin());
+        tarea.setHecha(requestTarea.getHecha());
+        tarea.setNivel(requestTarea.getNivel());
+        tarea.setNombre(requestTarea.getNombre());
+        tarea.setPrioridad(requestTarea.getPrioridad());
+        tarea.setRecordatorio(requestTarea.getRecordatorio());
         this.tareaRepository.save(tarea);
         return "Saved";
     }
