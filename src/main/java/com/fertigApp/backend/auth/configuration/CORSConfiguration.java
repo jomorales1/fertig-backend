@@ -11,7 +11,7 @@ import org.springframework.web.filter.CorsFilter;
 import static org.springframework.core.Ordered.HIGHEST_PRECEDENCE;
 import static org.springframework.http.HttpMethod.*;
 
-
+//Habilitación de CORS. Temporal.
 @Configuration
 public class CORSConfiguration
 {

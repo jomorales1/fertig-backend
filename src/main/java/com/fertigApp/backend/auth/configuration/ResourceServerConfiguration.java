@@ -21,6 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 //@RestController
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
 
+    //Declaración del tokenService declarado en AuthorizationServiceCongig
+    @Autowired
+    private DefaultTokenServices tokenService;
+
+    //URL's de los recursos públicos (no requieren Token)
     private static final String[] publicResources = new String[]
             {
                     "/oauth/token",
@@ -28,6 +33,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                     "/users/addUser"
             };
 
+    //URL's privadas, requieren autenticación con Token.
     private static final String[] userResources = new String[]
             {
                     "/users/get",
@@ -40,13 +46,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
                     "/tasks/deleteTask/**"
             };
 
-    @Autowired
-    private DefaultTokenServices tokenService;
 
-    @Autowired
-    private TokenStore tokenStore;
-
-
+    //Configuración de los roles que pueden acceder a los recursos privados y publicos.
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests().antMatchers(publicResources).permitAll(); //publica
@@ -68,7 +69,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Override
     public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
         resources.tokenServices(tokenService);
-        resources.resourceId(null);
+        resources.resourceId(null); //Corrige el error en el resourceId.
     }
 
 

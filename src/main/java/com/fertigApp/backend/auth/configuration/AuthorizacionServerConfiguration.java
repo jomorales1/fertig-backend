@@ -26,15 +26,15 @@ import javax.sql.DataSource;
 @Configuration
 @EnableAuthorizationServer
 public class AuthorizacionServerConfiguration extends AuthorizationServerConfigurerAdapter {
+
+    //Declaración del autheticationManager. Se usa Autowired, la Bean esta declarada en WebSecurityConfig
     @Autowired
     @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
 
+    //TokenStore, almacena los tokens guardados, estructura en la base de datos
     @Autowired
     private TokenStore tokenStore;
-
-//    @Autowired
-//    private UserDetailsServiceImpl userDetailsService;
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
@@ -44,6 +44,8 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
                 //.userDetailsService(userDetailsService);
     }
 
+    //En esta función se declara en los GranTypes válidos, el rol y el scope de la autenticación.
+    // La aplicación cliente debera considir con el cliente y secret aqúi declarados.
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients
@@ -54,15 +56,17 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
                 .scopes("read", "write")
                 .resourceIds("rest_service")
                 .secret("secret");
-                //.accessTokenValiditySeconds(24 * 365 * 60 * 60);
+                //.accessTokenValiditySeconds(24 * 365 * 60 * 60); //Modificación de la duración de la validez del Token.
                 //.autoApprove(true)
     }
 
+    //Bean del passwordEncoder utilizado en las demas clases.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    //Override de los metodos encode y matches de la autenticación.
     @Override
     public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception{
         PasswordEncoder passwordEncoder = new PasswordEncoder() {
@@ -79,6 +83,7 @@ public class AuthorizacionServerConfiguration extends AuthorizationServerConfigu
         oauthServer.passwordEncoder(passwordEncoder);
     }
 
+    //Declaración del tokenService.
     @Bean
     @Primary
     public DefaultTokenServices tokenService() {

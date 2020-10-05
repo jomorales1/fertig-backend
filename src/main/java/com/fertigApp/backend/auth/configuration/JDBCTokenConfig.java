@@ -11,9 +11,11 @@ import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
 import javax.sql.DataSource;
 
+
+//Clase que administra el TokenStore utilizando la base de datos.
 @Configuration
 public class JDBCTokenConfig {
-
+    //Valores de la base de datos y schema.
     @Value("${spring.datasource.url}")
     private String datasourceUrl;
 
@@ -26,6 +28,7 @@ public class JDBCTokenConfig {
     @Value("${spring.datasource.password}")
     private String dbPassword;
 
+    //DataSource utilizado por el TokenStore
     @Bean
     public DataSource dataSource() {
         final DriverManagerDataSource dataSource = new DriverManagerDataSource();
