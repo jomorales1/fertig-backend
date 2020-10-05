@@ -136,6 +136,14 @@ public class Rutina implements Serializable {
         this.recordatorio = recordatorio;
     }
 
+    public List<Completada> getCompletadas() {
+        return completadas;
+    }
+
+    public void setCompletadas(List<Completada> completadas) {
+        this.completadas = completadas;
+    }
+
     /*public List<Completada> getCompletadas() {
         return completadas;
     }*/
