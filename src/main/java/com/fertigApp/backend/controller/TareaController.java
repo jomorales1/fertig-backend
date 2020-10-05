@@ -8,18 +8,28 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/*
+ * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
+ * la entidad "Tarea".
+ * */
 @RestController
 public class TareaController {
+
+    // Repositorio responsable del manejo de la tabla "tarea" en la DB.
     @Autowired
     private TareaRepository tareaRepository;
+
+    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
     @GetMapping(path="/tasks")
     public @ResponseBody Iterable<Tarea> getAllTareas() {
         return this.tareaRepository.findAll();
     }
 
+    // Método GET para obtener todas las tareas de un usuario específico.
     @GetMapping(path="/tasks/getTasks")
     public Iterable<Tarea> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -30,6 +40,7 @@ public class TareaController {
         }
     }
 
+    // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
     public Tarea getTarea(@PathVariable Integer id) {
         return this.tareaRepository.findById(id).get();
@@ -49,12 +60,14 @@ public class TareaController {
                 });
     }
 
+    // Método POST para agregar un registro en la tabla "tarea" de la DB.
     @PostMapping(path="/tasks/addTask")
     public @ResponseBody String addNewTarea(@RequestBody Tarea tarea) {
         this.tareaRepository.save(tarea);
         return "Saved";
     }
 
+    // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
     @DeleteMapping(path="/tasks/deleteTask/{id}")
     public void deleteTarea(@RequestParam Integer id) {
         this.tareaRepository.deleteById(id);

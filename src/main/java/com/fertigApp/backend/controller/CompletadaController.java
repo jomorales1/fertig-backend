@@ -13,17 +13,27 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/*
+* Clase responsable de manejar request de tipo GET, POST y DELETE para
+* la entidad "Completada".
+* */
 @RestController
 public class CompletadaController {
+
+    // Repositorio responsable del manejo de la tabla "completada" en la DB.
     @Autowired
     private CompletadaRepository completadaRepository;
 
+    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Repositorio responsable del manejo de la tabla "rutina" en la DB.
     @Autowired
     private RutinaRepository rutinaRepository;
 
+    // Método GET para obtener del servidor una lista de actividades completadas
+    // que están relacionadas con una rutina específica.
     @GetMapping(path="/completed/getCompleted/{id}")
     public Iterable<Completada> getAllCompletadasByRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -41,6 +51,7 @@ public class CompletadaController {
         }
     }
 
+    // Método GET para obtener una entidad "completada" por medio de su id.
     @GetMapping(path="/completed/getOneCompleted/{id}")
     public Completada getCompleted(@PathVariable Integer id) {
         try {
@@ -51,6 +62,7 @@ public class CompletadaController {
         }
     }
 
+    // Método POST para agregar una entidad "completada" relacionada con cierta rutina.
     @PostMapping(path="/completed/addCompleted/")
     public @ResponseBody
     ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
@@ -60,7 +72,9 @@ public class CompletadaController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         completada.setRutina(rutinaRepository.findById(requestCompletada.getRutina()).get());
         completada.setFecha(requestCompletada.getFecha());
+        rutinaRepository.findById(requestCompletada.getRutina()).get().getCompletadas().add(completada);
         this.completadaRepository.save(completada);
+        this.rutinaRepository.save(rutinaRepository.findById(requestCompletada.getRutina()).get());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

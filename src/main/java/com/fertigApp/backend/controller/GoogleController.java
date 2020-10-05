@@ -19,15 +19,21 @@ import java.rmi.server.ExportException;
 import java.util.Collections;
 import java.util.List;
 
-
+/*
+ * Clase responsable de manejar request de tipo POST con el fin de verificar
+ * el token provisionado por el servidor de autenticación de Google.
+ * */
 @RestController
 public class GoogleController {
 
+    // Client ID asociada a la api de autenticación de Google.
     private final String clienId = "756516316743-ocrumr7v1j2kvtlcr2ubdkkih4d3trgo.apps.googleusercontent.com";
 
+    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Método POST para la verificación del token obtenido de la API de autenticación de Google.
     @PostMapping(path="/googleAuth/")
     public UsernamePasswordAuthenticationToken GoogleAuthentication(@RequestParam String tokenString){
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())

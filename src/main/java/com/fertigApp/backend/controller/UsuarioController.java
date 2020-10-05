@@ -16,24 +16,34 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/*
+ * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
+ * la entidad "Usuario".
+ * */
 @RestController	// This means that this class is a Controller
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UsuarioController {
+
+	// Repositorio responsable del manejo de la tabla "usuario" en la DB.
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
+	// Objeto responsable de la encriptación de contraseñas.
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	// Objeto responsable de la creación de tokens para usuarios.
 	@Autowired
 	private UserDetailsManager userDetailsManager;
 
+	// Método GET para obtener todas las entidades de tipo "usuario" de la DB.
 	@GetMapping(path="/users/getAllUsers") //Disponible como rol ADMIN
 	public @ResponseBody Iterable<Usuario> getAllUsuarios() {
 		// This returns a JSON or XML with the usuarios
 		return usuarioRepository.findAll();
 	}
 
+	// Método GET para obtener la información del usuario hace la request.
 	@GetMapping(path="/users/get")
 	public Usuario getUsuario() {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -44,6 +54,7 @@ public class UsuarioController {
 		}
 	}
 
+	// Método PUT para modificar la información de un usuario en la DB.
 	@PutMapping(path="/users/update")
 	public Usuario replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -70,6 +81,7 @@ public class UsuarioController {
 				});
 	}
 
+	// Método POST para añadir un registro de tipo "usuario" en la DB.
 	@PostMapping(path="/users/addUser") // Map ONLY POST Requests
 	public @ResponseBody ResponseEntity<Void> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
 		Usuario usuario = new Usuario();
@@ -90,6 +102,7 @@ public class UsuarioController {
 		return new ResponseEntity<>(HttpStatus.CREATED);
 	}
 
+	// Método DELETE para eliminar un registro de tipo "usuario" en la DB.
 	@DeleteMapping(path="/users/delete/")
 	public boolean deleteUsuario() {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

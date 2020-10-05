@@ -11,19 +11,29 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+/*
+ * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
+ * la entidad "Evento".
+ * */
 @RestController
 public class EventoController {
+
+    // Repositorio responsable del manejo de la tabla "evento" en la DB.
     @Autowired
     private EventoRepository eventoRepository;
 
+    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    // Método GET para obtener del servidor una lista de todos los eventos
+    // en la DB.
     @GetMapping(path="/events")
     public @ResponseBody Iterable<Evento> getAllEventos() {
         return this.eventoRepository.findAll();
     }
 
+    // Método GET para obtener la lista de eventos de un usuario determinado.
     @GetMapping(path="/events/getEvents")
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -35,6 +45,7 @@ public class EventoController {
         }
     }
 
+    // Método GET para obtener un evento específico de un usuario por medio de su ID.
     @GetMapping(path="/events/getEvent/{id}")
     public Evento getEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -52,6 +63,7 @@ public class EventoController {
         }
     }
 
+    // Método PUT para actualizar un evento específico.
     @PutMapping(path="/events/updateEvent/{id}")
     public Evento replaceEvento(@PathVariable Integer id, @RequestBody Evento event) {
         return this.eventoRepository.findById(id)
@@ -66,6 +78,7 @@ public class EventoController {
                 });
     }
 
+    // Método POST para agregar un evento a la DB.
     @PostMapping(path="/events/addEvent")
     public @ResponseBody ResponseEntity<Void> addNewEvento(@RequestBody RequestEvento requestEvento) {
         // Missing check information process
@@ -88,6 +101,7 @@ public class EventoController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // Método DELETE para borrar un registro de la tabla "evento" en la DB.
     @DeleteMapping(path="/events/deleteEvent/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
