@@ -1,66 +1,40 @@
-package com.fertigApp.backend.model;
+package com.fertigApp.backend.requestModels;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fertigApp.backend.model.Completada;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-@Entity
-@Table(name="rutina", schema="mydb")
-public class Rutina implements Serializable {
+public class RequestRutina implements Serializable {
 
-    @Id
-    @SequenceGenerator(name = "id_rutina_generator",
-        sequenceName = "public.rutina_rutina_id_seq", allocationSize = 1)
-    @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_rutina_generator")
-    @Column(name="id_rutina")
-    private int id;
-
-    @ManyToOne
-    @JoinColumn(name = "usuarioR")
-    private Usuario usuario;
+    private String usuario;
 
     private String nombre;
 
     private String descripcion;
 
-    private int prioridad;
+    private Integer prioridad;
 
     private String etiqueta;
 
-    private int estimacion;
+    private Integer estimacion;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_inicio")
     private Date fechaInicio;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_fin")
     private Date fechaFin;
 
     private String recurrencia;
 
-    private int recordatorio;
+    private Integer recordatorio;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "rutina")
     private List<Completada> completadas;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public Usuario getUsuario() {
+    public String getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(Usuario usuario) {
+    public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
 
@@ -80,11 +54,11 @@ public class Rutina implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -96,11 +70,11 @@ public class Rutina implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
+    public Integer getEstimacion() {
         return estimacion;
     }
 
-    public void setEstimacion(int estimacion) {
+    public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
     }
 
@@ -128,15 +102,11 @@ public class Rutina implements Serializable {
         this.recurrencia = recurrencia;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
-
-    /*public List<Completada> getCompletadas() {
-        return completadas;
-    }*/
 }

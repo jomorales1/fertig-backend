@@ -30,6 +30,10 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioE")
 	private List<Evento> eventos;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "usuarioR")
+	private List<Rutina> rutinas;
+
 	public Usuario() { }
 
 	public String getCorreo() {
@@ -78,5 +82,13 @@ public class Usuario implements Serializable {
 
 	public void setEventos(List<Evento> eventos) {
 		this.eventos = eventos;
+	}
+
+	public List<Rutina> getRutinas() {
+		return rutinas;
+	}
+
+	public void setRutinas(List<Rutina> rutinas) {
+		this.rutinas = rutinas;
 	}
 }

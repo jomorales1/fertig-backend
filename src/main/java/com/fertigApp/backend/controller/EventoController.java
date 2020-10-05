@@ -36,7 +36,9 @@ public class EventoController {
     }
 
     @GetMapping(path="/events/getEvent/{id}")
-    public Evento getEvento(@PathVariable String user, @PathVariable Integer id) {
+    public Evento getEvento(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String user = userDetails.getUsername();
         try {
             Evento evento = this.eventoRepository.findById(id).get();
             if (evento.getUsuario().getUsuario() != user) {
