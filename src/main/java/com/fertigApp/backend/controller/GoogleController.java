@@ -27,52 +27,42 @@ import java.util.List;
 public class GoogleController {
 
     // Client ID asociada a la api de autenticación de Google.
-    private final String clienId = "756516316743-ocrumr7v1j2kvtlcr2ubdkkih4d3trgo.apps.googleusercontent.com";
+    private final String clienId = "756516316743-7fcc8028epqmhnftjeclt9dqo0dk3tls.apps.googleusercontent.com";
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     @Autowired
     private UsuarioRepository usuarioRepository;
 
     // Método POST para la verificación del token obtenido de la API de autenticación de Google.
-    @PostMapping(path="/googleAuth/")
-    public UsernamePasswordAuthenticationToken GoogleAuthentication(@RequestParam String tokenString){
+    @PostMapping(path="/login/oauth2/code/google")
+    public String GoogleAuthentication(@RequestParam String Token){
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(clienId)).build();
-
-        UsernamePasswordAuthenticationToken token = null;
         try {
-            GoogleIdToken googleToken = verifier.verify(tokenString);
+            GoogleIdToken googleToken = verifier.verify(Token);
             if(googleToken != null){
                 Payload payLoad = googleToken.getPayload();
 
-                String userId = payLoad.getSubject();
-                System.out.println(userId);
+                String googleEmail = payLoad.getEmail();
+                if(usuarioRepository.existsByCorreo(googleEmail)){
+                    Usuario user = usuarioRepository.findByCorreo(googleEmail);
 
-                String email = payLoad.getEmail();
-                if(!usuarioRepository.findByCorreo(email).iterator().hasNext()){
-                    String name = email.substring(0, email.indexOf("@"));
-                    String userName = name;
-                    while(usuarioRepository.findByUsuario(userName) != null){
-                        userName = name;
-                        userName += String.valueOf(Math.abs(Math.random()));
+                    if(user.isGoogle()){
+                        return "Verificación exitosa";
+                    } else {
+                        return "Cuenta usada por otra persona sin estar vinculada con Google :/";
                     }
-
-                    Usuario user = new Usuario();
-                    user.setCorreo(email);
-                    user.setUsuario(userName);
-                    user.setNombre((String) payLoad.get("name"));
-                    user.setPassword(userName);
-                    usuarioRepository.save(user);
+                } else {
+                    return "No hay ninguna cuenta con ese correo";
                 }
-
-                token = new UsernamePasswordAuthenticationToken(email, "user");
             } else {
                 System.out.println("Error de token de google");
+                return "Error con el token de google";
             }
         } catch(Exception ex){
             ex.printStackTrace();
+            System.out.println(ex.getMessage());
+            return "Error verificando el token de google";
         }
-
-        return token;
     }
 }

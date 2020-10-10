@@ -18,9 +18,12 @@ public class Usuario implements Serializable {
 
 	private String nombre;
 
+	private boolean google;
+
+	private boolean facebook;
+
 	@JsonIgnore
 	private String password;
-
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioT")
@@ -90,5 +93,21 @@ public class Usuario implements Serializable {
 
 	public void setRutinas(List<Rutina> rutinas) {
 		this.rutinas = rutinas;
+	}
+
+	public boolean isGoogle() {
+		return google;
+	}
+
+	public void setGoogle(boolean google) {
+		this.google = google;
+	}
+
+	public boolean isFacebook() {
+		return facebook;
+	}
+
+	public void setFacebook(boolean facebook) {
+		this.facebook = facebook;
 	}
 }

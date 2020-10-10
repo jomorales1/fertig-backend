@@ -37,6 +37,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     private static final String[] userResources = new String[]
             {
                     "/users/get",
+                    "/users/getAllUsers",
                     "/users/update",
                     "/users/delete/",
                     "/tasks/getTasks",
