@@ -24,8 +24,9 @@ com/fertigApp/backend/repository/EventoRepository.java
  com.fertigApp.backend.repository.EventoRepository
 com/fertigApp/backend/requestModels/RequestEvento.java
  com.fertigApp.backend.requestModels.RequestEvento
-com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
- com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
+com/fertigApp/backend/auth/configuration/AuthorizacionServerConfiguration.java
+ com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration
+ com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration$1
 com/fertigApp/backend/model/Evento.java
  com.fertigApp.backend.model.Evento
 com/fertigApp/backend/repository/UsuarioRepository.java
@@ -52,6 +53,5 @@ com/fertigApp/backend/requestModels/RequestTarea.java
  com.fertigApp.backend.requestModels.RequestTarea
 com/fertigApp/backend/controller/MainController.java
  com.fertigApp.backend.controller.MainController
-com/fertigApp/backend/auth/configuration/AuthorizacionServerConfiguration.java
- com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration
- com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration$1
+com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
+ com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
