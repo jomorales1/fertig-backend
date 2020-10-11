@@ -31,7 +31,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private UserDetailsManager userDetailsManager;
 
-    //Modificación del usuerDetailsManger.
+    //Modificación del userDetailsManager.
     @Bean
     public UserDetailsManager userDetailsManager() {
         userDetailsManager = new InMemoryUserDetailsManager(); //Creamos un nuevo InMemoryUserDetailsManager
