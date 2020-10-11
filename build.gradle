@@ -33,6 +33,9 @@ dependencies {
 	implementation 'org.springframework.session:spring-session-core'
 	testImplementation 'io.projectreactor:reactor-test'
 	compile 'com.google.api-client:google-api-client:1.30.10'
+
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-security', version: '1.5.3.RELEASE'
+	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.7.0'
 }
 
 dependencyManagement {

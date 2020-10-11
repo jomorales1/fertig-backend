@@ -89,11 +89,12 @@ public class UsuarioController {
 		usuario.setNombre(requestUsuario.getNombre());
 		usuario.setUsuario(requestUsuario.getUsuario());
 		usuario.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
+		usuario.setFacebook(false);
+		usuario.setGoogle(false);
 
 		if (usuarioRepository.existsById(usuario.getUsuario()))
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		List<Usuario> usuarios = (List<Usuario>) usuarioRepository.findByCorreo(usuario.getCorreo());
-		if(!usuarios.isEmpty())
+		if(usuarioRepository.existsByCorreo(usuario.getCorreo()))
 			return new ResponseEntity<>(HttpStatus.CONFLICT);
 		usuarioRepository.save(usuario);
 		UserDetails user = User.builder().username(usuario.getUsuario()).password(usuario.getPassword()).
