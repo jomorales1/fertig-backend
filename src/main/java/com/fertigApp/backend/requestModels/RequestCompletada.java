@@ -6,10 +6,6 @@ public class RequestCompletada {
     private Integer rutina;
     private Date fecha;
 
-    public RequestCompletada() {
-
-    }
-
     public Integer getRutina() {
         return rutina;
     }

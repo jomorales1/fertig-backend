@@ -1,23 +1,21 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.UsuarioRepository;
-import com.fertigApp.backend.requestModels.RequestUsuario;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.rmi.server.ExportException;
 import java.util.Collections;
-import java.util.List;
 
 /*
  * Clase responsable de manejar request de tipo POST con el fin de verificar
@@ -25,6 +23,8 @@ import java.util.List;
  * */
 @RestController
 public class GoogleController {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Client ID asociada a la api de autenticación de Google.
     private final String clienId = "756516316743-7fcc8028epqmhnftjeclt9dqo0dk3tls.apps.googleusercontent.com";
@@ -56,12 +56,12 @@ public class GoogleController {
                     return "No hay ninguna cuenta con ese correo";
                 }
             } else {
-                System.out.println("Error de token de google");
+                LOGGER.info("Error de token de google");
                 return "Error con el token de google";
             }
         } catch(Exception ex){
             ex.printStackTrace();
-            System.out.println(ex.getMessage());
+            LOGGER.info(ex.getMessage());
             return "Error verificando el token de google";
         }
     }

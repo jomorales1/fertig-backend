@@ -1,15 +1,7 @@
 package com.fertigApp.backend.requestModels;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fertigApp.backend.model.Tarea;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.List;
 
 public class RequestUsuario implements Serializable {
 	private String correo;

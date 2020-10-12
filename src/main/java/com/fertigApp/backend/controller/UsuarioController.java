@@ -11,10 +11,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -47,11 +44,7 @@ public class UsuarioController {
 	@GetMapping(path="/users/get")
 	public Usuario getUsuario() {
 		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		try {
-			return usuarioRepository.findById(userDetails.getUsername()).get();
-		} catch(java.util.NoSuchElementException ex){
-			return null;
-		}
+		return (usuarioRepository.findById(userDetails.getUsername()).isPresent() ? usuarioRepository.findById(userDetails.getUsername()).get() : null);
 	}
 
 	// Método PUT para modificar la información de un usuario en la DB.

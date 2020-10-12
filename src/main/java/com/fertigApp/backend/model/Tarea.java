@@ -1,7 +1,6 @@
 package com.fertigApp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.io.Serializable;

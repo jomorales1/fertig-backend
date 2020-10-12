@@ -1,9 +1,12 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.RutinaRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
  * */
 @RestController
 public class RutinaController {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
     @Autowired
@@ -37,12 +42,13 @@ public class RutinaController {
     @GetMapping(path="/routines/getRoutines")
     public Iterable<Rutina> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try {
+
+        if(usuarioRepository.findById(userDetails.getUsername()).isPresent()){
             return usuarioRepository.findById(userDetails.getUsername()).get().getRutinas();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("User not found");
-            return null;
         }
+        LOGGER.info("User not found");
+        return null;
+
     }
 
     // Método GET para obtener una rutina específica por medio de su ID.
@@ -50,17 +56,16 @@ public class RutinaController {
     public Rutina getRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
-        try {
-            Rutina evento = this.rutinaRepository.findById(id).get();
-            if (evento.getUsuario().getUsuario() != user) {
-                System.out.println("Wrong user");
-                return null;
-            }
-            return this.rutinaRepository.findById(id).get();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("Routine not found");
+
+        if(rutinaRepository.findById(id).isPresent()){
+            if(rutinaRepository.findById(id).get().getUsuario().getUsuario().equals(user))
+                return rutinaRepository.findById(id).get();
+            LOGGER.info("Wrong user");
             return null;
         }
+        LOGGER.info("Routine not found");
+        return null;
+
     }
 
     // Método PUT para modificar un registro en la base de datos.
@@ -104,10 +109,10 @@ public class RutinaController {
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<Void> deleteRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Rutina rutina = this.rutinaRepository.findById(id).get();
-        if (rutina.getUsuario().getUsuario() != userDetails.getUsername())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        this.rutinaRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        if (this.rutinaRepository.findById(id).isPresent() && this.rutinaRepository.findById(id).get().getUsuario().getUsuario().equals(userDetails.getUsername())){
+            this.rutinaRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

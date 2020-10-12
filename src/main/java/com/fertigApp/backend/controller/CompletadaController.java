@@ -4,8 +4,9 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import com.fertigApp.backend.repository.RutinaRepository;
-import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestCompletada;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +21,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class CompletadaController {
 
+    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
+
     // Repositorio responsable del manejo de la tabla "completada" en la DB.
     @Autowired
     private CompletadaRepository completadaRepository;
-
-    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    @Autowired
-    private UsuarioRepository usuarioRepository;
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
     @Autowired
@@ -38,26 +37,25 @@ public class CompletadaController {
     public Iterable<Completada> getAllCompletadasByRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
-        try {
+
+        if(rutinaRepository.findById(id).isPresent()){
             Rutina rutina = rutinaRepository.findById(id).get();
-            if (rutina == null || rutina.getUsuario().getUsuario() != user) {
-                System.out.println("Invalid data");
+            if (rutina.getUsuario().getUsuario().equals(user)) {
+                LOGGER.info("Invalid data");
                 return null;
             }
             return rutina.getCompletadas();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("User not found");
-            return null;
         }
+        return null;
     }
 
     // Método GET para obtener una entidad "completada" por medio de su id.
     @GetMapping(path="/completed/getOneCompleted/{id}")
     public Completada getCompleted(@PathVariable Integer id) {
-        try {
+        if(completadaRepository.findById(id).isPresent())
             return completadaRepository.findById(id).get();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("Completed not found");
+        else{
+            LOGGER.info("Completed not found");
             return null;
         }
     }
@@ -68,7 +66,7 @@ public class CompletadaController {
     ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
         // Missing check information process
         Completada completada = new Completada();
-        if (rutinaRepository.findById(requestCompletada.getRutina()).get() == null)
+        if (rutinaRepository.findById(requestCompletada.getRutina()).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         completada.setRutina(rutinaRepository.findById(requestCompletada.getRutina()).get());
         completada.setFecha(requestCompletada.getFecha());

@@ -23,8 +23,8 @@ import org.springframework.security.provisioning.UserDetailsManager;
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    UsuarioRepository usuarioRepository;
+//    @Autowired
+//    UsuarioRepository usuarioRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -33,7 +33,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     //Modificación del userDetailsManager.
     @Bean
-    public UserDetailsManager userDetailsManager() {
+    public UserDetailsManager userDetailsManager(UsuarioRepository usuarioRepository) {
         userDetailsManager = new InMemoryUserDetailsManager(); //Creamos un nuevo InMemoryUserDetailsManager
 
         //Itermaos sobre los usuarios en el repositorio y los agregamos al userDetailsManager
@@ -66,14 +66,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-//        http.authorizeRequests()
-//                .antMatchers("/usuario/**").hasRole("USER")
-//                .anyRequest().authenticated()
-//                .and()
-//                .httpBasic()
-//                .and()
-//                .csrf().disable();
 
         http.csrf().disable(); //Desahibilitación de csfr por ser innecesario.
     }

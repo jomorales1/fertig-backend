@@ -6,16 +6,18 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 
 import static java.util.Collections.emptyList;
 
 public class JwtUtil {
 
+    private JwtUtil() {
+        throw new IllegalStateException("JwtUtil Clsss");
+    }
+
     // Método para crear y retornar el JWT
     static String addAuthentication(String username) {
-
         return Jwts.builder()
                 .setSubject(username)
 

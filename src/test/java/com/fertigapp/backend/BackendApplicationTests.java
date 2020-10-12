@@ -19,7 +19,7 @@ class BackendApplicationTests {
     }
 
     @Test
-    public void authLoginOk() throws Exception{
+    void authLoginOk() throws Exception{
         assertTrue(true);
     }
 

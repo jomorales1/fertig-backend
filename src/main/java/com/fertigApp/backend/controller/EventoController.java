@@ -1,9 +1,12 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.repository.EventoRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestEvento;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
  * */
 @RestController
 public class EventoController {
+
+    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "evento" en la DB.
     @Autowired
@@ -37,10 +42,10 @@ public class EventoController {
     @GetMapping(path="/events/getEvents")
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try {
+        if (usuarioRepository.findById(userDetails.getUsername()).isPresent())
             return usuarioRepository.findById(userDetails.getUsername()).get().getEventos();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("User not found");
+        else{
+            LOGGER.info("User not found");
             return null;
         }
     }
@@ -50,17 +55,18 @@ public class EventoController {
     public Evento getEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
-        try {
+
+        if (this.eventoRepository.findById(id).isPresent()){
             Evento evento = this.eventoRepository.findById(id).get();
-            if (evento.getUsuario().getUsuario() != user) {
+            if (evento.getUsuario().getUsuario().equals(user)) {
                 System.out.println("Wrong user");
                 return null;
             }
             return this.eventoRepository.findById(id).get();
-        } catch (java.util.NoSuchElementException ex) {
-            System.out.println("Event not found");
-            return null;
         }
+        LOGGER.info("Event not found");
+        return null;
+
     }
 
     // Método PUT para actualizar un evento específico.
@@ -105,10 +111,13 @@ public class EventoController {
     @DeleteMapping(path="/events/deleteEvent/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Evento evento = this.eventoRepository.findById(id).get();
-        if (evento.getUsuario().getUsuario() != userDetails.getUsername())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        this.eventoRepository.deleteById(id);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        if(this.eventoRepository.findById(id).isPresent()){
+            Evento evento = this.eventoRepository.findById(id).get();
+            if (! evento.getUsuario().getUsuario().equals(userDetails.getUsername()))
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            this.eventoRepository.deleteById(id);
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 }

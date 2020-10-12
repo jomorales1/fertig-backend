@@ -16,8 +16,6 @@ public class RequestEvento implements Serializable {
     private String recurrencia;
     private Integer recordatorio;
 
-    public RequestEvento() { };
-
     public String getUsuario() {
         return usuario;
     }

@@ -22,6 +22,10 @@ public class Completada implements Serializable {
     @Column(name="fecha")
     private Date fecha;
 
+    public int getId() {
+        return id;
+    }
+
     public Rutina getRutina() {
         return rutina;
     }

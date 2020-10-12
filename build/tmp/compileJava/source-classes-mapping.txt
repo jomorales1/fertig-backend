@@ -1,59 +1,59 @@
 com/fertigApp/backend/auth/configuration/JDBCTokenConfig.java
  com.fertigApp.backend.auth.configuration.JDBCTokenConfig
-com/fertigApp/backend/BackendApplication.java
- com.fertigApp.backend.BackendApplication
-com/fertigApp/backend/model/Usuario.java
- com.fertigApp.backend.model.Usuario
-com/fertigApp/backend/controller/TareaController.java
- com.fertigApp.backend.controller.TareaController
-com/fertigApp/backend/auth/configuration/CORSConfiguration.java
- com.fertigApp.backend.auth.configuration.CORSConfiguration
-com/fertigApp/backend/controller/EventoController.java
- com.fertigApp.backend.controller.EventoController
-com/fertigApp/backend/repository/RutinaRepository.java
- com.fertigApp.backend.repository.RutinaRepository
-com/fertigApp/backend/auth/configuration/ResourceServerConfiguration.java
- com.fertigApp.backend.auth.configuration.ResourceServerConfiguration
-com/fertigApp/backend/model/Tarea.java
- com.fertigApp.backend.model.Tarea
-com/fertigApp/backend/repository/CompletadaRepository.java
- com.fertigApp.backend.repository.CompletadaRepository
-com/fertigApp/backend/controller/CompletadaController.java
- com.fertigApp.backend.controller.CompletadaController
-com/fertigApp/backend/auth/configuration/JwtUtil.java
- com.fertigApp.backend.auth.configuration.JwtUtil
-com/fertigApp/backend/repository/EventoRepository.java
- com.fertigApp.backend.repository.EventoRepository
-com/fertigApp/backend/requestModels/RequestEvento.java
- com.fertigApp.backend.requestModels.RequestEvento
-com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
- com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
-com/fertigApp/backend/model/Evento.java
- com.fertigApp.backend.model.Evento
-com/fertigApp/backend/repository/UsuarioRepository.java
- com.fertigApp.backend.repository.UsuarioRepository
-com/fertigApp/backend/model/Rutina.java
- com.fertigApp.backend.model.Rutina
+com/fertigApp/backend/requestModels/RequestTarea.java
+ com.fertigApp.backend.requestModels.RequestTarea
 com/fertigApp/backend/requestModels/RequestRutina.java
  com.fertigApp.backend.requestModels.RequestRutina
+com/fertigApp/backend/model/Tarea.java
+ com.fertigApp.backend.model.Tarea
+com/fertigApp/backend/auth/configuration/CORSConfiguration.java
+ com.fertigApp.backend.auth.configuration.CORSConfiguration
 com/fertigApp/backend/requestModels/RequestUsuario.java
  com.fertigApp.backend.requestModels.RequestUsuario
-com/fertigApp/backend/model/Completada.java
- com.fertigApp.backend.model.Completada
-com/fertigApp/backend/requestModels/RequestCompletada.java
- com.fertigApp.backend.requestModels.RequestCompletada
-com/fertigApp/backend/controller/GoogleController.java
- com.fertigApp.backend.controller.GoogleController
-com/fertigApp/backend/controller/UsuarioController.java
- com.fertigApp.backend.controller.UsuarioController
+com/fertigApp/backend/repository/RutinaRepository.java
+ com.fertigApp.backend.repository.RutinaRepository
 com/fertigApp/backend/controller/RutinaController.java
  com.fertigApp.backend.controller.RutinaController
 com/fertigApp/backend/repository/TareaRepository.java
  com.fertigApp.backend.repository.TareaRepository
-com/fertigApp/backend/requestModels/RequestTarea.java
- com.fertigApp.backend.requestModels.RequestTarea
-com/fertigApp/backend/controller/MainController.java
- com.fertigApp.backend.controller.MainController
+com/fertigApp/backend/repository/CompletadaRepository.java
+ com.fertigApp.backend.repository.CompletadaRepository
+com/fertigApp/backend/controller/UsuarioController.java
+ com.fertigApp.backend.controller.UsuarioController
+com/fertigApp/backend/repository/UsuarioRepository.java
+ com.fertigApp.backend.repository.UsuarioRepository
+com/fertigApp/backend/repository/EventoRepository.java
+ com.fertigApp.backend.repository.EventoRepository
+com/fertigApp/backend/model/Evento.java
+ com.fertigApp.backend.model.Evento
+com/fertigApp/backend/model/Completada.java
+ com.fertigApp.backend.model.Completada
+com/fertigApp/backend/model/Rutina.java
+ com.fertigApp.backend.model.Rutina
+com/fertigApp/backend/model/Usuario.java
+ com.fertigApp.backend.model.Usuario
+com/fertigApp/backend/controller/TareaController.java
+ com.fertigApp.backend.controller.TareaController
+com/fertigApp/backend/BackendApplication.java
+ com.fertigApp.backend.BackendApplication
+com/fertigApp/backend/controller/EventoController.java
+ com.fertigApp.backend.controller.EventoController
+com/fertigApp/backend/requestModels/RequestEvento.java
+ com.fertigApp.backend.requestModels.RequestEvento
+com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
+ com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
+com/fertigApp/backend/auth/configuration/ResourceServerConfiguration.java
+ com.fertigApp.backend.auth.configuration.ResourceServerConfiguration
+com/fertigApp/backend/controller/CompletadaController.java
+ com.fertigApp.backend.controller.CompletadaController
+com/fertigApp/backend/requestModels/RequestCompletada.java
+ com.fertigApp.backend.requestModels.RequestCompletada
+com/fertigApp/backend/controller/GoogleController.java
+ com.fertigApp.backend.controller.GoogleController
 com/fertigApp/backend/auth/configuration/AuthorizacionServerConfiguration.java
  com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration
  com.fertigApp.backend.auth.configuration.AuthorizacionServerConfiguration$1
+com/fertigApp/backend/auth/configuration/JwtUtil.java
+ com.fertigApp.backend.auth.configuration.JwtUtil
+com/fertigApp/backend/controller/MainController.java
+ com.fertigApp.backend.controller.MainController

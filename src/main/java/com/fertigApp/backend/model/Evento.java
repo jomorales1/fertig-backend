@@ -41,10 +41,6 @@ public class Evento implements Serializable {
 
     private Integer recordatorio;
 
-    public Evento() {
-
-    }
-
     public int getId() {
         return id;
     }

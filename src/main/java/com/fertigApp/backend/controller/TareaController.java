@@ -37,17 +37,17 @@ public class TareaController {
     @GetMapping(path="/tasks/getTasks")
     public Iterable<Tarea> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try {
+
+        if(usuarioRepository.findById(userDetails.getUsername()).isPresent())
             return usuarioRepository.findById(userDetails.getUsername()).get().getTareas();
-        } catch(java.util.NoSuchElementException ex){
-            return null;
-        }
+        return null;
+
     }
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
     public Tarea getTarea(@PathVariable Integer id) {
-        return this.tareaRepository.findById(id).get();
+        return (this.tareaRepository.findById(id).isPresent() ? this.tareaRepository.findById(id).get() : null);
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
@@ -68,26 +68,31 @@ public class TareaController {
     @PostMapping(path="/tasks/addTask")
     public @ResponseBody String addNewTarea(@RequestBody RequestTarea requestTarea) {
         Tarea tarea= new Tarea();
-        Logger.getGlobal().log(Level.INFO,SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString());
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        tarea.setUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
-        tarea.setDescripcion(requestTarea.getDescripcion());
-        tarea.setEstimacion(requestTarea.getEstimacion());
-        tarea.setEtiqueta(requestTarea.getEtiqueta());
-        tarea.setFechaFin(requestTarea.getFechaFin());
-        tarea.setFechaInicio(requestTarea.getFechaFin());
-        tarea.setHecha(requestTarea.getHecha());
-        tarea.setNivel(requestTarea.getNivel());
-        tarea.setNombre(requestTarea.getNombre());
-        tarea.setPrioridad(requestTarea.getPrioridad());
-        tarea.setRecordatorio(requestTarea.getRecordatorio());
-        this.tareaRepository.save(tarea);
-        return "Saved";
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
+        if(usuarioRepository.findById(userDetails.getUsername()).isPresent()){
+            tarea.setUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
+            tarea.setDescripcion(requestTarea.getDescripcion());
+            tarea.setEstimacion(requestTarea.getEstimacion());
+            tarea.setEtiqueta(requestTarea.getEtiqueta());
+            tarea.setFechaFin(requestTarea.getFechaFin());
+            tarea.setFechaInicio(requestTarea.getFechaFin());
+            tarea.setHecha(requestTarea.getHecha());
+            tarea.setNivel(requestTarea.getNivel());
+            tarea.setNombre(requestTarea.getNombre());
+            tarea.setPrioridad(requestTarea.getPrioridad());
+            tarea.setRecordatorio(requestTarea.getRecordatorio());
+            this.tareaRepository.save(tarea);
+            return "Saved";
+        }
+        return "User not found";
     }
 
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
     @DeleteMapping(path="/tasks/deleteTask/{id}")
-    public void deleteTarea(@RequestParam Integer id) {
+    //@RequestParam
+    public void deleteTarea(@PathVariable Integer id) {
         this.tareaRepository.deleteById(id);
     }
 }
