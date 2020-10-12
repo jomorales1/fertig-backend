@@ -2,27 +2,23 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.UsuarioRepository;
-import com.fertigApp.backend.requestModels.RequestUsuario;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-
-import java.rmi.server.ExportException;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import java.util.Collections;
-import java.util.List;
 
 /*
  * Clase responsable de manejar request de tipo POST con el fin de verificar
  * el token provisionado por el servidor de autenticación de Google.
  * */
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class GoogleController {
 

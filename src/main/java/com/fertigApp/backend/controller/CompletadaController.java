@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 * Clase responsable de manejar request de tipo GET, POST y DELETE para
 * la entidad "Completada".
 * */
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class CompletadaController {
 

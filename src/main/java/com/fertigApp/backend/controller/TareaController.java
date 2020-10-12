@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * */
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class TareaController {
 
@@ -32,6 +32,7 @@ public class TareaController {
     public @ResponseBody Iterable<Tarea> getAllTareas() {
         return this.tareaRepository.findAll();
     }
+
 
     // Método GET para obtener todas las tareas de un usuario específico.
     @GetMapping(path="/tasks/getTasks")
