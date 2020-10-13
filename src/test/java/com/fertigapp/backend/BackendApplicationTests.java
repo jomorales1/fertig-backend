@@ -11,7 +11,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
 @ExtendWith(SpringExtension.class)
-@SpringBootConfiguration
 @SpringBootTest
 class BackendApplicationTests {
     public static void main(String[] args) {

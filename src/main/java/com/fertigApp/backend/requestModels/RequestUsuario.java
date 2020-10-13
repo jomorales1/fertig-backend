@@ -12,6 +12,8 @@ public class RequestUsuario implements Serializable {
 
 	private String password;
 
+	public RequestUsuario() { };
+
 	public RequestUsuario(String correo, String nombre, String usuario, String password) {
 		this.correo = correo;
 		this.nombre = nombre;
