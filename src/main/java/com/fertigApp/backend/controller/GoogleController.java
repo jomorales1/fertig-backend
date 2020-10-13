@@ -11,6 +11,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import java.util.Collections;
  * Clase responsable de manejar request de tipo POST con el fin de verificar
  * el token provisionado por el servidor de autenticación de Google.
  * */
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class GoogleController {
 

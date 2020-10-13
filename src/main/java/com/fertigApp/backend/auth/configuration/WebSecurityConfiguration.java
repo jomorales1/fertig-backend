@@ -1,6 +1,8 @@
 package com.fertigApp.backend.auth.configuration;
 
-import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.auth.jwt.AuthEntryPointJwt;
+import com.fertigApp.backend.auth.jwt.AuthTokenFilter;
+import com.fertigApp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -8,68 +10,81 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.provisioning.UserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-//    @Autowired
-//    UsuarioRepository usuarioRepository;
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    UserDetailsServiceImpl userDetailsService;
 
-    private UserDetailsManager userDetailsManager;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
-    //Modificación del userDetailsManager.
+
     @Bean
-    public UserDetailsManager userDetailsManager(UsuarioRepository usuarioRepository) {
-        userDetailsManager = new InMemoryUserDetailsManager(); //Creamos un nuevo InMemoryUserDetailsManager
-
-        //Itermaos sobre los usuarios en el repositorio y los agregamos al userDetailsManager
-        for (Usuario usuario: usuarioRepository.findAll() ){
-            UserDetails user = User.builder().username(usuario.getUsuario()).password(usuario.getPassword()).
-                    roles("USER").build();
-            userDetailsManager.createUser(user);
-        }
-
-        //Retorno del nuevo userDetailsManager
-        return userDetailsManager;
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
     }
 
-    //Esta función llama a la anterior.
+    //URL's de los recursos públicos (no requieren Token)
+    private static final String[] publicResources = new String[]
+            {
+                    "/oauth/token",
+                    "/oauth/authorize**",
+                    "/users/addUser",
+                    "/signin"
+            };
+    //configuración de seguridad del servidor
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        //habilita cors y dehabilita la verificación de csrf
+        http.cors().and().csrf().disable()
+                //delega el manejo de solicitudes no autorizadas a nuestra clase authEntryPointJwt
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                //configuración para que todas las sesiónes sean stateless
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                //autorizar a cualquiera para acceder a los recursos publicos
+                .authorizeRequests().antMatchers(publicResources).permitAll()
+                //pedir autenticación en cualquier otro recurso
+                .anyRequest().authenticated();
+        //añadir filtro para la validación de tokens
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    //Bean del passwordEncoder utilizado en las demas clases.
     @Bean
-    @Override
-    public UserDetailsService userDetailsService() {
-        return userDetailsManager;
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
+    //configuración para usar nuestra implementacion de userDetailsService con nuestro passwordEncoder
+    //en vez de la usada por defecto
     @Override
-    protected void configure( AuthenticationManagerBuilder builder ) throws Exception{
-        builder.userDetailsService( userDetailsService( ) ).passwordEncoder(passwordEncoder);
+    public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
-
+    //configuración para permitir siempre solicitudes tipo OPTIONS
     @Override
     public void configure(final WebSecurity web) {
         web.ignoring().antMatchers(HttpMethod.OPTIONS);
     }
-
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
-
-        http.csrf().disable(); //Desahibilitación de csfr por ser innecesario.
-    }
-
+    //bean del autenticationManager para usar en otras clases
     @Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

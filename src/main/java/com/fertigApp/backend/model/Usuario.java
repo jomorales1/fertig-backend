@@ -40,6 +40,15 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioR")
 	private List<Rutina> rutinas;
 
+	public Usuario() { }
+
+	public Usuario(String usuario, String correo, String password, String nombre) {
+		this.usuario = usuario;
+		this.correo = correo;
+		this.nombre = nombre;
+		this.password = password;
+	}
+
 	public String getCorreo() {
 		return correo;
 	}
