@@ -47,7 +47,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     "/oauth/token",
                     "/oauth/authorize**",
                     "/users/addUser",
-                    "/signin"
+                    "/signin",
+                    "/login/oauth2/code/google"
             };
     //configuración de seguridad del servidor
     @Override
