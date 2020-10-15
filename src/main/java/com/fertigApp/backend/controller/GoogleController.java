@@ -1,7 +1,11 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.auth.jwt.JwtUtil;
+import com.fertigApp.backend.auth.services.UserDetailsImpl;
+import com.fertigApp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.JwtResponse;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -11,11 +15,21 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.jaas.JaasAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /*
  * Clase responsable de manejar request de tipo POST con el fin de verificar
@@ -34,36 +48,97 @@ public class GoogleController {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
     // Método POST para la verificación del token obtenido de la API de autenticación de Google.
     @PostMapping(path="/login/oauth2/code/google")
-    public String GoogleAuthentication(@RequestParam String Token){
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
+    public ResponseEntity<?> GoogleAuthentication(@RequestParam String Token){
+
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
+                .Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(clienId)).build();
+
         try {
             GoogleIdToken googleToken = verifier.verify(Token);
+
             if(googleToken != null){
                 Payload payLoad = googleToken.getPayload();
-
                 String googleEmail = payLoad.getEmail();
+
                 if(usuarioRepository.existsByCorreo(googleEmail)){
                     Usuario user = usuarioRepository.findByCorreo(googleEmail);
 
                     if(user.isGoogle()){
-                        return "Verificación exitosa";
+                        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsuario());
+                        //se autentica al usuario ante spring para acceder a los recursos
+                        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        String nToken = jwtUtil.generateJwtToken(authentication);
+
+                        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                        List<String> roles = userDetails.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList());
+
+                        return ResponseEntity.ok(new JwtResponse(nToken,
+                                userDetails.getUsername(),
+                                user.getCorreo(),
+                                roles));
                     } else {
-                        return "Cuenta usada por otra persona sin estar vinculada con Google :/";
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cuenta usada por otra persona sin estar vinculada con Google :/");
                     }
                 } else {
-                    return "No hay ninguna cuenta con ese correo";
+                    Usuario user = new Usuario();
+                    user.setCorreo(googleEmail);
+                    user.setNombre(payLoad.get("name").toString());
+                    user.setPassword(new String(""));
+                    user.setFacebook(false);
+                    user.setGoogle(true);
+
+                    String userName = googleEmail.substring(0, googleEmail.indexOf("@"));
+                    String comparator = userName;
+                    while(usuarioRepository.existsById(comparator)){
+                        comparator = userName;
+                        comparator += String.valueOf((int)(Math.random()));
+                    }
+                    userName = comparator;
+                    user.setUsuario(userName);
+
+                    usuarioRepository.save(user);
+
+                    UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsuario());
+                    //se autentica al usuario ante spring para acceder a los recursos
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    String nToken = jwtUtil.generateJwtToken(authentication);
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                    List<String> roles = userDetails.getAuthorities().stream()
+                            .map(GrantedAuthority::getAuthority)
+                            .collect(Collectors.toList());
+
+                    return ResponseEntity.ok(new JwtResponse(nToken,
+                            userDetails.getUsername(),
+                            user.getCorreo(),
+                            roles));
                 }
             } else {
                 LOGGER.info("Error de token de google");
-                return "Error con el token de google";
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error con el token de google");
             }
         } catch(Exception ex){
             ex.printStackTrace();
             LOGGER.info(ex.getMessage());
-            return "Error verificando el token de google";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error verificando el token de google");
         }
     }
 }
