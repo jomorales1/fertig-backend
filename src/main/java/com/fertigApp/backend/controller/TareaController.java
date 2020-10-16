@@ -1,31 +1,40 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.repository.TareaRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestTarea;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
  * la entidad "Tarea".
  * */
-import java.util.logging.Level;
-import java.util.logging.Logger;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class TareaController {
 
+    private static final org.slf4j.Logger LOGGER= LoggerFactory.getLogger(Completada.class);
+
     // Repositorio responsable del manejo de la tabla "tarea" en la DB.
-    @Autowired
-    private TareaRepository tareaRepository;
+    private final TareaRepository tareaRepository;
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    public TareaController(TareaRepository tareaRepository, UsuarioRepository usuarioRepository) {
+        this.tareaRepository = tareaRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
     @GetMapping(path="/tasks")
@@ -52,22 +61,39 @@ public class TareaController {
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
-    public Tarea replaceTarea(@PathVariable Integer id, @RequestBody Tarea task) {
+    public Tarea replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
         return this.tareaRepository.findById(id)
                 .map(tarea -> {
-                    tarea = task;
+                    if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
+                        LOGGER.info("User not found");
+                        return null;
+                    }
+                    tarea.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
+                    tarea.setNombre(task.getNombre());
+                    tarea.setDescripcion(task.getDescripcion());
+                    tarea.setPrioridad(task.getPrioridad());
+                    tarea.setEtiqueta(task.getEtiqueta());
+                    tarea.setEstimacion(task.getEstimacion());
+                    tarea.setFechaInicio(task.getFechaInicio());
+                    tarea.setFechaFin(task.getFechaFin());
+                    tarea.setNivel(task.getNivel());
+                    tarea.setHecha(task.getHecha());
                     this.tareaRepository.save(tarea);
+                    LOGGER.info("Task updated");
                     return tarea;
                 })
                 .orElseGet(() -> {
-                    this.tareaRepository.save(task);
-                    return task;
+                    LOGGER.info("Task not found");
+                    return null;
                 });
     }
 
     // Método POST para agregar un registro en la tabla "tarea" de la DB.
     @PostMapping(path="/tasks/addTask")
-    public @ResponseBody String addNewTarea(@RequestBody RequestTarea requestTarea) {
+    public @ResponseBody ResponseEntity<Void> addNewTarea(@RequestBody RequestTarea requestTarea) {
         Tarea tarea= new Tarea();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
@@ -85,9 +111,9 @@ public class TareaController {
             tarea.setPrioridad(requestTarea.getPrioridad());
             tarea.setRecordatorio(requestTarea.getRecordatorio());
             this.tareaRepository.save(tarea);
-            return "Saved";
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
-        return "User not found";
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.

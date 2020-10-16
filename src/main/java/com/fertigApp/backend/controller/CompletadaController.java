@@ -7,7 +7,6 @@ import com.fertigApp.backend.repository.RutinaRepository;
 import com.fertigApp.backend.requestModels.RequestCompletada;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,12 +24,15 @@ public class CompletadaController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "completada" en la DB.
-    @Autowired
-    private CompletadaRepository completadaRepository;
+    private final CompletadaRepository completadaRepository;
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
-    @Autowired
-    private RutinaRepository rutinaRepository;
+    private final RutinaRepository rutinaRepository;
+
+    public CompletadaController(CompletadaRepository completadaRepository, RutinaRepository rutinaRepository) {
+        this.completadaRepository = completadaRepository;
+        this.rutinaRepository = rutinaRepository;
+    }
 
     // Método GET para obtener del servidor una lista de actividades completadas
     // que están relacionadas con una rutina específica.

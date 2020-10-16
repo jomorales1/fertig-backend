@@ -1,6 +1,7 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.Completada;
+import com.fertigApp.backend.model.Usuario;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -8,7 +9,7 @@ import java.util.List;
 
 public class RequestRutina implements Serializable {
 
-    private String usuario;
+    private Usuario usuarioR;
 
     private String nombre;
 
@@ -30,12 +31,12 @@ public class RequestRutina implements Serializable {
 
     private List<Completada> completadas;
 
-    public String getUsuario() {
-        return usuario;
+    public Usuario getUsuarioR() {
+        return usuarioR;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setUsuarioR(Usuario usuarioR) {
+        this.usuarioR = usuarioR;
     }
 
     public String getNombre() {
@@ -108,5 +109,13 @@ public class RequestRutina implements Serializable {
 
     public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
+    }
+
+    public List<Completada> getCompletadas() {
+        return completadas;
+    }
+
+    public void setCompletadas(List<Completada> completadas) {
+        this.completadas = completadas;
     }
 }

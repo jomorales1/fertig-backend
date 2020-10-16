@@ -7,12 +7,13 @@ import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.logging.Level;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -25,12 +26,15 @@ public class EventoController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "evento" en la DB.
-    @Autowired
-    private EventoRepository eventoRepository;
+    private final EventoRepository eventoRepository;
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+
+    public EventoController(EventoRepository eventoRepository, UsuarioRepository usuarioRepository) {
+        this.eventoRepository = eventoRepository;
+        this.usuarioRepository = usuarioRepository;
+    }
 
     // Método GET para obtener del servidor una lista de todos los eventos
     // en la DB.
@@ -72,40 +76,59 @@ public class EventoController {
 
     // Método PUT para actualizar un evento específico.
     @PutMapping(path="/events/updateEvent/{id}")
-    public Evento replaceEvento(@PathVariable Integer id, @RequestBody Evento event) {
+    public Evento replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
         return this.eventoRepository.findById(id)
                 .map(evento -> {
-                    evento = event;
+                    if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
+                        LOGGER.info("User not found");
+                        return null;
+                    }
+                    evento.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
+                    evento.setNombre(event.getNombre());
+                    evento.setDescripcion(event.getDescripcion());
+                    evento.setPrioridad(event.getPrioridad());
+                    evento.setEtiqueta(event.getEtiqueta());
+                    evento.setEstimacion(event.getEstimacion());
+                    evento.setFechaInicio(event.getFechaInicio());
+                    evento.setFechaFin(event.getFechaFin());
+                    evento.setRecurrencia(event.getRecurrencia());
+                    evento.setRecordatorio(event.getRecordatorio());
                     this.eventoRepository.save(evento);
+                    LOGGER.info("Event updated");
                     return evento;
                 })
                 .orElseGet(() -> {
-                    this.eventoRepository.save(event);
-                    return event;
+                    LOGGER.info("Event not found");
+                    return null;
                 });
     }
 
     // Método POST para agregar un evento a la DB.
     @PostMapping(path="/events/addEvent")
     public @ResponseBody ResponseEntity<Void> addNewEvento(@RequestBody RequestEvento requestEvento) {
-        // Missing check information process
         Evento evento = new Evento();
-        if (usuarioRepository.findById(requestEvento.getUsuario()).isEmpty())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        evento.setUsuario(usuarioRepository.findById(requestEvento.getUsuario()).get());
-        evento.setNombre(requestEvento.getNombre());
-        evento.setDescripcion(requestEvento.getDescripcion());
-        evento.setPrioridad(requestEvento.getPrioridad());
-        evento.setEtiqueta(requestEvento.getEtiqueta());
-        if (requestEvento.getEstimacion() != null)
-            evento.setEstimacion(requestEvento.getEstimacion());
-        evento.setFechaInicio(requestEvento.getFechaInicio());
-        evento.setFechaFin(requestEvento.getFechaFin());
-        evento.setRecurrencia(requestEvento.getRecurrencia());
-        if (requestEvento.getRecordatorio() != null)
-            evento.setRecordatorio(requestEvento.getRecordatorio());
-        this.eventoRepository.save(evento);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
+        if (usuarioRepository.findById(userDetails.getUsername()).isPresent()){
+            evento.setNombre(requestEvento.getNombre());
+            evento.setDescripcion(requestEvento.getDescripcion());
+            evento.setPrioridad(requestEvento.getPrioridad());
+            evento.setEtiqueta(requestEvento.getEtiqueta());
+            if (requestEvento.getEstimacion() != null)
+                evento.setEstimacion(requestEvento.getEstimacion());
+            evento.setFechaInicio(requestEvento.getFechaInicio());
+            evento.setFechaFin(requestEvento.getFechaFin());
+            evento.setRecurrencia(requestEvento.getRecurrencia());
+            if (requestEvento.getRecordatorio() != null)
+                evento.setRecordatorio(requestEvento.getRecordatorio());
+            this.eventoRepository.save(evento);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     // Método DELETE para borrar un registro de la tabla "evento" en la DB.

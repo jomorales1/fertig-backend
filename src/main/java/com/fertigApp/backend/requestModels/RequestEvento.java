@@ -1,11 +1,13 @@
 package com.fertigApp.backend.requestModels;
 
+import com.fertigApp.backend.model.Usuario;
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class RequestEvento implements Serializable {
 
-    private String usuario;
+    private Usuario usuarioE;
     private String nombre;
     private String descripcion;
     private Integer prioridad;
@@ -16,12 +18,12 @@ public class RequestEvento implements Serializable {
     private String recurrencia;
     private Integer recordatorio;
 
-    public String getUsuario() {
-        return usuario;
+    public Usuario getUsuarioE() {
+        return usuarioE;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public void setUsuarioE(Usuario usuarioE) {
+        this.usuarioE = usuarioE;
     }
 
     public String getNombre() {
