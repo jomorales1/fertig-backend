@@ -28,7 +28,7 @@ public class RequestTarea {
 
         private int nivel;
 
-        private int hecha;
+        private boolean hecha;
 
         @JsonInclude(JsonInclude.Include.NON_NULL)
         private Integer recordatorio ;
@@ -113,11 +113,11 @@ public class RequestTarea {
             this.nivel = nivel;
         }
 
-        public int getHecha() {
+        public boolean getHecha() {
             return hecha;
         }
 
-        public void setHecha(int hecha) {
+        public void setHecha(boolean hecha) {
             this.hecha = hecha;
         }
 

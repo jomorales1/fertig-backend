@@ -1,10 +1,13 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.auth.services.UserDetailsImpl;
 import com.fertigApp.backend.model.Tarea;
+import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.repository.TareaRepository;
 import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -64,6 +67,25 @@ public class TareaController {
                     return task;
                 });
     }
+    @PutMapping(path="/tasks/checkTask/{id}")
+    public ResponseEntity<?> checkTarea(@PathVariable Integer id) {
+        try{
+            Tarea tarea = this.tareaRepository.findById(id).orElseThrow(Exception::new);
+            UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (tarea.getUsuarioT().getCorreo().equals(principal.getEmail())){
+                tarea.setHecha(!tarea.getHecha());
+                this.tareaRepository.save(tarea);
+                return ResponseEntity.ok().body(null);
+            }
+            return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea pertieneciente a otro usuario"));
+
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea inexistente"));
+        }
+
+
+
+    }
 
     // Método POST para agregar un registro en la tabla "tarea" de la DB.
     @PostMapping(path="/tasks/addTask")
@@ -78,7 +100,7 @@ public class TareaController {
             tarea.setEstimacion(requestTarea.getEstimacion());
             tarea.setEtiqueta(requestTarea.getEtiqueta());
             tarea.setFechaFin(requestTarea.getFechaFin());
-            tarea.setFechaInicio(requestTarea.getFechaFin());
+            tarea.setFechaInicio(requestTarea.getFechaInicio());
             tarea.setHecha(requestTarea.getHecha());
             tarea.setNivel(requestTarea.getNivel());
             tarea.setNombre(requestTarea.getNombre());
