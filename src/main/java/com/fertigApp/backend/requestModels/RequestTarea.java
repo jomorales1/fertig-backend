@@ -45,7 +45,7 @@ public class RequestTarea {
             return usuarioT;
         }
 
-        public void setUsuario(Usuario usuarioT) {
+        public void setUsuarioT(Usuario usuarioT) {
             this.usuarioT = usuarioT;
         }
 

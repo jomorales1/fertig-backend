@@ -1,7 +1,6 @@
 package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.auth.jwt.JwtUtil;
-import com.fertigApp.backend.auth.services.UserDetailsImpl;
 import com.fertigApp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
@@ -14,18 +13,17 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.authentication.jaas.JaasAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,26 +39,29 @@ public class GoogleController {
 
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
-    // Client ID asociada a la api de autenticación de Google.
-    private final String clienId = "756516316743-7fcc8028epqmhnftjeclt9dqo0dk3tls.apps.googleusercontent.com";
-
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
+    final
     AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
+
+    public GoogleController(UsuarioRepository usuarioRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
+        this.usuarioRepository = usuarioRepository;
+        this.jwtUtil = jwtUtil;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+    }
 
     // Método POST para la verificación del token obtenido de la API de autenticación de Google.
     @PostMapping(path="/login/oauth2/code/google")
     public ResponseEntity<?> GoogleAuthentication(@RequestParam String Token){
 
+        // Client ID asociada a la api de autenticación de Google.
+        String clienId = "756516316743-7fcc8028epqmhnftjeclt9dqo0dk3tls.apps.googleusercontent.com";
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier
                 .Builder(new NetHttpTransport(), JacksonFactory.getDefaultInstance())
                 .setAudience(Collections.singletonList(clienId)).build();
@@ -99,7 +100,7 @@ public class GoogleController {
                     Usuario user = new Usuario();
                     user.setCorreo(googleEmail);
                     user.setNombre(payLoad.get("name").toString());
-                    user.setPassword(new String(""));
+                    user.setPassword("");
                     user.setFacebook(false);
                     user.setGoogle(true);
 
