@@ -2,9 +2,9 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
-import com.fertigApp.backend.repository.RutinaRepository;
-import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.services.RutinaService;
+import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,21 +26,21 @@ public class RutinaController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
-    private final RutinaRepository rutinaRepository;
+    private final RutinaService rutinaService;
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public RutinaController(RutinaRepository rutinaRepository, UsuarioRepository usuarioRepository) {
-        this.rutinaRepository = rutinaRepository;
-        this.usuarioRepository = usuarioRepository;
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService) {
+        this.rutinaService = rutinaService;
+        this.usuarioService = usuarioService;
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
     @GetMapping(path="/routines")
     public @ResponseBody
     Iterable<Rutina> getAllRutinas() {
-        return this.rutinaRepository.findAll();
+        return this.rutinaService.findAll();
     }
 
     // Método GET para obtener todas las rutinas de un usuario específico.
@@ -48,8 +48,8 @@ public class RutinaController {
     public Iterable<Rutina> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioRepository.findById(userDetails.getUsername()).isPresent()){
-            return usuarioRepository.findById(userDetails.getUsername()).get().getRutinas();
+        if(usuarioService.findById(userDetails.getUsername()).isPresent()){
+            return usuarioService.findById(userDetails.getUsername()).get().getRutinas();
         }
         LOGGER.info("User not found");
         return null;
@@ -62,9 +62,9 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
-        if(rutinaRepository.findById(id).isPresent()){
-            if(rutinaRepository.findById(id).get().getUsuario().getUsuario().equals(user))
-                return rutinaRepository.findById(id).get();
+        if(rutinaService.findById(id).isPresent()){
+            if(rutinaService.findById(id).get().getUsuario().getUsuario().equals(user))
+                return rutinaService.findById(id).get();
             LOGGER.info("Wrong user");
             return null;
         }
@@ -79,13 +79,13 @@ public class RutinaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.rutinaRepository.findById(id)
+        return this.rutinaService.findById(id)
                 .map(rutina -> {
-                    if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
+                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
                         return null;
                     }
-                    rutina.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
+                    rutina.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
                     rutina.setNombre(routine.getNombre());
                     rutina.setDescripcion(routine.getDescripcion());
                     rutina.setPrioridad(routine.getPrioridad());
@@ -96,7 +96,7 @@ public class RutinaController {
                     rutina.setRecurrencia(routine.getRecurrencia());
                     rutina.setRecordatorio(routine.getRecordatorio());
                     rutina.setCompletadas(routine.getCompletadas());
-                    this.rutinaRepository.save(rutina);
+                    this.rutinaService.save(rutina);
                     LOGGER.info("Routine replaced");
                     return rutina;
                 })
@@ -114,8 +114,8 @@ public class RutinaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if(usuarioRepository.findById(userDetails.getUsername()).isPresent()) {
-            rutina.setUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
+        if(usuarioService.findById(userDetails.getUsername()).isPresent()) {
+            rutina.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
             rutina.setNombre(requestRutina.getNombre());
             rutina.setDescripcion(requestRutina.getDescripcion());
             rutina.setPrioridad(requestRutina.getPrioridad());
@@ -125,7 +125,7 @@ public class RutinaController {
             rutina.setRecurrencia(requestRutina.getRecurrencia());
             if (requestRutina.getRecordatorio() != null)
                 rutina.setRecordatorio(requestRutina.getRecordatorio());
-            this.rutinaRepository.save(rutina);
+            this.rutinaService.save(rutina);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -135,8 +135,8 @@ public class RutinaController {
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<Void> deleteRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (this.rutinaRepository.findById(id).isPresent() && this.rutinaRepository.findById(id).get().getUsuario().getUsuario().equals(userDetails.getUsername())){
-            this.rutinaRepository.deleteById(id);
+        if (this.rutinaService.findById(id).isPresent() && this.rutinaService.findById(id).get().getUsuario().getUsuario().equals(userDetails.getUsername())){
+            this.rutinaService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

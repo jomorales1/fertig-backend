@@ -5,7 +5,7 @@ import com.fertigApp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.JwtResponse;
-import com.fertigApp.backend.repository.UsuarioRepository;
+import com.fertigApp.backend.services.UsuarioService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -40,7 +40,7 @@ public class GoogleController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
     private final JwtUtil jwtUtil;
 
@@ -49,8 +49,8 @@ public class GoogleController {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    public GoogleController(UsuarioRepository usuarioRepository, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
-        this.usuarioRepository = usuarioRepository;
+    public GoogleController(UsuarioService usuarioService, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
+        this.usuarioService = usuarioService;
         this.jwtUtil = jwtUtil;
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
@@ -73,8 +73,8 @@ public class GoogleController {
                 Payload payLoad = googleToken.getPayload();
                 String googleEmail = payLoad.getEmail();
 
-                if(usuarioRepository.existsByCorreo(googleEmail)){
-                    Usuario user = usuarioRepository.findByCorreo(googleEmail);
+                if(usuarioService.existsByCorreo(googleEmail)){
+                    Usuario user = usuarioService.findByCorreo(googleEmail);
 
                     if(user.isGoogle()){
                         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsuario());
@@ -106,14 +106,14 @@ public class GoogleController {
 
                     String userName = googleEmail.substring(0, googleEmail.indexOf("@"));
                     String comparator = userName;
-                    while(usuarioRepository.existsById(comparator)){
+                    while(usuarioService.existsById(comparator)){
                         comparator = userName;
                         comparator += String.valueOf((int)(Math.random()));
                     }
                     userName = comparator;
                     user.setUsuario(userName);
 
-                    usuarioRepository.save(user);
+                    usuarioService.save(user);
 
                     UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsuario());
                     //se autentica al usuario ante spring para acceder a los recursos

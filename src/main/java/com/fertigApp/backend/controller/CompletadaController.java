@@ -2,9 +2,9 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
-import com.fertigApp.backend.repository.CompletadaRepository;
-import com.fertigApp.backend.repository.RutinaRepository;
 import com.fertigApp.backend.requestModels.RequestCompletada;
+import com.fertigApp.backend.services.CompletadaService;
+import com.fertigApp.backend.services.RutinaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -24,14 +24,14 @@ public class CompletadaController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "completada" en la DB.
-    private final CompletadaRepository completadaRepository;
+    private final CompletadaService completadaService;
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
-    private final RutinaRepository rutinaRepository;
+    private final RutinaService rutinaService;
 
-    public CompletadaController(CompletadaRepository completadaRepository, RutinaRepository rutinaRepository) {
-        this.completadaRepository = completadaRepository;
-        this.rutinaRepository = rutinaRepository;
+    public CompletadaController(CompletadaService completadaService, RutinaService rutinaService) {
+        this.completadaService = completadaService;
+        this.rutinaService = rutinaService;
     }
 
     // Método GET para obtener del servidor una lista de actividades completadas
@@ -41,8 +41,8 @@ public class CompletadaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
-        if(rutinaRepository.findById(id).isPresent()){
-            Rutina rutina = rutinaRepository.findById(id).get();
+        if(rutinaService.findById(id).isPresent()){
+            Rutina rutina = rutinaService.findById(id).get();
             if (rutina.getUsuario().getUsuario().equals(user)) {
                 LOGGER.info("Invalid data");
                 return null;
@@ -55,8 +55,8 @@ public class CompletadaController {
     // Método GET para obtener una entidad "completada" por medio de su id.
     @GetMapping(path="/completed/getOneCompleted/{id}")
     public Completada getCompleted(@PathVariable Integer id) {
-        if(completadaRepository.findById(id).isPresent())
-            return completadaRepository.findById(id).get();
+        if(completadaService.findById(id).isPresent())
+            return completadaService.findById(id).get();
         else{
             LOGGER.info("Completed not found");
             return null;
@@ -69,13 +69,13 @@ public class CompletadaController {
     ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
         // Missing check information process
         Completada completada = new Completada();
-        if (rutinaRepository.findById(requestCompletada.getRutina()).isEmpty())
+        if (rutinaService.findById(requestCompletada.getRutina()).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        completada.setRutina(rutinaRepository.findById(requestCompletada.getRutina()).get());
+        completada.setRutina(rutinaService.findById(requestCompletada.getRutina()).get());
         completada.setFecha(requestCompletada.getFecha());
-        rutinaRepository.findById(requestCompletada.getRutina()).get().getCompletadas().add(completada);
-        this.completadaRepository.save(completada);
-        this.rutinaRepository.save(rutinaRepository.findById(requestCompletada.getRutina()).get());
+        rutinaService.findById(requestCompletada.getRutina()).get().getCompletadas().add(completada);
+        this.completadaService.save(completada);
+        this.rutinaService.save(rutinaService.findById(requestCompletada.getRutina()).get());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

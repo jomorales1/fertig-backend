@@ -2,9 +2,9 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
-import com.fertigApp.backend.repository.EventoRepository;
-import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestEvento;
+import com.fertigApp.backend.services.EventoService;
+import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -26,29 +26,29 @@ public class EventoController {
     private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
 
     // Repositorio responsable del manejo de la tabla "evento" en la DB.
-    private final EventoRepository eventoRepository;
+    private final EventoService eventoService;
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public EventoController(EventoRepository eventoRepository, UsuarioRepository usuarioRepository) {
-        this.eventoRepository = eventoRepository;
-        this.usuarioRepository = usuarioRepository;
+    public EventoController(EventoService eventoService, UsuarioService usuarioService) {
+        this.eventoService = eventoService;
+        this.usuarioService = usuarioService;
     }
 
     // Método GET para obtener del servidor una lista de todos los eventos
     // en la DB.
     @GetMapping(path="/events")
     public @ResponseBody Iterable<Evento> getAllEventos() {
-        return this.eventoRepository.findAll();
+        return this.eventoService.findAll();
     }
 
     // Método GET para obtener la lista de eventos de un usuario determinado.
     @GetMapping(path="/events/getEvents")
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (usuarioRepository.findById(userDetails.getUsername()).isPresent())
-            return usuarioRepository.findById(userDetails.getUsername()).get().getEventos();
+        if (usuarioService.findById(userDetails.getUsername()).isPresent())
+            return usuarioService.findById(userDetails.getUsername()).get().getEventos();
         else{
             LOGGER.info("User not found");
             return null;
@@ -61,13 +61,13 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
-        if (this.eventoRepository.findById(id).isPresent()){
-            Evento evento = this.eventoRepository.findById(id).get();
+        if (this.eventoService.findById(id).isPresent()){
+            Evento evento = this.eventoService.findById(id).get();
             if (evento.getUsuario().getUsuario().equals(user)) {
                 System.out.println("Wrong user");
                 return null;
             }
-            return this.eventoRepository.findById(id).get();
+            return this.eventoService.findById(id).get();
         }
         LOGGER.info("Event not found");
         return null;
@@ -80,13 +80,13 @@ public class EventoController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.eventoRepository.findById(id)
+        return this.eventoService.findById(id)
                 .map(evento -> {
-                    if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
+                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
                         return null;
                     }
-                    evento.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
+                    evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
                     evento.setNombre(event.getNombre());
                     evento.setDescripcion(event.getDescripcion());
                     evento.setPrioridad(event.getPrioridad());
@@ -96,7 +96,7 @@ public class EventoController {
                     evento.setFechaFin(event.getFechaFin());
                     evento.setRecurrencia(event.getRecurrencia());
                     evento.setRecordatorio(event.getRecordatorio());
-                    this.eventoRepository.save(evento);
+                    this.eventoService.save(evento);
                     LOGGER.info("Event updated");
                     return evento;
                 })
@@ -113,7 +113,7 @@ public class EventoController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if (usuarioRepository.findById(userDetails.getUsername()).isPresent()){
+        if (usuarioService.findById(userDetails.getUsername()).isPresent()){
             evento.setNombre(requestEvento.getNombre());
             evento.setDescripcion(requestEvento.getDescripcion());
             evento.setPrioridad(requestEvento.getPrioridad());
@@ -125,7 +125,7 @@ public class EventoController {
             evento.setRecurrencia(requestEvento.getRecurrencia());
             if (requestEvento.getRecordatorio() != null)
                 evento.setRecordatorio(requestEvento.getRecordatorio());
-            this.eventoRepository.save(evento);
+            this.eventoService.save(evento);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -135,11 +135,11 @@ public class EventoController {
     @DeleteMapping(path="/events/deleteEvent/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(this.eventoRepository.findById(id).isPresent()){
-            Evento evento = this.eventoRepository.findById(id).get();
+        if(this.eventoService.findById(id).isPresent()){
+            Evento evento = this.eventoService.findById(id).get();
             if (! evento.getUsuario().getUsuario().equals(userDetails.getUsername()))
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            this.eventoRepository.deleteById(id);
+            this.eventoService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
