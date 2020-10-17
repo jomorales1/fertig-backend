@@ -48,12 +48,14 @@ public class FacebookController {
     @PostMapping(path="/login/oauth2/code/facebook")
     public ResponseEntity<?>  facebook(@RequestParam String Token) {
         Facebook facebook = new FacebookTemplate(Token);
-        final String[] fields = {"email", "picture", "name"};
+        final String[] fields = {"email", "name"};
         User facebookUser = facebook.fetchObject("me", User.class, fields);
-        System.out.println(facebookUser.getEmail());
-        System.out.println(facebookUser.getName());
 
         String facebookEmail = facebookUser.getEmail();
+        if(facebookEmail == null) {
+            facebookEmail = facebookUser.getId() + "@facebook.com";
+        }
+
         if (usuarioRepository.existsByCorreo(facebookEmail)) {
             Usuario user = usuarioRepository.findByCorreo(facebookEmail);
 
@@ -88,7 +90,12 @@ public class FacebookController {
             user.setFacebook(true);
             user.setGoogle(false);
 
-            String userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
+            String userName;
+            if(facebookEmail.contains("@facebook.com")){
+                userName = facebookUser.getName().replaceAll(" ", "");
+            } else {
+                userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
+            }
             String comparator = userName;
             while (usuarioRepository.existsById(comparator)) {
                 comparator = userName;
