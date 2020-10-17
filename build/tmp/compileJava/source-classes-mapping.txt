@@ -24,8 +24,8 @@ com/fertigApp/backend/auth/jwt/AuthEntryPointJwt.java
  com.fertigApp.backend.auth.jwt.AuthEntryPointJwt
 com/fertigApp/backend/repository/EventoRepository.java
  com.fertigApp.backend.repository.EventoRepository
-com/fertigApp/backend/requestModels/RequestTarea.java
- com.fertigApp.backend.requestModels.RequestTarea
+com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
+ com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
 com/fertigApp/backend/auth/services/UserDetailsServiceImpl.java
  com.fertigApp.backend.auth.services.UserDetailsServiceImpl
 com/fertigApp/backend/requestModels/RequestEvento.java
@@ -50,8 +50,10 @@ com/fertigApp/backend/auth/jwt/AuthTokenFilter.java
  com.fertigApp.backend.auth.jwt.AuthTokenFilter
 com/fertigApp/backend/requestModels/RequestCompletada.java
  com.fertigApp.backend.requestModels.RequestCompletada
-com/fertigApp/backend/auth/configuration/WebSecurityConfiguration.java
- com.fertigApp.backend.auth.configuration.WebSecurityConfiguration
+com/fertigApp/backend/controller/GoogleController.java
+ com.fertigApp.backend.controller.GoogleController
+com/fertigApp/backend/requestModels/RequestTarea.java
+ com.fertigApp.backend.requestModels.RequestTarea
 com/fertigApp/backend/payload/response/MessageResponse.java
  com.fertigApp.backend.payload.response.MessageResponse
 com/fertigApp/backend/controller/UsuarioController.java
@@ -60,5 +62,5 @@ com/fertigApp/backend/controller/RutinaController.java
  com.fertigApp.backend.controller.RutinaController
 com/fertigApp/backend/repository/TareaRepository.java
  com.fertigApp.backend.repository.TareaRepository
-com/fertigApp/backend/controller/GoogleController.java
- com.fertigApp.backend.controller.GoogleController
+com/fertigApp/backend/controller/FacebookController.java
+ com.fertigApp.backend.controller.FacebookController
