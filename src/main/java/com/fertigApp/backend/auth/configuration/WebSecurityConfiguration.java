@@ -48,7 +48,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     "/oauth/authorize**",
                     "/users/addUser",
                     "/signin",
-                    "/login/oauth2/code/google"
+                    "/login/oauth2/code/google",
+                    "/login/oauth2/code/facebook"
             };
     //configuración de seguridad del servidor
     @Override
