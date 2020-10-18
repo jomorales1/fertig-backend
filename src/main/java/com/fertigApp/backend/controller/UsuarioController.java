@@ -90,7 +90,8 @@ public class UsuarioController {
     public ResponseEntity<?> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioService.existsByCorreo(requestUsuario.getCorreo())){
+        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) &&
+            !usuarioService.findById(userDetails.getUsername()).get().getCorreo().equals(requestUsuario.getCorreo())){
             return ResponseEntity.badRequest().body(null);
         }
         Usuario user = new Usuario();
@@ -131,14 +132,14 @@ public class UsuarioController {
     }
 
     // Método DELETE para eliminar un registro de tipo "usuario" en la DB.
-    @DeleteMapping(path="/users/delete/")
-    public boolean deleteUsuario() {
+    @DeleteMapping(path="/users/delete")
+    public ResponseEntity<Void> deleteUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         try{
             usuarioService.deleteById(userDetails.getUsername());
-            return true;
+            return new ResponseEntity<>(HttpStatus.ACCEPTED);
         } catch(org.springframework.dao.EmptyResultDataAccessException ex){
-            return false;
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 }
