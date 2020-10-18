@@ -78,8 +78,7 @@ public class RutinaControllerTests {
         routine.setRecurrencia("codification");
         routine.setRecordatorio(60);
 
-        rutinaService.save(routine);
-        return routine;
+        return rutinaService.save(routine);
     }
 
     public String getToken(Usuario user) throws Exception {
@@ -118,7 +117,10 @@ public class RutinaControllerTests {
 //
 //        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
 //        for(int i=0; i<5; i++)
-//            rutinas.add((rutinaService.findById(40+i).isEmpty()) ? setUpRutina(40+i) : rutinaService.findById(40+i).get());
+//            if (usuarioService.findById("test_user").get().getRutinas() == null || usuarioService.findById("test_user").get().getRutinas().size() < i)
+//                rutinas.add(setUpRutina(user));
+//            else
+//                rutinas.add(user.getRutinas().get(i));
 //        String token = getToken(user);
 //        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
 //        assertThat(resultActions.andExpect(status().isOk()));
@@ -140,10 +142,8 @@ public class RutinaControllerTests {
         Usuario user;
         Rutina rutina;
         user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
-        if (usuarioService.findById("test_user").get().getRutinas() != null)
-            rutina = setUpRutina(user);
-        else
-            rutina = usuarioService.findById("test_user").get().getRutinas().get(0);
+        rutina = setUpRutina(user);
+
         String token = getToken(user);
         ResultActions resultActions = this.mockMvc.perform(get(uri+"/"+rutina.getId()).header("Authorization", "Bearer " + token));
         assertThat(resultActions.andExpect(status().isOk()));
@@ -161,6 +161,6 @@ public class RutinaControllerTests {
         assertEquals(rutinaObtained.getRecordatorio(), rutina.getRecordatorio());
 
         rutinaService.deleteById(rutina.getId());
-//        usuarioService.deleteById("test_user");
+        usuarioService.deleteById("test_user");
     }
 }

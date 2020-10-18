@@ -96,7 +96,7 @@ public class UsuarioControllerTests {
         ResultActions resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(loginRequest)).accept(MediaType.ALL));
         assertThat(resultActions.andExpect(status().isOk()));
-//        this.usuarioService.deleteById(user.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
@@ -128,7 +128,7 @@ public class UsuarioControllerTests {
         assertEquals(userObtained.getUsuario(), user.getUsuario());
         assertEquals(userObtained.getCorreo(), user.getCorreo());
         assertEquals(userObtained.getNombre(), user.getNombre());
-//        this.usuarioService.deleteById(user.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
@@ -155,7 +155,7 @@ public class UsuarioControllerTests {
         assertEquals(userObtained.getUsuario(), requestUsuario.getUsuario());
         assertEquals(userObtained.getCorreo(), requestUsuario.getCorreo());
         assertEquals(userObtained.getNombre(), requestUsuario.getNombre());
-//        this.usuarioService.deleteById(user.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class UsuarioControllerTests {
         ResultActions resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(requestUsuario)));
         assertThat(resultActions.andExpect(status().isCreated()));
-//        this.usuarioService.deleteById(requestUsuario.getUsuario());
+        this.usuarioService.deleteById(requestUsuario.getUsuario());
     }
 
     @Test
