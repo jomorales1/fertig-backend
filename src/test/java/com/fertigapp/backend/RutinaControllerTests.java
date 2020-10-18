@@ -16,11 +16,16 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
 import java.util.Date;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -43,6 +48,9 @@ public class RutinaControllerTests {
 
     private final ObjectMapper objectMapper = mapperBuilder.build();
 
+    private final Date fechaIncio = new Date();
+    private final Date fechaFin = new Date();
+
     public Usuario setUpUsuario() {
         Usuario user = new Usuario();
 
@@ -50,6 +58,7 @@ public class RutinaControllerTests {
         user.setCorreo("test@email.com");
         user.setNombre("Test User");
         user.setPassword(passwordEncoder.encode("testing"));
+        user.setRutinas(new ArrayList<>());
 
         this.usuarioService.save(user);
         return user;
@@ -58,34 +67,14 @@ public class RutinaControllerTests {
     public Rutina setUpRutina(Usuario user) {
         Rutina routine = new Rutina();
 
-        routine.setUsuario(usuarioService.findById(user.getUsuario()).get());
-        routine.setNombre("test_routine");
-        routine.setDescripcion("test_routine_description");
-        routine.setPrioridad(2);
-        routine.setEtiqueta("test_routine_tag");
-        routine.setEstimacion(90);
-        routine.setFechaFin(new Date());
-        routine.setFechaFin(new Date());
-        routine.setRecurrencia("codification");
-        routine.setRecordatorio(60);
-
-        rutinaService.save(routine);
-//        usuarioService.findById("test_user").get().getRutinas().add(routine);
-        return routine;
-    }
-
-    public Rutina setUpRutina(Integer id) {
-        Rutina routine = new Rutina();
-
-        routine.setId(id);
         routine.setUsuario(setUpUsuario());
         routine.setNombre("test_routine");
         routine.setDescripcion("test_routine_description");
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
         routine.setEstimacion(90);
-        routine.setFechaFin(new Date());
-        routine.setFechaFin(new Date());
+        routine.setFechaInicio(this.fechaIncio);
+        routine.setFechaFin(this.fechaFin);
         routine.setRecurrencia("codification");
         routine.setRecordatorio(60);
 
@@ -145,30 +134,33 @@ public class RutinaControllerTests {
 //        assertEquals(rutinasObtained.get(4),rutinas.get(4));
 //    }
 
-//    @Test
-//    public void getRutina() throws Exception {
-//        String uri = "/routines/getRoutine";
-//        Usuario user;
-//        Rutina rutina;
-//        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
-//        rutina = (usuarioService.findById("test_user").get().getRutinas().isEmpty()) ? setUpRutina(user) : usuarioService.findById("test_user").get().getRutinas().get(0);
-//        String token = getToken(user);
-//        ResultActions resultActions = this.mockMvc.perform(get(uri+"/"+rutina.getId()).header("Authorization", "Bearer " + token));
-//        assertThat(resultActions.andExpect(status().isOk()));
-//        MvcResult mvcResult = resultActions.andReturn();
-//        String response = mvcResult.getResponse().getContentAsString();
-//        Rutina rutinaObtained = objectMapper.readValue(response, Rutina.class);
-//        assertEquals(rutinaObtained.getNombre(), rutina.getNombre());
-//        assertEquals(rutinaObtained.getDescripcion(), rutina.getDescripcion());
-//        assertEquals(rutinaObtained.getPrioridad(),rutina.getPrioridad());
-//        assertEquals(rutinaObtained.getEtiqueta(), rutina.getEtiqueta());
-//        assertEquals(rutinaObtained.getEstimacion(), rutina.getEstimacion());
-//        assertEquals(rutinaObtained.getFechaInicio(), rutina.getFechaInicio());
-//        assertEquals(rutinaObtained.getFechaFin(), rutina.getFechaFin());
-//        assertEquals(rutinaObtained.getRecurrencia(), rutina.getRecurrencia());
-//        assertEquals(rutinaObtained.getRecordatorio(), rutina.getRecordatorio());
-//
+    @Test
+    public void getRutina() throws Exception {
+        String uri = "/routines/getRoutine";
+        Usuario user;
+        Rutina rutina;
+        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
+        if (usuarioService.findById("test_user").get().getRutinas() != null)
+            rutina = setUpRutina(user);
+        else
+            rutina = usuarioService.findById("test_user").get().getRutinas().get(0);
+        String token = getToken(user);
+        ResultActions resultActions = this.mockMvc.perform(get(uri+"/"+rutina.getId()).header("Authorization", "Bearer " + token));
+        assertThat(resultActions.andExpect(status().isOk()));
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        Rutina rutinaObtained = objectMapper.readValue(response, Rutina.class);
+        assertEquals(rutinaObtained.getNombre(), rutina.getNombre());
+        assertEquals(rutinaObtained.getDescripcion(), rutina.getDescripcion());
+        assertEquals(rutinaObtained.getPrioridad(),rutina.getPrioridad());
+        assertEquals(rutinaObtained.getEtiqueta(), rutina.getEtiqueta());
+        assertEquals(rutinaObtained.getEstimacion(), rutina.getEstimacion());
+        assertTrue(rutinaObtained.getFechaInicio().compareTo(rutina.getFechaInicio()) < 10);
+        assertTrue(rutinaObtained.getFechaFin().compareTo(rutina.getFechaFin()) < 10);
+        assertEquals(rutinaObtained.getRecurrencia(), rutina.getRecurrencia());
+        assertEquals(rutinaObtained.getRecordatorio(), rutina.getRecordatorio());
+
+        rutinaService.deleteById(rutina.getId());
 //        usuarioService.deleteById("test_user");
-//        rutinaService.deleteById(rutina.getId());
-//    }
+    }
 }
