@@ -75,7 +75,7 @@ public class RutinaController {
 
     // Método PUT para modificar un registro en la base de datos.
     @PutMapping(path="/routines/updateRoutine/{id}")
-    public Rutina replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
+    public ResponseEntity<?> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
@@ -83,7 +83,7 @@ public class RutinaController {
                 .map(rutina -> {
                     if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
-                        return null;
+                        return ResponseEntity.badRequest().body(null);
                     }
                     rutina.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
                     rutina.setNombre(routine.getNombre());
@@ -98,18 +98,17 @@ public class RutinaController {
                     rutina.setCompletadas(routine.getCompletadas());
                     this.rutinaService.save(rutina);
                     LOGGER.info("Routine replaced");
-                    return rutina;
+                    return ResponseEntity.ok().body(rutina);
                 })
                 .orElseGet(() -> {
                     LOGGER.info("Routine not found");
-                    return null;
+                    return ResponseEntity.badRequest().body(null);
                 });
     }
 
     // Método POST para añadir un registro en la tabla "rutina" de la DB.
     @PostMapping(path="/routines/addRoutine")
-    public @ResponseBody
-    ResponseEntity<Void> addNewRutina(@RequestBody RequestRutina requestRutina) {
+    public @ResponseBody ResponseEntity<Void> addNewRutina(@RequestBody RequestRutina requestRutina) {
         Rutina rutina = new Rutina();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());

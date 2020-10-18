@@ -65,8 +65,7 @@ public class CompletadaController {
 
     // Método POST para agregar una entidad "completada" relacionada con cierta rutina.
     @PostMapping(path="/completed/addCompleted/")
-    public @ResponseBody
-    ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
+    public @ResponseBody ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
         // Missing check information process
         Completada completada = new Completada();
         if (rutinaService.findById(requestCompletada.getRutina()).isEmpty())

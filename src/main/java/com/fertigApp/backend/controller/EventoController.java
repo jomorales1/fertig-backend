@@ -76,7 +76,7 @@ public class EventoController {
 
     // Método PUT para actualizar un evento específico.
     @PutMapping(path="/events/updateEvent/{id}")
-    public Evento replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
+    public ResponseEntity<?> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
@@ -84,7 +84,7 @@ public class EventoController {
                 .map(evento -> {
                     if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
-                        return null;
+                        return ResponseEntity.badRequest().body(null);
                     }
                     evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
                     evento.setNombre(event.getNombre());
@@ -98,11 +98,11 @@ public class EventoController {
                     evento.setRecordatorio(event.getRecordatorio());
                     this.eventoService.save(evento);
                     LOGGER.info("Event updated");
-                    return evento;
+                    return ResponseEntity.ok().body(evento);
                 })
                 .orElseGet(() -> {
                     LOGGER.info("Event not found");
-                    return null;
+                    return ResponseEntity.badRequest().body(null);
                 });
     }
 

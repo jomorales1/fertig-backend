@@ -63,7 +63,7 @@ public class TareaController {
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
-    public Tarea replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
+    public ResponseEntity<?> replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
@@ -71,7 +71,7 @@ public class TareaController {
                 .map(tarea -> {
                     if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
-                        return null;
+                        return ResponseEntity.badRequest().body(null);
                     }
                     tarea.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
                     tarea.setNombre(task.getNombre());
@@ -85,11 +85,11 @@ public class TareaController {
                     tarea.setHecha(task.getHecha());
                     this.tareaService.save(tarea);
                     LOGGER.info("Task updated");
-                    return tarea;
+                    return ResponseEntity.ok().body(tarea);
                 })
                 .orElseGet(() -> {
                     LOGGER.info("Task not found");
-                    return null;
+                    return ResponseEntity.badRequest().body(null);
                 });
     }
     @PutMapping(path="/tasks/checkTask/{id}")
