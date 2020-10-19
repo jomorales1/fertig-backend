@@ -4,6 +4,7 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
@@ -34,9 +35,12 @@ public class RutinaController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService) {
+    private final CompletadaService completadaService;
+
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, CompletadaService completadaService) {
         this.rutinaService = rutinaService;
         this.usuarioService = usuarioService;
+        this.completadaService = completadaService;
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
@@ -102,7 +106,7 @@ public class RutinaController {
                     rutina.setFechaFin(routine.getFechaFin());
                     rutina.setRecurrencia(routine.getRecurrencia());
                     rutina.setRecordatorio(routine.getRecordatorio());
-                    rutina.setCompletadas(routine.getCompletadas());
+                    rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
                     this.rutinaService.save(rutina);
                     LOGGER.info("Routine replaced");
                     return ResponseEntity.ok().body(rutina);
@@ -131,6 +135,8 @@ public class RutinaController {
             rutina.setRecurrencia(requestRutina.getRecurrencia());
             if (requestRutina.getRecordatorio() != null)
                 rutina.setRecordatorio(requestRutina.getRecordatorio());
+            rutina.setFechaInicio(requestRutina.getFechaInicio());
+            rutina.setFechaFin(requestRutina.getFechaFin());
             this.rutinaService.save(rutina);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

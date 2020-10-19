@@ -13,7 +13,7 @@ public class Evento implements Serializable {
         sequenceName = "public.evento_evento_id_seq", allocationSize = 1)
     @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_evento_generator")
     @Column(name="id_evento")
-    private Integer id;
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "usuario")
