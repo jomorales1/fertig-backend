@@ -2,6 +2,7 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.services.CompletadaService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 /*
@@ -55,8 +57,9 @@ public class RutinaController {
     public ResponseEntity<?> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioService.findById(userDetails.getUsername()).isPresent()){
-            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isPresent()){
+            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.get());
             List<RutinaResponse> rutinaResponses = new ArrayList<>();
             for(Rutina rutina : rutinas) {
                 List<Completada> completadas;
@@ -75,17 +78,17 @@ public class RutinaController {
     @GetMapping(path="/routines/getRoutine/{id}")
     public Rutina getRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String user = userDetails.getUsername();
+        String username = userDetails.getUsername();
 
-        if(rutinaService.findById(id).isPresent()){
-            if(rutinaService.findById(id).get().getUsuario().getUsuario().equals(user))
-                return rutinaService.findById(id).get();
+        Optional<Rutina> optRutina = rutinaService.findById(id);
+        if(optRutina.isPresent()){
+            if(optRutina.get().getUsuario().getUsuario().equals(username))
+                return optRutina.get();
             LOGGER.info("Wrong user");
             return null;
         }
         LOGGER.info("Routine not found");
         return null;
-
     }
 
     // Método PUT para modificar un registro en la base de datos.
@@ -128,8 +131,10 @@ public class RutinaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if(usuarioService.findById(userDetails.getUsername()).isPresent()) {
-            rutina.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
+
+        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isPresent()) {
+            rutina.setUsuario(optUsuario.get());
             rutina.setNombre(requestRutina.getNombre());
             rutina.setDescripcion(requestRutina.getDescripcion());
             rutina.setPrioridad(requestRutina.getPrioridad());
@@ -151,7 +156,8 @@ public class RutinaController {
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<Void> deleteRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (this.rutinaService.findById(id).isPresent() && this.rutinaService.findById(id).get().getUsuario().getUsuario().equals(userDetails.getUsername())){
+        Optional<Rutina> optRutina = this.rutinaService.findById(id);
+        if (optRutina.isPresent() && optRutina.get().getUsuario().getUsuario().equals(userDetails.getUsername())){
             this.rutinaService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);
         }

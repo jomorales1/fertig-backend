@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /*
@@ -82,7 +83,8 @@ public class UsuarioController {
     @GetMapping(path="/users/get")
     public Usuario getUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return (usuarioService.findById(userDetails.getUsername()).isPresent() ? usuarioService.findById(userDetails.getUsername()).get() : null);
+        Optional<Usuario> usuario = usuarioService.findById(userDetails.getUsername());
+        return (usuario.orElse(null));
     }
 
     // Método PUT para modificar la información de un usuario en la DB.
@@ -90,16 +92,13 @@ public class UsuarioController {
     public ResponseEntity<?> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) &&
-            !usuarioService.findById(userDetails.getUsername()).get().getCorreo().equals(requestUsuario.getCorreo())){
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) || optUsuario.isEmpty() || !optUsuario.get().getCorreo().equals(requestUsuario.getCorreo())){
             return ResponseEntity.badRequest().body(null);
         }
 
-        if (usuarioService.findById(userDetails.getUsername()).isPresent()) {
-            if (!usuarioService.findById(userDetails.getUsername()).get().getUsuario()
-                .equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
-                return ResponseEntity.badRequest().body(null);
-            }
+        if (!optUsuario.get().getUsuario().equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
+            return ResponseEntity.badRequest().body(null);
         }
 
         Usuario user = new Usuario();

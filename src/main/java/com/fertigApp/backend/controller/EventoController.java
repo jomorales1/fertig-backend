@@ -2,6 +2,7 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -13,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.logging.Level;
 
 /*
@@ -47,8 +49,9 @@ public class EventoController {
     @GetMapping(path="/events/getEvents")
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (usuarioService.findById(userDetails.getUsername()).isPresent())
-            return eventoService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
+        if (optUsuario.isPresent())
+            return eventoService.findByUsuario(optUsuario.get());
         else{
             LOGGER.info("User not found");
             return null;
@@ -61,13 +64,13 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
-        if (this.eventoService.findById(id).isPresent()){
-            Evento evento = this.eventoService.findById(id).get();
-            if (!evento.getUsuario().getUsuario().equals(user)) {
+        Optional<Evento> optEvento = this.eventoService.findById(id);
+        if (optEvento.isPresent()){
+            if (!optEvento.get().getUsuario().getUsuario().equals(user)) {
                 LOGGER.info("Wrong user");
                 return null;
             }
-            return this.eventoService.findById(id).get();
+            return optEvento.get();
         }
         LOGGER.info("Event not found");
         return null;
@@ -112,8 +115,9 @@ public class EventoController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if (usuarioService.findById(userDetails.getUsername()).isPresent()){
-            evento.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if (optUsuario.isPresent()){
+            evento.setUsuario(optUsuario.get());
             evento.setNombre(requestEvento.getNombre());
             evento.setDescripcion(requestEvento.getDescripcion());
             evento.setPrioridad(requestEvento.getPrioridad());
@@ -135,9 +139,9 @@ public class EventoController {
     @DeleteMapping(path="/events/deleteEvent/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(this.eventoService.findById(id).isPresent()){
-            Evento evento = this.eventoService.findById(id).get();
-            if (! evento.getUsuario().getUsuario().equals(userDetails.getUsername()))
+        Optional<Evento> optEvento = this.eventoService.findById(id);
+        if(optEvento.isPresent()){
+            if (!optEvento.get().getUsuario().getUsuario().equals(userDetails.getUsername()))
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             this.eventoService.deleteById(id);
             return new ResponseEntity<>(HttpStatus.ACCEPTED);

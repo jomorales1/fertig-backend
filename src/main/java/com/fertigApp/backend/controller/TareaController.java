@@ -3,6 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.auth.services.UserDetailsImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Tarea;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.TareaService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,16 +52,16 @@ public class TareaController {
     public Iterable<Tarea> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioService.findById(userDetails.getUsername()).isPresent())
-            return tareaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
-        return null;
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        return optUsuario.map(tareaService::findByUsuario).orElse(null);
 
     }
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
     public Tarea getTarea(@PathVariable Integer id) {
-        return (this.tareaService.findById(id).isPresent() ? this.tareaService.findById(id).get() : null);
+        Optional<Tarea> optTarea = this.tareaService.findById(id);
+        return (optTarea.orElse(null));
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
@@ -117,8 +119,9 @@ public class TareaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if(usuarioService.findById(userDetails.getUsername()).isPresent()){
-            tarea.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isPresent()){
+            tarea.setUsuario(optUsuario.get());
             tarea.setDescripcion(requestTarea.getDescripcion());
             tarea.setEstimacion(requestTarea.getEstimacion());
             tarea.setEtiqueta(requestTarea.getEtiqueta());
