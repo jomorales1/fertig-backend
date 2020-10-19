@@ -110,7 +110,7 @@ public class RutinaController {
                     rutina.setFechaFin(routine.getFechaFin());
                     rutina.setRecurrencia(routine.getRecurrencia());
                     rutina.setRecordatorio(routine.getRecordatorio());
-                    rutina.setCompletadas(routine.getCompletadas());
+                    rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
                     this.rutinaService.save(rutina);
                     LOGGER.info("Routine replaced");
                     return ResponseEntity.ok().body(rutina);
@@ -139,6 +139,8 @@ public class RutinaController {
             rutina.setRecurrencia(requestRutina.getRecurrencia());
             if (requestRutina.getRecordatorio() != null)
                 rutina.setRecordatorio(requestRutina.getRecordatorio());
+            rutina.setFechaInicio(requestRutina.getFechaInicio());
+            rutina.setFechaFin(requestRutina.getFechaFin());
             this.rutinaService.save(rutina);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

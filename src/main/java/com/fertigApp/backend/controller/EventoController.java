@@ -114,6 +114,7 @@ public class EventoController {
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         if (usuarioService.findById(userDetails.getUsername()).isPresent()){
+            evento.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
             evento.setNombre(requestEvento.getNombre());
             evento.setDescripcion(requestEvento.getDescripcion());
             evento.setPrioridad(requestEvento.getPrioridad());

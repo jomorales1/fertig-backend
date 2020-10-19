@@ -93,7 +93,7 @@ public class TareaController {
                 });
     }
 
-    @PutMapping(path="/tasks/checkTask/{id}")
+    @PatchMapping(path="/tasks/checkTask/{id}")
     public ResponseEntity<?> checkTarea(@PathVariable Integer id) {
         try{
             Tarea tarea = this.tareaService.findById(id).orElseThrow(Exception::new);
