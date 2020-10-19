@@ -2,6 +2,7 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -13,6 +14,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /*
@@ -45,14 +48,18 @@ public class RutinaController {
 
     // Método GET para obtener todas las rutinas de un usuario específico.
     @GetMapping(path="/routines/getRoutines")
-    public Iterable<Rutina> getAllRutinasByUsuario() {
+    public ResponseEntity<?> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(usuarioService.findById(userDetails.getUsername()).isPresent()){
-            return rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+            List<RutinaResponse> rutinaResponses = new ArrayList<>();
+            for(Rutina rutina : rutinas)
+                rutinaResponses.add(new RutinaResponse(rutina));
+            return ResponseEntity.ok().body(rutinaResponses);
         }
         LOGGER.info("User not found");
-        return null;
+        return ResponseEntity.badRequest().body(null);
 
     }
 
