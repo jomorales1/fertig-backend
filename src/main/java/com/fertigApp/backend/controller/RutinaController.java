@@ -58,8 +58,12 @@ public class RutinaController {
         if(usuarioService.findById(userDetails.getUsername()).isPresent()){
             List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
             List<RutinaResponse> rutinaResponses = new ArrayList<>();
-            for(Rutina rutina : rutinas)
-                rutinaResponses.add(new RutinaResponse(rutina));
+            for(Rutina rutina : rutinas) {
+                List<Completada> completadas;
+                completadas = (List<Completada>) completadaService.findByRutina(rutina);
+                Completada ultimaCompletada = completadas.get(completadas.size() - 1);
+                rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
+            }
             return ResponseEntity.ok().body(rutinaResponses);
         }
         LOGGER.info("User not found");
