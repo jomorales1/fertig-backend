@@ -93,7 +93,7 @@ public class UsuarioController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) || optUsuario.isEmpty() || !optUsuario.get().getCorreo().equals(requestUsuario.getCorreo())){
+        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) && optUsuario.isPresent() && !optUsuario.get().getCorreo().equals(requestUsuario.getCorreo())){
             return ResponseEntity.badRequest().body(null);
         }
 
