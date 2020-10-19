@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="completada", schema="mydb")
+@Table(name="completada")
 public class Completada implements Serializable {
 
     @Id

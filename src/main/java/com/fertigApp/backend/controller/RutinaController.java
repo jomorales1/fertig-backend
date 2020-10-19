@@ -2,7 +2,9 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
@@ -13,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 
 /*
@@ -31,9 +35,12 @@ public class RutinaController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService) {
+    private final CompletadaService completadaService;
+
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, CompletadaService completadaService) {
         this.rutinaService = rutinaService;
         this.usuarioService = usuarioService;
+        this.completadaService = completadaService;
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
@@ -45,14 +52,18 @@ public class RutinaController {
 
     // Método GET para obtener todas las rutinas de un usuario específico.
     @GetMapping(path="/routines/getRoutines")
-    public Iterable<Rutina> getAllRutinasByUsuario() {
+    public ResponseEntity<?> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(usuarioService.findById(userDetails.getUsername()).isPresent()){
-            return rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
+            List<RutinaResponse> rutinaResponses = new ArrayList<>();
+            for(Rutina rutina : rutinas)
+                rutinaResponses.add(new RutinaResponse(rutina));
+            return ResponseEntity.ok().body(rutinaResponses);
         }
         LOGGER.info("User not found");
-        return null;
+        return ResponseEntity.badRequest().body(null);
 
     }
 
@@ -95,7 +106,7 @@ public class RutinaController {
                     rutina.setFechaFin(routine.getFechaFin());
                     rutina.setRecurrencia(routine.getRecurrencia());
                     rutina.setRecordatorio(routine.getRecordatorio());
-                    rutina.setCompletadas(routine.getCompletadas());
+                    rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
                     this.rutinaService.save(rutina);
                     LOGGER.info("Routine replaced");
                     return ResponseEntity.ok().body(rutina);
@@ -124,6 +135,8 @@ public class RutinaController {
             rutina.setRecurrencia(requestRutina.getRecurrencia());
             if (requestRutina.getRecordatorio() != null)
                 rutina.setRecordatorio(requestRutina.getRecordatorio());
+            rutina.setFechaInicio(requestRutina.getFechaInicio());
+            rutina.setFechaFin(requestRutina.getFechaFin());
             this.rutinaService.save(rutina);
             return new ResponseEntity<>(HttpStatus.CREATED);
         }

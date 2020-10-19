@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="evento", schema="mydb")
+@Table(name="evento")
 public class Evento implements Serializable {
 
     @Id
@@ -13,7 +13,7 @@ public class Evento implements Serializable {
         sequenceName = "public.evento_evento_id_seq", allocationSize = 1)
     @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_evento_generator")
     @Column(name="id_evento")
-    private Integer id;
+    private int id;
 
     @ManyToOne
     @JoinColumn(name = "usuario")
