@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
 @AutoConfigureMockMvc
-public class RutinaControllerTests {
+class RutinaControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
@@ -53,7 +53,7 @@ public class RutinaControllerTests {
     private final Date fechaIncio = new Date();
     private final Date fechaFin = new Date();
 
-    public Usuario setUpUsuario() {
+    Usuario setUpUsuario() {
         Usuario user = new Usuario();
 
         user.setUsuario("test_user");
@@ -66,7 +66,7 @@ public class RutinaControllerTests {
         return user;
     }
 
-    public Rutina setUpRutina(Usuario user) {
+    Rutina setUpRutina(Usuario user) {
         Rutina routine = new Rutina();
 
         routine.setUsuario(setUpUsuario());
@@ -83,7 +83,7 @@ public class RutinaControllerTests {
         return rutinaService.save(routine);
     }
 
-    public String getToken(Usuario user) throws Exception {
+    String getToken(Usuario user) throws Exception {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
@@ -106,26 +106,25 @@ public class RutinaControllerTests {
 
 
     @Test
-    public void contextLoads(){
+    void contextLoads(){
         assertTrue(true);
     }
 
 
     @Test
     @WithMockUser(value = "ADMIN")
-    public void getAllRutina() throws Exception {
+    void getAllRutina() throws Exception {
         String uri = "/routines";
         Usuario user;
         user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
         Rutina rutina = setUpRutina(user);
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
         List<Rutina> rutinas = objectMapper.readValue(response, javaList);
-        assertTrue(rutinas != null);
+        assertNotNull(rutinas);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -165,7 +164,7 @@ public class RutinaControllerTests {
 //    }
 
     @Test
-    public void getRutina() throws Exception {
+    void getRutina() throws Exception {
         String uri = "/routines/getRoutine";
         Usuario user;
         Rutina rutina;
@@ -173,8 +172,8 @@ public class RutinaControllerTests {
         rutina = setUpRutina(user);
 
         String token = getToken(user);
-        ResultActions resultActions = this.mockMvc.perform(get(uri+"/"+rutina.getId()).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri+"/"+rutina.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Rutina rutinaObtained = objectMapper.readValue(response, Rutina.class);

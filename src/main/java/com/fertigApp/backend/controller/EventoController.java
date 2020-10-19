@@ -63,15 +63,14 @@ public class EventoController {
 
         if (this.eventoService.findById(id).isPresent()){
             Evento evento = this.eventoService.findById(id).get();
-            if (evento.getUsuario().getUsuario().equals(user)) {
-                System.out.println("Wrong user");
+            if (!evento.getUsuario().getUsuario().equals(user)) {
+                LOGGER.info("Wrong user");
                 return null;
             }
             return this.eventoService.findById(id).get();
         }
         LOGGER.info("Event not found");
         return null;
-
     }
 
     // Método PUT para actualizar un evento específico.

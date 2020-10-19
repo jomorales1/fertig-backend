@@ -25,15 +25,13 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = WebEnvironment.MOCK, classes = BackendApplication.class)
 @AutoConfigureMockMvc
-public class TareaControllerTests {
+class TareaControllerTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -106,13 +104,13 @@ public class TareaControllerTests {
     }
 
     @Test
-    public void contextLoads() {
+    void contextLoads() {
         assertTrue(true);
     }
 
     @Test
     @WithMockUser(value = "ADMIN")
-    public void getAllTareas() throws Exception {
+    void getAllTareas() throws Exception {
         String uri = "/tasks";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -121,18 +119,17 @@ public class TareaControllerTests {
         Tarea task = setUp(user);
 
         ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
-//        assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Tarea.class);
-        List<Tarea> tareas = objectMapper.readValue(response, javaList);
-        assertNotNull(tareas);
+        List<Tarea> tasks = objectMapper.readValue(response, javaList);
+        assertNotNull(tasks);
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    public void getAllTareasByUsuario() throws Exception {
+    void getAllTareasByUsuario() throws Exception {
         String uri = "/tasks/getTasks";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -141,15 +138,15 @@ public class TareaControllerTests {
         String token = getToken(user);
         Tarea task = setUp(user);
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Tarea.class);
         List<Tarea> tasks = objectMapper.readValue(response, javaList);
         assertNotNull(tasks);
-        assertThat(tasks.get(0).getUsuarioT().getUsuario().equals(task.getUsuarioT().getUsuario()));
-        assertThat(tasks.get(0).getNombre().equals(task.getNombre()));
+        assertEquals(tasks.get(0).getUsuarioT().getUsuario(), task.getUsuarioT().getUsuario());
+        assertEquals(tasks.get(0).getNombre(), task.getNombre());
         for (Tarea tarea : tasks) {
             this.tareaService.deleteById(tarea.getId());
         }
@@ -157,7 +154,7 @@ public class TareaControllerTests {
     }
 
     @Test
-    public void getTarea() throws Exception {
+    void getTarea() throws Exception {
         String uri = "/tasks/getTask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -166,20 +163,20 @@ public class TareaControllerTests {
         String token = getToken(user);
         Tarea task = setUp(user);
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri + task.getId()).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri + task.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Tarea obtainedTask = objectMapper.readValue(response, Tarea.class);
-        assertThat(obtainedTask.getUsuarioT().getUsuario().equals(user.getUsuario()));
-        assertThat(obtainedTask.getNombre().equals(task.getNombre()));
+        assertEquals(obtainedTask.getUsuarioT().getUsuario(), user.getUsuario());
+        assertEquals(obtainedTask.getNombre(), task.getNombre());
 
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    public void replaceTarea() throws Exception {
+    void replaceTarea() throws Exception {
         String uri = "/tasks/updateTask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -201,21 +198,21 @@ public class TareaControllerTests {
 
         // Valid request -> status 200 expected
         ResultActions resultActions = this.mockMvc.perform(put(uri + task.getId()).header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)));
-        assertThat(resultActions.andExpect(status().isOk()));
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
+                .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Tarea obtainedTask = objectMapper.readValue(response, Tarea.class);
         assertNotNull(obtainedTask);
-        assertThat(obtainedTask.getUsuarioT().getUsuario().equals(requestTarea.getUsuarioT().getUsuario()));
-        assertThat(obtainedTask.getNombre().equals(requestTarea.getNombre()));
+        assertEquals(obtainedTask.getUsuarioT().getUsuario(), requestTarea.getUsuarioT().getUsuario());
+        assertEquals(obtainedTask.getNombre(), requestTarea.getNombre());
 
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    public void checkTarea() throws Exception {
+    void checkTarea() throws Exception {
         String uri = "/tasks/checkTask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -224,21 +221,23 @@ public class TareaControllerTests {
         String token = getToken(user);
         Tarea task = setUp(user);
 
-        ResultActions resultActions = this.mockMvc.perform(patch(uri + task.getId()).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
-        Tarea obtainedTask = this.tareaService.findById(task.getId()).get();
-        assertThat(obtainedTask.getUsuarioT().getUsuario().equals(task.getUsuarioT().getUsuario()));
-        assertTrue(obtainedTask.getHecha());
+        this.mockMvc.perform(patch(uri + task.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        if (this.tareaService.findById(task.getId()).isPresent()) {
+            Tarea obtainedTask = this.tareaService.findById(task.getId()).get();
+            assertEquals(obtainedTask.getUsuarioT().getUsuario(), task.getUsuarioT().getUsuario());
+            assertTrue(obtainedTask.getHecha());
+        }
 
-        resultActions = this.mockMvc.perform(patch(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isBadRequest()));
+        this.mockMvc.perform(patch(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+            .andExpect(status().isBadRequest());
 
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    public void addNewTarea() throws Exception {
+    void addNewTarea() throws Exception {
         String uri = "/tasks/addTask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -257,19 +256,19 @@ public class TareaControllerTests {
         requestTarea.setHecha(false);
         requestTarea.setRecordatorio(2);
 
-        ResultActions resultActions = this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)));
-        assertThat(resultActions.andExpect(status().isCreated()));
+        this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
+                .andExpect(status().isCreated());
 
-        List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
-        for (Tarea tarea : tareas) {
-            this.tareaService.deleteById(tarea.getId());
+        List<Tarea> tasks = (List<Tarea>) this.tareaService.findAll();
+        for (Tarea task : tasks) {
+            this.tareaService.deleteById(task.getId());
         }
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    public void deleteTarea() throws Exception {
+    void deleteTarea() throws Exception {
         String uri = "/tasks/deleteTask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
@@ -278,8 +277,8 @@ public class TareaControllerTests {
         String token = getToken(user);
         Tarea task = setUp(user);
 
-        ResultActions resultActions = this.mockMvc.perform(delete(uri + task.getId()).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
+        this.mockMvc.perform(delete(uri + task.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
 
         this.usuarioService.deleteById(user.getUsuario());
     }
