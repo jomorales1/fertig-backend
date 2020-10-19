@@ -48,7 +48,7 @@ public class EventoController {
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (usuarioService.findById(userDetails.getUsername()).isPresent())
-            return usuarioService.findById(userDetails.getUsername()).get().getEventos();
+            return eventoService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
         else{
             LOGGER.info("User not found");
             return null;

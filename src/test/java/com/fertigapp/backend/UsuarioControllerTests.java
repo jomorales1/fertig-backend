@@ -120,6 +120,7 @@ public class UsuarioControllerTests {
             user = setUp();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
+
         ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
         assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
@@ -128,6 +129,10 @@ public class UsuarioControllerTests {
         assertEquals(userObtained.getUsuario(), user.getUsuario());
         assertEquals(userObtained.getCorreo(), user.getCorreo());
         assertEquals(userObtained.getNombre(), user.getNombre());
+
+        resultActions = this.mockMvc.perform(get(uri));
+        assertThat(resultActions.andExpect(status().isUnauthorized()));
+
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -141,6 +146,8 @@ public class UsuarioControllerTests {
 
         String uri = "/users/update";
         String searchUri = "/users/get";
+
+        // Valid request -> status 200 expected
         RequestUsuario requestUsuario = new RequestUsuario(user.getCorreo(), user.getNombre() + "Version 2", user.getUsuario(), "testing");
         ResultActions resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
@@ -155,17 +162,51 @@ public class UsuarioControllerTests {
         assertEquals(userObtained.getUsuario(), requestUsuario.getUsuario());
         assertEquals(userObtained.getCorreo(), requestUsuario.getCorreo());
         assertEquals(userObtained.getNombre(), requestUsuario.getNombre());
+
+        Usuario newUser = new Usuario("srogers", "srogers@avengers.com", this.passwordEncoder.encode("imbetterthanstark"), "Captain America");
+        this.usuarioService.save(newUser);
+
+        // Invalid request (existing email) -> status 400 expected
+        requestUsuario.setCorreo("srogers@avengers.com");
+        resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)));
+        assertThat(resultActions.andExpect(status().isBadRequest()));
+
+        // Invalid request (existing username) -> status 400 expected
+        requestUsuario.setCorreo(user.getCorreo());
+        requestUsuario.setUsuario("srogers");
+        resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)));
+        assertThat(resultActions.andExpect(status().isBadRequest()));
+
         this.usuarioService.deleteById(user.getUsuario());
+        this.usuarioService.deleteById("srogers");
     }
 
     @Test
     public void addNewUser() throws Exception {
         String uri = "/users/addUser";
         RequestUsuario requestUsuario = new RequestUsuario("add_user@test.com", "Test Add User", "addUser", "add_user_password");
+
+        // Valid request -> status 201 expected
         ResultActions resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(requestUsuario)));
         assertThat(resultActions.andExpect(status().isCreated()));
-        this.usuarioService.deleteById(requestUsuario.getUsuario());
+
+        // Invalid request (existing username) -> status 400 expected
+        requestUsuario.setCorreo("add_user2@test.com");
+        resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(objectMapper.writeValueAsString(requestUsuario)));
+        assertThat(resultActions.andExpect(status().isBadRequest()));
+
+        // Invalid request (existing email) -> status 400 expected
+        requestUsuario.setUsuario("addUser2");
+        requestUsuario.setCorreo("add_user@test.com");
+        resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content(objectMapper.writeValueAsString(requestUsuario)));
+        assertThat(resultActions.andExpect(status().isBadRequest()));
+
+        this.usuarioService.deleteById("addUser");
     }
 
     @Test

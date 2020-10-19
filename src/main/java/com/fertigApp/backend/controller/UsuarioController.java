@@ -94,6 +94,14 @@ public class UsuarioController {
             !usuarioService.findById(userDetails.getUsername()).get().getCorreo().equals(requestUsuario.getCorreo())){
             return ResponseEntity.badRequest().body(null);
         }
+
+        if (usuarioService.findById(userDetails.getUsername()).isPresent()) {
+            if (!usuarioService.findById(userDetails.getUsername()).get().getUsuario()
+                .equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
+                return ResponseEntity.badRequest().body(null);
+            }
+        }
+
         Usuario user = new Usuario();
         user.setCorreo(requestUsuario.getCorreo());
         user.setNombre(requestUsuario.getNombre());

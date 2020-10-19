@@ -1,6 +1,7 @@
 package com.fertigApp.backend.services;
 
 import com.fertigApp.backend.model.Completada;
+import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +22,9 @@ public class CompletadaService {
 
     public Completada save(Completada completada){
         return completadaRepository.save(completada);
+    }
+
+    public Iterable<Completada> findByRutina(Rutina rutina){
+        return completadaRepository.findByRutina(rutina);
     }
 }

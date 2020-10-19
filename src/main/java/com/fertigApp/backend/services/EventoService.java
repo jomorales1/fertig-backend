@@ -1,6 +1,7 @@
 package com.fertigApp.backend.services;
 
 import com.fertigApp.backend.model.Evento;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.EventoRepository;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,10 @@ public class EventoService {
 
     public void deleteById(Integer id){
         eventoRepository.deleteById(id);
+    }
+
+    public Iterable<Evento> findByUsuario(Usuario usuario){
+        return eventoRepository.findByUsuarioE(usuario);
     }
 
 }

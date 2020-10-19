@@ -49,7 +49,7 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(usuarioService.findById(userDetails.getUsername()).isPresent()){
-            return usuarioService.findById(userDetails.getUsername()).get().getRutinas();
+            return rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
         }
         LOGGER.info("User not found");
         return null;
