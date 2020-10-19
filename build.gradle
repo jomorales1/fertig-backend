@@ -9,7 +9,6 @@ plugins {
 group = 'com.FertigApp'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '14'
-tasks['sonarqube'].dependsOn(test)
 
 repositories {
     mavenCentral()
@@ -53,9 +52,19 @@ sonarqube {
     property "sonar.organization", "fertigapp"
     property "sonar.host.url", "https://sonarcloud.io"
 	property "sonar.binaries", "build/classes"
-	property "sonar.test", "junit"
-	property "sources", "src"
+	property "sonar.sources", "src/main"
+	property "sonar.tests", "src/test"
 	property "sonar.java.coveragePlugin", "jacoco"
-    property "sonar.jacoco.reportPath", "build/jacoco/test.exec"
+	property "sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test"
   }
+}
+
+plugins.withType(JacocoPlugin) {
+	tasks["test"].finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
 }
