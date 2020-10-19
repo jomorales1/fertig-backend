@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name="rutina", schema="mydb")
+@Table(name="rutina")
 public class Rutina implements Serializable {
 
     @Id

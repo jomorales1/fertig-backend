@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="tarea", schema="mydb")
+@Table(name="tarea")
 public class Tarea implements Serializable {
 
     @Id

@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity// This tells Hibernate to make a table out of this class
-@Table(name = "usuario", schema = "mydb")
+@Table(name = "usuario")
 public class Usuario implements Serializable {
 
 	@Id
