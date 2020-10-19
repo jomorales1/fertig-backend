@@ -4,9 +4,9 @@ import com.fertigApp.backend.auth.services.UserDetailsImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.payload.response.MessageResponse;
-import com.fertigApp.backend.repository.UsuarioRepository;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.TareaService;
+import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +31,11 @@ public class TareaController {
     private final TareaService tareaService;
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public TareaController(TareaService tareaService, UsuarioRepository usuarioRepository) {
+    public TareaController(TareaService tareaService, UsuarioService usuarioService) {
         this.tareaService = tareaService;
-        this.usuarioRepository = usuarioRepository;
+        this.usuarioService = usuarioService;
     }
 
     // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
@@ -50,8 +50,8 @@ public class TareaController {
     public Iterable<Tarea> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if(usuarioRepository.findById(userDetails.getUsername()).isPresent())
-            return tareaService.findByUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
+        if(usuarioService.findById(userDetails.getUsername()).isPresent())
+            return tareaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
         return null;
 
     }
@@ -69,11 +69,11 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) principal;
         return this.tareaService.findById(id)
                 .map(tarea -> {
-                    if(usuarioRepository.findByUsuario(userDetails.getUsername()).isEmpty()){
+                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
                         LOGGER.info("User not found");
                         return ResponseEntity.badRequest().body(null);
                     }
-                    tarea.setUsuario(usuarioRepository.findByUsuario(userDetails.getUsername()).get());
+                    tarea.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
                     tarea.setNombre(task.getNombre());
                     tarea.setDescripcion(task.getDescripcion());
                     tarea.setPrioridad(task.getPrioridad());
@@ -116,8 +116,8 @@ public class TareaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if(usuarioRepository.findById(userDetails.getUsername()).isPresent()){
-            tarea.setUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
+        if(usuarioService.findById(userDetails.getUsername()).isPresent()){
+            tarea.setUsuario(usuarioService.findById(userDetails.getUsername()).get());
             tarea.setDescripcion(requestTarea.getDescripcion());
             tarea.setEstimacion(requestTarea.getEstimacion());
             tarea.setEtiqueta(requestTarea.getEtiqueta());
