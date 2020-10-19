@@ -3,11 +3,13 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
     id "org.sonarqube" version "3.0"
+	id "jacoco"
 }
 
 group = 'com.FertigApp'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '14'
+tasks['sonarqube'].dependsOn(test)
 
 repositories {
     mavenCentral()
@@ -50,5 +52,10 @@ sonarqube {
     property "sonar.projectKey", "FertigApp_BackEnd"
     property "sonar.organization", "fertigapp"
     property "sonar.host.url", "https://sonarcloud.io"
+	property "sonar.binaries", "build/classes"
+	property "sonar.test", "junit"
+	property "sources", "src"
+	property "sonar.java.coveragePlugin", "jacoco"
+	property "sonar.jacoco.reportPath", "build/test-reports/jacoco.exec"
   }
 }
