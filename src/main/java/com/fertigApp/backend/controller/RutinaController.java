@@ -4,6 +4,7 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
@@ -34,9 +35,12 @@ public class RutinaController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService) {
+    private final CompletadaService completadaService;
+
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, CompletadaService completadaService) {
         this.rutinaService = rutinaService;
         this.usuarioService = usuarioService;
+        this.completadaService = completadaService;
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
@@ -54,8 +58,12 @@ public class RutinaController {
         if(usuarioService.findById(userDetails.getUsername()).isPresent()){
             List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuarioService.findById(userDetails.getUsername()).get());
             List<RutinaResponse> rutinaResponses = new ArrayList<>();
-            for(Rutina rutina : rutinas)
-                rutinaResponses.add(new RutinaResponse(rutina));
+            for(Rutina rutina : rutinas) {
+                List<Completada> completadas;
+                completadas = (List<Completada>) completadaService.findByRutina(rutina);
+                Completada ultimaCompletada = completadas.get(completadas.size() - 1);
+                rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
+            }
             return ResponseEntity.ok().body(rutinaResponses);
         }
         LOGGER.info("User not found");
