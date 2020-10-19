@@ -120,8 +120,8 @@ public class TareaControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         Tarea task = setUp(user);
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
+//        assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Tarea.class);

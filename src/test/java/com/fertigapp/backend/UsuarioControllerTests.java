@@ -13,6 +13,7 @@ import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.util.Assert;
 
 import java.util.List;
 
@@ -94,8 +96,8 @@ public class UsuarioControllerTests {
         loginRequest.setUsername(user.getUsuario());
         loginRequest.setPassword("testing");
         ResultActions resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content(objectMapper.writeValueAsString(loginRequest)).accept(MediaType.ALL));
-        assertThat(resultActions.andExpect(status().isOk()));
+        .content(objectMapper.writeValueAsString(loginRequest)).accept(MediaType.ALL)).andExpect(status().isOk());
+        //assertThat(resultActions.andExpect(status().isOk()));
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -103,8 +105,8 @@ public class UsuarioControllerTests {
     @WithMockUser(value = "ADMIN")
     public void getAllUsuarios() throws Exception {
         String uri = "/users/getAllUsers";
-        ResultActions resultActions = this.mockMvc.perform(get(uri));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
+        //assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
@@ -121,8 +123,9 @@ public class UsuarioControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isOk()));
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        //assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Usuario userObtained = objectMapper.readValue(response, Usuario.class);
@@ -130,8 +133,8 @@ public class UsuarioControllerTests {
         assertEquals(userObtained.getCorreo(), user.getCorreo());
         assertEquals(userObtained.getNombre(), user.getNombre());
 
-        resultActions = this.mockMvc.perform(get(uri));
-        assertThat(resultActions.andExpect(status().isUnauthorized()));
+        resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isUnauthorized());
+        //assertThat(resultActions.andExpect(status().isUnauthorized()));
 
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -151,11 +154,11 @@ public class UsuarioControllerTests {
         RequestUsuario requestUsuario = new RequestUsuario(user.getCorreo(), user.getNombre() + "Version 2", user.getUsuario(), "testing");
         ResultActions resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
-                        .writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isOk()));
+                        .writeValueAsString(requestUsuario))).andExpect(status().isOk());
+        //assertThat(resultActions.andExpect(status().isOk()));
         ResultActions findUpdatedUser = this.mockMvc.perform(get(searchUri)
-        .header("Authorization", "Bearer " + token));
-        assertThat(findUpdatedUser.andExpect(status().isOk()));
+        .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+        //assertThat(findUpdatedUser.andExpect(status().isOk()));
         MvcResult mvcResult = findUpdatedUser.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         Usuario userObtained = objectMapper.readValue(response, Usuario.class);
@@ -169,15 +172,17 @@ public class UsuarioControllerTests {
         // Invalid request (existing email) -> status 400 expected
         requestUsuario.setCorreo("srogers@avengers.com");
         resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isBadRequest()));
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)))
+            .andExpect(status().isBadRequest());
+        //assertThat(resultActions.andExpect(status().isBadRequest()));
 
         // Invalid request (existing username) -> status 400 expected
         requestUsuario.setCorreo(user.getCorreo());
         requestUsuario.setUsuario("srogers");
         resultActions = this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isBadRequest()));
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestUsuario)))
+            .andExpect(status().isBadRequest());
+        //assertThat(resultActions.andExpect(status().isBadRequest()));
 
         this.usuarioService.deleteById(user.getUsuario());
         this.usuarioService.deleteById("srogers");
@@ -190,21 +195,21 @@ public class UsuarioControllerTests {
 
         // Valid request -> status 201 expected
         ResultActions resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content(objectMapper.writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isCreated()));
+        .content(objectMapper.writeValueAsString(requestUsuario))).andExpect(status().isCreated());
+        //assertThat(resultActions.andExpect(status().isCreated()));
 
         // Invalid request (existing username) -> status 400 expected
         requestUsuario.setCorreo("add_user2@test.com");
         resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content(objectMapper.writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isBadRequest()));
+        .content(objectMapper.writeValueAsString(requestUsuario))).andExpect(status().isBadRequest());
+        //assertThat(resultActions.andExpect(status().isBadRequest()));
 
         // Invalid request (existing email) -> status 400 expected
         requestUsuario.setUsuario("addUser2");
         requestUsuario.setCorreo("add_user@test.com");
         resultActions = this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
-        .content(objectMapper.writeValueAsString(requestUsuario)));
-        assertThat(resultActions.andExpect(status().isBadRequest()));
+        .content(objectMapper.writeValueAsString(requestUsuario))).andExpect(status().isBadRequest());
+        //assertThat(resultActions.andExpect(status().isBadRequest()));
 
         this.usuarioService.deleteById("addUser");
     }
@@ -218,8 +223,9 @@ public class UsuarioControllerTests {
         String token = getToken(user);
 
         String uri = "/users/delete";
-        ResultActions resultActions = this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token));
-        assertThat(resultActions.andExpect(status().isAccepted()));
+        ResultActions resultActions = this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isAccepted());
+        //assertThat(resultActions.andExpect(status().isAccepted()));
     }
 
 }
