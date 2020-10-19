@@ -1,6 +1,7 @@
 package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
@@ -15,16 +16,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -109,32 +111,58 @@ public class RutinaControllerTests {
     }
 
 
-//    @Test
-//    public void getAllRutinasByUsuario() throws Exception {
-//        String uri = "/routines/getRoutines";
-//        Usuario user;
-//        List<Rutina> rutinas = new ArrayList<>();
-//
-//        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
-//        for(int i=0; i<5; i++)
-//            if (usuarioService.findById("test_user").get().getRutinas() == null || usuarioService.findById("test_user").get().getRutinas().size() < i)
-//                rutinas.add(setUpRutina(user));
-//            else
-//                rutinas.add(user.getRutinas().get(i));
-//        String token = getToken(user);
-//        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
-//        assertThat(resultActions.andExpect(status().isOk()));
-//        MvcResult mvcResult = resultActions.andReturn();
-//        String response = mvcResult.getResponse().getContentAsString();
-//        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
-//        List<Rutina> rutinasObtained = objectMapper.readValue(response, javaList);
-//        assertNotNull(rutinasObtained);
-//        assertEquals(rutinasObtained.get(0),rutinas.get(0));
-//        assertEquals(rutinasObtained.get(1),rutinas.get(1));
-//        assertEquals(rutinasObtained.get(2),rutinas.get(2));
-//        assertEquals(rutinasObtained.get(3),rutinas.get(3));
-//        assertEquals(rutinasObtained.get(4),rutinas.get(4));
-//    }
+    @Test
+    @WithMockUser(value = "ADMIN")
+    public void getAllRutina() throws Exception {
+        String uri = "/routines";
+        Usuario user;
+        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+
+        ResultActions resultActions = this.mockMvc.perform(get(uri));
+        assertThat(resultActions.andExpect(status().isOk()));
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
+        List<Rutina> rutinas = objectMapper.readValue(response, javaList);
+        assertTrue(rutinas != null);
+        this.rutinaService.deleteById(rutina.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    public void getAllRutinasByUsuario() throws Exception {
+        String uri = "/routines/getRoutines";
+        Usuario user;
+        List<Rutina> rutinas = new ArrayList<>();
+
+        user = (usuarioService.findById("test_user").isEmpty()) ? setUpUsuario() : usuarioService.findById("test_user").get();
+        for(int i=0; i<1; i++)
+            rutinas.add(setUpRutina(user));
+
+        String token = getToken(user);
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token));
+        assertThat(resultActions.andExpect(status().isOk()));
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
+        List<Rutina> rutinasObtained = objectMapper.readValue(response, javaList);
+        assertNotNull(rutinasObtained);
+
+        for(int i=0; i<1; i++){
+            assertEquals(rutinasObtained.get(i).getNombre(), rutinas.get(i).getNombre());
+            assertEquals(rutinasObtained.get(i).getDescripcion(), rutinas.get(i).getDescripcion());
+            assertEquals(rutinasObtained.get(i).getPrioridad(),rutinas.get(i).getPrioridad());
+            assertEquals(rutinasObtained.get(i).getEtiqueta(), rutinas.get(i).getEtiqueta());
+            assertEquals(rutinasObtained.get(i).getEstimacion(), rutinas.get(i).getEstimacion());
+            assertTrue(rutinasObtained.get(i).getFechaInicio().compareTo(rutinas.get(i).getFechaInicio()) < 10);
+            assertTrue(rutinasObtained.get(i).getFechaFin().compareTo(rutinas.get(i).getFechaFin()) < 10);
+            assertEquals(rutinasObtained.get(i).getRecurrencia(), rutinas.get(i).getRecurrencia());
+            assertEquals(rutinasObtained.get(i).getRecordatorio(), rutinas.get(i).getRecordatorio());
+            rutinaService.deleteById(rutinas.get(i).getId());
+        }
+        usuarioService.deleteById("test_user");
+    }
 
     @Test
     public void getRutina() throws Exception {

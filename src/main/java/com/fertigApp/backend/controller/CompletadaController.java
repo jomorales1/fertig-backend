@@ -47,7 +47,7 @@ public class CompletadaController {
                 LOGGER.info("Invalid data");
                 return null;
             }
-            return rutina.getCompletadas();
+            return completadaService.findByRutina(rutina);
         }
         return null;
     }

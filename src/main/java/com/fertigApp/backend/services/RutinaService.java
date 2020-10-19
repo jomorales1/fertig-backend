@@ -1,6 +1,7 @@
 package com.fertigApp.backend.services;
 
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.RutinaRepository;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,9 @@ public class RutinaService {
 
     public void deleteById(Integer id){
         rutinaRepository.deleteById(id);
+    }
+
+    public Iterable<Rutina> findByUsuario (Usuario usuario){
+        return rutinaRepository.findByUsuarioR(usuario);
     }
 }

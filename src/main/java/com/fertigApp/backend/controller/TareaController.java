@@ -51,7 +51,7 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         if(usuarioRepository.findById(userDetails.getUsername()).isPresent())
-            return usuarioRepository.findById(userDetails.getUsername()).get().getTareas();
+            return tareaService.findByUsuario(usuarioRepository.findById(userDetails.getUsername()).get());
         return null;
 
     }
@@ -107,9 +107,6 @@ public class TareaController {
         }catch (Exception e){
             return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea inexistente"));
         }
-
-
-
     }
 
     // Método POST para agregar un registro en la tabla "tarea" de la DB.
