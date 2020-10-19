@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="Juan Diego (generated)" id="1602985725397-1">
+    <changeSet author="simon (generated)" id="1603070173520-1">
         <createTable tableName="completada">
             <column name="id_completada" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -13,7 +13,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-2">
+    <changeSet author="simon (generated)" id="1603070173520-2">
         <createTable tableName="evento">
             <column autoIncrement="true" name="id_evento" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -23,11 +23,11 @@
             </column>
             <column name="nombre" type="VARCHAR(30)"/>
             <column name="descripcion" type="VARCHAR(120)"/>
-            <column name="prioridad" type="INT">
+            <column defaultValueNumeric="1" name="prioridad" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="etiqueta" type="VARCHAR(20)"/>
-            <column name="estimacion" type="INT"/>
+            <column defaultValueNumeric="0" name="estimacion" type="INT"/>
             <column name="fecha_inicio" type="datetime">
                 <constraints nullable="false"/>
             </column>
@@ -37,15 +37,15 @@
             <column name="recurrencia" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
-            <column name="recordatorio" type="INT UNSIGNED"/>
+            <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-3">
+    <changeSet author="simon (generated)" id="1603070173520-3">
         <createTable tableName="evento_evento_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-4">
+    <changeSet author="simon (generated)" id="1603070173520-4">
         <createTable tableName="oauth_access_token">
             <column name="authentication_id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
@@ -70,7 +70,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-5">
+    <changeSet author="simon (generated)" id="1603070173520-5">
         <createTable tableName="oauth_refresh_token">
             <column name="token_id" type="VARCHAR(255)">
                 <constraints nullable="false" primaryKey="true"/>
@@ -83,7 +83,7 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-6">
+    <changeSet author="simon (generated)" id="1603070173520-6">
         <createTable tableName="rutina">
             <column autoIncrement="true" name="id_rutina" type="INT">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
@@ -95,25 +95,25 @@
                 <constraints nullable="false"/>
             </column>
             <column name="descripcion" type="VARCHAR(120)"/>
-            <column name="prioridad" type="INT UNSIGNED">
+            <column defaultValueNumeric="1" name="prioridad" type="INT UNSIGNED">
                 <constraints nullable="false"/>
             </column>
             <column name="etiqueta" type="VARCHAR(20)"/>
-            <column name="estimacion" type="INT UNSIGNED"/>
+            <column defaultValueNumeric="0" name="estimacion" type="INT UNSIGNED"/>
             <column name="fecha_inicio" type="datetime"/>
             <column name="fecha_fin" type="datetime"/>
             <column name="recurrencia" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
-            <column name="recordatorio" type="INT"/>
+            <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-7">
+    <changeSet author="simon (generated)" id="1603070173520-7">
         <createTable tableName="rutina_rutina_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-8">
+    <changeSet author="simon (generated)" id="1603070173520-8">
         <createTable tableName="tarea">
             <column autoIncrement="true" name="id_tarea" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -125,28 +125,28 @@
                 <constraints nullable="false"/>
             </column>
             <column name="descripcion" type="VARCHAR(30)"/>
-            <column name="prioridad" type="INT">
+            <column defaultValueNumeric="1" name="prioridad" type="INT">
                 <constraints nullable="false"/>
             </column>
             <column name="etiqueta" type="VARCHAR(20)"/>
-            <column name="estimacion" type="INT"/>
+            <column defaultValueNumeric="0" name="estimacion" type="INT"/>
             <column name="fecha_inicio" type="datetime"/>
             <column name="fecha_fin" type="datetime"/>
-            <column name="nivel" type="INT UNSIGNED">
+            <column defaultValueNumeric="0" name="nivel" type="INT UNSIGNED">
                 <constraints nullable="false"/>
             </column>
             <column name="hecha" type="TINYINT(3)">
                 <constraints nullable="false"/>
             </column>
-            <column name="recordatorio" type="INT"/>
+            <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-9">
+    <changeSet author="simon (generated)" id="1603070173520-9">
         <createTable tableName="tarea_tarea_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-10">
+    <changeSet author="simon (generated)" id="1603070173520-10">
         <createTable tableName="usuario">
             <column name="usuario" type="VARCHAR(45)">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
@@ -154,7 +154,7 @@
             <column name="password" type="VARCHAR(68)">
                 <constraints nullable="false"/>
             </column>
-            <column name="correo" type="VARCHAR(255)">
+            <column name="correo" type="VARCHAR(128)">
                 <constraints nullable="false" unique="true"/>
             </column>
             <column name="nombre" type="VARCHAR(30)"/>
@@ -166,31 +166,31 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-11">
+    <changeSet author="simon (generated)" id="1603070173520-11">
         <createIndex indexName="correoE_idx" tableName="evento">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-12">
+    <changeSet author="simon (generated)" id="1603070173520-12">
         <createIndex indexName="correoE_idx" tableName="tarea">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-13">
+    <changeSet author="simon (generated)" id="1603070173520-13">
         <createIndex indexName="correoT_idx" tableName="rutina">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-14">
+    <changeSet author="simon (generated)" id="1603070173520-14">
         <addForeignKeyConstraint baseColumnNames="id_completada" baseTableName="completada" constraintName="actividad_completada" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id_rutina" referencedTableName="rutina" validate="true"/>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-15">
+    <changeSet author="simon (generated)" id="1603070173520-15">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="evento" constraintName="correoE" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-16">
+    <changeSet author="simon (generated)" id="1603070173520-16">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="rutina" constraintName="correoR" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
-    <changeSet author="Juan Diego (generated)" id="1602985725397-17">
+    <changeSet author="simon (generated)" id="1603070173520-17">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="tarea" constraintName="correoT" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
 </databaseChangeLog>
