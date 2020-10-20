@@ -78,34 +78,35 @@ public class EventoController {
 
     // Método PUT para actualizar un evento específico.
     @PutMapping(path="/events/updateEvent/{id}")
-    public ResponseEntity<?> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
+    public ResponseEntity<Evento> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.eventoService.findById(id)
-                .map(evento -> {
-                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
-                        LOGGER.info("User not found");
-                        return ResponseEntity.badRequest().body(null);
-                    }
-                    evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
-                    evento.setNombre(event.getNombre());
-                    evento.setDescripcion(event.getDescripcion());
-                    evento.setPrioridad(event.getPrioridad());
-                    evento.setEtiqueta(event.getEtiqueta());
-                    evento.setEstimacion(event.getEstimacion());
-                    evento.setFechaInicio(event.getFechaInicio());
-                    evento.setFechaFin(event.getFechaFin());
-                    evento.setRecurrencia(event.getRecurrencia());
-                    evento.setRecordatorio(event.getRecordatorio());
-                    this.eventoService.save(evento);
-                    LOGGER.info("Event updated");
-                    return ResponseEntity.ok().body(evento);
-                })
-                .orElseGet(() -> {
-                    LOGGER.info("Event not found");
-                    return ResponseEntity.badRequest().body(null);
-                });
+        Optional<Evento> optionalEvento = eventoService.findById(id);
+        if(optionalEvento.isPresent()){
+            if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
+                LOGGER.info("User not found");
+                return ResponseEntity.badRequest().body(null);
+            }
+            Evento evento = optionalEvento.get();
+
+            evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
+            evento.setNombre(event.getNombre());
+            evento.setDescripcion(event.getDescripcion());
+            evento.setPrioridad(event.getPrioridad());
+            evento.setEtiqueta(event.getEtiqueta());
+            evento.setEstimacion(event.getEstimacion());
+            evento.setFechaInicio(event.getFechaInicio());
+            evento.setFechaFin(event.getFechaFin());
+            evento.setRecurrencia(event.getRecurrencia());
+            evento.setRecordatorio(event.getRecordatorio());
+            this.eventoService.save(evento);
+            LOGGER.info("Event updated");
+            return ResponseEntity.ok().body(evento);
+        } else {
+            LOGGER.info("Event not found");
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Método POST para agregar un evento a la DB.

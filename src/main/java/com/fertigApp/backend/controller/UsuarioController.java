@@ -53,7 +53,7 @@ public class UsuarioController {
 
     //Metodo POST para iniciar sesión
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         //se llama al administrador de autenticación para que
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -89,7 +89,7 @@ public class UsuarioController {
 
     // Método PUT para modificar la información de un usuario en la DB.
     @PutMapping(path="/users/update")
-    public ResponseEntity<?> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
+    public ResponseEntity<Usuario> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
@@ -97,7 +97,7 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(null);
         }
 
-        if (!optUsuario.get().getUsuario().equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
+        if (optUsuario.isPresent() && !optUsuario.get().getUsuario().equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
             return ResponseEntity.badRequest().body(null);
         }
 
@@ -106,21 +106,22 @@ public class UsuarioController {
         user.setNombre(requestUsuario.getNombre());
         user.setUsuario(requestUsuario.getUsuario());
         user.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
-        return usuarioService.findById(userDetails.getUsername())
-                .map(usuario -> {
-                    usuario.setCorreo(user.getCorreo());
-                    usuario.setNombre(user.getNombre());
-                    if(!requestUsuario.getPassword().equals(""))
-                        usuario.setPassword(user.getPassword());
-                    usuarioService.save(usuario);
-                    return ResponseEntity.ok().body(usuario);
-                })
-                .orElseGet(() -> ResponseEntity.badRequest().body(null));
+        if(optUsuario.isPresent()){
+            Usuario usuario = optUsuario.get();
+            usuario.setCorreo(user.getCorreo());
+            usuario.setNombre(user.getNombre());
+            if(!requestUsuario.getPassword().equals(""))
+                usuario.setPassword(user.getPassword());
+            usuarioService.save(usuario);
+            return ResponseEntity.ok().body(usuario);
+        } else {
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Método POST para añadir un registro de tipo "usuario" en la DB.
     @PostMapping(path="/users/addUser") // Map ONLY POST Requests
-    public @ResponseBody ResponseEntity<?> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
+    public @ResponseBody ResponseEntity<MessageResponse> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
         if (usuarioService.existsById(requestUsuario.getUsuario()))
             return ResponseEntity
                     .badRequest()

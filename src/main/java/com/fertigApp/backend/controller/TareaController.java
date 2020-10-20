@@ -65,40 +65,43 @@ public class TareaController {
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
-    public ResponseEntity<?> replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
+    public ResponseEntity<Tarea> replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.tareaService.findById(id)
-                .map(tarea -> {
-                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
-                        LOGGER.info("User not found");
-                        return ResponseEntity.badRequest().body(null);
-                    }
-                    tarea.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
-                    tarea.setNombre(task.getNombre());
-                    tarea.setDescripcion(task.getDescripcion());
-                    tarea.setPrioridad(task.getPrioridad());
-                    tarea.setEtiqueta(task.getEtiqueta());
-                    tarea.setEstimacion(task.getEstimacion());
-                    tarea.setFechaInicio(task.getFechaInicio());
-                    tarea.setFechaFin(task.getFechaFin());
-                    tarea.setNivel(task.getNivel());
-                    tarea.setHecha(task.getHecha());
-                    this.tareaService.save(tarea);
-                    LOGGER.info("Task updated");
-                    return ResponseEntity.ok().body(tarea);
-                })
-                .orElseGet(() -> {
-                    LOGGER.info("Task not found");
-                    return ResponseEntity.badRequest().body(null);
-                });
+
+        Optional<Tarea> optionalTarea = tareaService.findById(id);
+        if(optionalTarea.isPresent()){
+            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+            if(optionalUsuario.isEmpty()){
+                LOGGER.info("User not found");
+                return ResponseEntity.badRequest().body(null);
+            }
+            Tarea tarea = optionalTarea.get();
+            tarea.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
+            tarea.setNombre(task.getNombre());
+            tarea.setDescripcion(task.getDescripcion());
+            tarea.setPrioridad(task.getPrioridad());
+            tarea.setEtiqueta(task.getEtiqueta());
+            tarea.setEstimacion(task.getEstimacion());
+            tarea.setFechaInicio(task.getFechaInicio());
+            tarea.setFechaFin(task.getFechaFin());
+            tarea.setNivel(task.getNivel());
+            tarea.setHecha(task.getHecha());
+            this.tareaService.save(tarea);
+            LOGGER.info("Task updated");
+            return ResponseEntity.ok().body(tarea);
+        } else {
+            LOGGER.info("Task not found");
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     @PatchMapping(path="/tasks/checkTask/{id}")
-    public ResponseEntity<?> checkTarea(@PathVariable Integer id) {
-        try{
-            Tarea tarea = this.tareaService.findById(id).orElseThrow(Exception::new);
+    public ResponseEntity<MessageResponse> checkTarea(@PathVariable Integer id) {
+        Optional<Tarea> optionalTarea = tareaService.findById(id);
+        if(optionalTarea.isPresent()){
+            Tarea tarea = optionalTarea.get();
             UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (tarea.getUsuarioT().getCorreo().equals(principal.getEmail())){
                 tarea.setHecha(!tarea.getHecha());
@@ -106,8 +109,7 @@ public class TareaController {
                 return ResponseEntity.ok().body(null);
             }
             return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea pertieneciente a otro usuario"));
-
-        }catch (Exception e){
+        } else {
             return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea inexistente"));
         }
     }

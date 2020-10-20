@@ -96,7 +96,7 @@ public class FacebookController {
 
             String userName;
             if(facebookEmail.contains("@facebook.com")){
-                userName = facebookUser.getName().replaceAll(" ", "");
+                userName = facebookUser.getName().replace(" ", "");
             } else {
                 userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
             }

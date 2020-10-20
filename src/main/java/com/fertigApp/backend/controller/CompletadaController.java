@@ -13,6 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 /*
 * Clase responsable de manejar request de tipo GET, POST y DELETE para
 * la entidad "Completada".
@@ -41,13 +43,13 @@ public class CompletadaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
-        if(rutinaService.findById(id).isPresent()){
-            Rutina rutina = rutinaService.findById(id).get();
-            if (!rutina.getUsuario().getUsuario().equals(user)) {
+        Optional<Rutina> optionalRutina = rutinaService.findById(id);
+        if(optionalRutina.isPresent()){
+            if (!optionalRutina.get().getUsuario().getUsuario().equals(user)) {
                 LOGGER.info("Invalid data");
                 return null;
             }
-            return completadaService.findByRutina(rutina);
+            return completadaService.findByRutina(optionalRutina.get());
         }
         return null;
     }
@@ -55,9 +57,10 @@ public class CompletadaController {
     // Método GET para obtener una entidad "completada" por medio de su id.
     @GetMapping(path="/completed/getOneCompleted/{id}")
     public Completada getCompleted(@PathVariable Integer id) {
-        if(completadaService.findById(id).isPresent())
-            return completadaService.findById(id).get();
-        else{
+        Optional<Completada> optionalCompletada = completadaService.findById(id);
+        if(optionalCompletada.isPresent())
+            return optionalCompletada.get();
+        else {
             LOGGER.info("Completed not found");
             return null;
         }
@@ -68,12 +71,12 @@ public class CompletadaController {
     public @ResponseBody ResponseEntity<Void> addNewCompletada(@RequestBody RequestCompletada requestCompletada) {
         // Missing check information process
         Completada completada = new Completada();
-        if (rutinaService.findById(requestCompletada.getRutina()).isEmpty())
+        Optional<Rutina> optionalRutina = rutinaService.findById(requestCompletada.getRutina());
+        if (optionalRutina.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        completada.setRutina(rutinaService.findById(requestCompletada.getRutina()).get());
+        completada.setRutina(optionalRutina.get());
         completada.setFecha(requestCompletada.getFecha());
         this.completadaService.save(completada);
-        this.rutinaService.save(rutinaService.findById(requestCompletada.getRutina()).get());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
-import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestCompletada;
@@ -17,12 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,7 +26,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.util.Date;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -38,7 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
 @AutoConfigureMockMvc
-public class CompletadaControllerTest {
+class CompletadaControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -123,12 +118,12 @@ public class CompletadaControllerTest {
     }
 
     @Test
-    public void contextLoads() {
+    void contextLoads() {
         assertTrue(true);
     }
 
     @Test
-    public void AddNewCompletada() throws Exception {
+    void AddNewCompletada() throws Exception {
         String uri = "/completed/addCompleted/";
         Usuario usuario = setUpUsuario();
         Rutina rutina = setUpRutina(usuario, new Date(0), new Date(3600*24*30));
@@ -155,7 +150,7 @@ public class CompletadaControllerTest {
     }
 
     @Test
-    public void getAllCompletadasByRutina() throws Exception {
+    void getAllCompletadasByRutina() throws Exception {
         String uri = "/completed/getCompleted/";
         Usuario usuario = setUpUsuario();
         Rutina rutina = setUpRutina(usuario, new Date(0), new Date(3600*24*30));
@@ -186,7 +181,7 @@ public class CompletadaControllerTest {
     }
 
     @Test
-    public void getCompleted() throws Exception {
+    void getCompleted() throws Exception {
         String uri = "/completed/getOneCompleted/";
         Usuario usuario = setUpUsuario();
         Rutina rutina = setUpRutina(usuario, new Date(0), new Date(3600*24*30));
