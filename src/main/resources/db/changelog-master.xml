@@ -1,19 +1,24 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.1.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
-    <changeSet author="simon (generated)" id="1603070173520-1">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-1">
         <createTable tableName="completada">
-            <column name="id_completada" type="INT">
-                <constraints nullable="false" primaryKey="true"/>
+            <column autoIncrement="true" name="id_completada" type="INT">
+                <constraints nullable="false" primaryKey="true" unique="true"/>
             </column>
             <column name="fecha" type="datetime">
                 <constraints nullable="false"/>
             </column>
-            <column name="id" type="INT">
+            <column name="rutina" type="INT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-2">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-2">
+        <createTable tableName="completada_id_seq">
+            <column name="next_val" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="Juan Diego (generated)" id="1603165982584-3">
         <createTable tableName="evento">
             <column autoIncrement="true" name="id_evento" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -40,50 +45,12 @@
             <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-3">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-4">
         <createTable tableName="evento_evento_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-4">
-        <createTable tableName="oauth_access_token">
-            <column name="authentication_id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true" unique="true"/>
-            </column>
-            <column name="token_id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="token" type="BLOB">
-                <constraints nullable="false"/>
-            </column>
-            <column name="user_name" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="client_id" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="authentication" type="BLOB">
-                <constraints nullable="false"/>
-            </column>
-            <column name="refresh_token" type="VARCHAR(255)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-5">
-        <createTable tableName="oauth_refresh_token">
-            <column name="token_id" type="VARCHAR(255)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="token" type="BLOB">
-                <constraints nullable="false"/>
-            </column>
-            <column name="authentication" type="BLOB">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-    </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-6">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-5">
         <createTable tableName="rutina">
             <column autoIncrement="true" name="id_rutina" type="INT">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
@@ -108,12 +75,12 @@
             <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-7">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-6">
         <createTable tableName="rutina_rutina_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-8">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-7">
         <createTable tableName="tarea">
             <column autoIncrement="true" name="id_tarea" type="INT">
                 <constraints nullable="false" primaryKey="true"/>
@@ -141,12 +108,12 @@
             <column defaultValueNumeric="-1" name="recordatorio" type="INT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-9">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-8">
         <createTable tableName="tarea_tarea_id_seq">
             <column name="next_val" type="BIGINT"/>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-10">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-9">
         <createTable tableName="usuario">
             <column name="usuario" type="VARCHAR(45)">
                 <constraints nullable="false" primaryKey="true" unique="true"/>
@@ -166,31 +133,36 @@
             </column>
         </createTable>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-11">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-10">
+        <createIndex indexName="actividad_completada_idx" tableName="completada">
+            <column name="rutina"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="Juan Diego (generated)" id="1603165982584-11">
         <createIndex indexName="correoE_idx" tableName="evento">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-12">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-12">
         <createIndex indexName="correoE_idx" tableName="tarea">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-13">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-13">
         <createIndex indexName="correoT_idx" tableName="rutina">
             <column name="usuario"/>
         </createIndex>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-14">
-        <addForeignKeyConstraint baseColumnNames="id_completada" baseTableName="completada" constraintName="actividad_completada" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id_rutina" referencedTableName="rutina" validate="true"/>
+    <changeSet author="Juan Diego (generated)" id="1603165982584-14">
+        <addForeignKeyConstraint baseColumnNames="rutina" baseTableName="completada" constraintName="actividad_completada" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id_rutina" referencedTableName="rutina" validate="true"/>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-15">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-15">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="evento" constraintName="correoE" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-16">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-16">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="rutina" constraintName="correoR" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
-    <changeSet author="simon (generated)" id="1603070173520-17">
+    <changeSet author="Juan Diego (generated)" id="1603165982584-17">
         <addForeignKeyConstraint baseColumnNames="usuario" baseTableName="tarea" constraintName="correoT" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="usuario" referencedTableName="usuario" validate="true"/>
     </changeSet>
 </databaseChangeLog>

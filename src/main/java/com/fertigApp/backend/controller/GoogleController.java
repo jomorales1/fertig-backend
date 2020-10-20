@@ -45,8 +45,7 @@ public class GoogleController {
 
     private final JwtUtil jwtUtil;
 
-    final
-    AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -90,11 +89,13 @@ public class GoogleController {
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList());
 
+                        LOGGER.info("Un usuario ha iniciado sesión con su cuenta de Google");
                         return ResponseEntity.ok(new JwtResponse(nToken,
                                 userDetails.getUsername(),
                                 user.getCorreo(),
                                 roles));
                     } else {
+                        LOGGER.info("Se ha intentado iniciar sesión con Google a una cuenta no asociada");
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cuenta usada por otra persona sin estar vinculada con Google :/");
                     }
                 } else {
@@ -128,6 +129,7 @@ public class GoogleController {
                             .map(GrantedAuthority::getAuthority)
                             .collect(Collectors.toList());
 
+                    LOGGER.info("Se ha registrado un usuario a través de Google");
                     return ResponseEntity.ok(new JwtResponse(nToken,
                             userDetails.getUsername(),
                             user.getCorreo(),

@@ -5,6 +5,7 @@ import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,6 +26,13 @@ public class CompletadaService {
     }
 
     public Iterable<Completada> findByRutina(Rutina rutina){
-        return completadaRepository.findByRutina(rutina);
+        return completadaRepository.findByRutinaC(rutina);
+    }
+
+    public void deleteByRutina(Rutina rutina){
+        List<Completada> completadaList = (List<Completada>) completadaRepository.findByRutinaC(rutina);
+        for(Completada completada : completadaList){
+            completadaRepository.deleteById(completada.getId());
+        }
     }
 }

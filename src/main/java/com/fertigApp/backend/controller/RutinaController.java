@@ -54,7 +54,7 @@ public class RutinaController {
 
     // Método GET para obtener todas las rutinas de un usuario específico.
     @GetMapping(path="/routines/getRoutines")
-    public ResponseEntity<?> getAllRutinasByUsuario() {
+    public ResponseEntity<List<RutinaResponse>> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
@@ -95,35 +95,37 @@ public class RutinaController {
 
     // Método PUT para modificar un registro en la base de datos.
     @PutMapping(path="/routines/updateRoutine/{id}")
-    public ResponseEntity<?> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
+    public ResponseEntity<Rutina> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.rutinaService.findById(id)
-                .map(rutina -> {
-                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
-                        LOGGER.info("User not found");
-                        return ResponseEntity.badRequest().body(null);
-                    }
-                    rutina.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
-                    rutina.setNombre(routine.getNombre());
-                    rutina.setDescripcion(routine.getDescripcion());
-                    rutina.setPrioridad(routine.getPrioridad());
-                    rutina.setEtiqueta(routine.getEtiqueta());
-                    rutina.setEstimacion(routine.getEstimacion());
-                    rutina.setFechaInicio(routine.getFechaInicio());
-                    rutina.setFechaFin(routine.getFechaFin());
-                    rutina.setRecurrencia(routine.getRecurrencia());
-                    rutina.setRecordatorio(routine.getRecordatorio());
-                    rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
-                    this.rutinaService.save(rutina);
-                    LOGGER.info("Routine replaced");
-                    return ResponseEntity.ok().body(rutina);
-                })
-                .orElseGet(() -> {
-                    LOGGER.info("Routine not found");
-                    return ResponseEntity.badRequest().body(null);
-                });
+
+        Optional<Rutina> optionalRutina = rutinaService.findById(id);
+        if(optionalRutina.isPresent()){
+            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+            if(optionalUsuario.isEmpty()){
+                LOGGER.info("User not found");
+                return ResponseEntity.badRequest().body(null);
+            }
+            Rutina rutina = optionalRutina.get();
+            rutina.setUsuario(optionalUsuario.get());
+            rutina.setNombre(routine.getNombre());
+            rutina.setDescripcion(routine.getDescripcion());
+            rutina.setPrioridad(routine.getPrioridad());
+            rutina.setEtiqueta(routine.getEtiqueta());
+            rutina.setEstimacion(routine.getEstimacion());
+            rutina.setFechaInicio(routine.getFechaInicio());
+            rutina.setFechaFin(routine.getFechaFin());
+            rutina.setRecurrencia(routine.getRecurrencia());
+            rutina.setRecordatorio(routine.getRecordatorio());
+            rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
+            this.rutinaService.save(rutina);
+            LOGGER.info("Routine replaced");
+            return ResponseEntity.ok().body(rutina);
+        } else {
+            LOGGER.info("Routine not found");
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Método POST para añadir un registro en la tabla "rutina" de la DB.
