@@ -153,8 +153,12 @@ class UsuarioControllerTests {
         RequestUsuario requestUsuario = new RequestUsuario();
         requestUsuario.setCorreo(user.getCorreo());
         requestUsuario.setNombre(user.getNombre() + "Version 2");
-        requestUsuario.setUsuario(user.getUsuario());
+        requestUsuario.setUsuario(user.getUsuario() + "v2");
         requestUsuario.setPassword("testing");
+        this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
+                        .writeValueAsString(requestUsuario))).andExpect(status().isBadRequest());
+        requestUsuario.setUsuario(user.getUsuario());
         this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
                         .writeValueAsString(requestUsuario))).andExpect(status().isOk());
