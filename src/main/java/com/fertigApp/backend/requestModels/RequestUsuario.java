@@ -19,7 +19,11 @@ public class RequestUsuario implements Serializable {
 		this.password = password;
 	}
 
-	public String getCorreo() {
+    public RequestUsuario() {
+
+    }
+
+    public String getCorreo() {
 		return correo;
 	}
 

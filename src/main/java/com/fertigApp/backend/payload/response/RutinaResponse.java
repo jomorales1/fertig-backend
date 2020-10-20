@@ -10,6 +10,8 @@ public class RutinaResponse {
 
     public Rutina rutina;
 
+    public RutinaResponse() { };
+
     public RutinaResponse(Rutina rutina, Completada completada) {
         this.rutina = rutina;
         this.ultimaCompletada = completada;

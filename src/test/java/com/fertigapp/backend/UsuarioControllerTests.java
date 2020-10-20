@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -51,6 +52,9 @@ class UsuarioControllerTests {
         user.setCorreo("test@email.com");
         user.setNombre("Test User");
         user.setPassword(passwordEncoder.encode("testing"));
+        user.setTareas(new ArrayList<>());
+        user.setRutinas(new ArrayList<>());
+        user.setEventos(new ArrayList<>());
 
         this.usuarioService.save(user);
         return user;
@@ -146,7 +150,11 @@ class UsuarioControllerTests {
         String searchUri = "/users/get";
 
         // Valid request -> status 200 expected
-        RequestUsuario requestUsuario = new RequestUsuario(user.getCorreo(), user.getNombre() + "Version 2", user.getUsuario(), "testing");
+        RequestUsuario requestUsuario = new RequestUsuario();
+        requestUsuario.setCorreo(user.getCorreo());
+        requestUsuario.setNombre(user.getNombre() + "Version 2");
+        requestUsuario.setUsuario(user.getUsuario());
+        requestUsuario.setPassword("testing");
         this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
                         .writeValueAsString(requestUsuario))).andExpect(status().isOk());
