@@ -96,12 +96,8 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) principal;
 
         Optional<Rutina> optionalRutina = rutinaService.findById(id);
-        if(optionalRutina.isPresent()){
-            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-            if(optionalUsuario.isEmpty()){
-                LOGGER.info("User not found");
-                return ResponseEntity.badRequest().body(null);
-            }
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
             Rutina rutina = optionalRutina.get();
             rutina.setUsuario(optionalUsuario.get());
             rutina.setNombre(routine.getNombre());
