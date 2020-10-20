@@ -77,6 +77,7 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -85,5 +86,10 @@ public class UserDetailsImpl implements UserDetails {
             return false;
         UserDetailsImpl user = (UserDetailsImpl) o;
         return Objects.equals(username, user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
