@@ -78,7 +78,7 @@ public class TareaController {
                 return ResponseEntity.badRequest().body(null);
             }
             Tarea tarea = optionalTarea.get();
-            tarea.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
+            tarea.setUsuario(optionalUsuario.get());
             tarea.setNombre(task.getNombre());
             tarea.setDescripcion(task.getDescripcion());
             tarea.setPrioridad(task.getPrioridad());

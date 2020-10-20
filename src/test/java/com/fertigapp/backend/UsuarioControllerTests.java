@@ -219,6 +219,7 @@ class UsuarioControllerTests {
         String token = getToken(user);
 
         String uri = "/users/delete";
+
         this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
     }

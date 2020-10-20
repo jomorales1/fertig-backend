@@ -143,11 +143,7 @@ public class UsuarioController {
     @DeleteMapping(path="/users/delete")
     public ResponseEntity<Void> deleteUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try{
-            usuarioService.deleteById(userDetails.getUsername());
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch(org.springframework.dao.EmptyResultDataAccessException ex){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        usuarioService.deleteById(userDetails.getUsername());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

@@ -84,13 +84,14 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) principal;
         Optional<Evento> optionalEvento = eventoService.findById(id);
         if(optionalEvento.isPresent()){
-            if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
+            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+            if(optionalUsuario.isEmpty()){
                 LOGGER.info("User not found");
                 return ResponseEntity.badRequest().body(null);
             }
             Evento evento = optionalEvento.get();
 
-            evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
+            evento.setUsuario(optionalUsuario.get());
             evento.setNombre(event.getNombre());
             evento.setDescripcion(event.getDescripcion());
             evento.setPrioridad(event.getPrioridad());
