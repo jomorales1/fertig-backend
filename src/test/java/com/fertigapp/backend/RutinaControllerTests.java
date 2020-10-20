@@ -204,6 +204,12 @@ class RutinaControllerTests {
         assertEquals(rutinaObtained.getRecurrencia(), rutina.getRecurrencia());
         assertEquals(rutinaObtained.getRecordatorio(), rutina.getRecordatorio());
 
+        resultActions = this.mockMvc.perform(get(uri + "/" + (rutina.getId() + 1)).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+        assertTrue(response.isEmpty());
+
         rutinaService.deleteById(rutina.getId());
         usuarioService.deleteById("test_user");
     }
