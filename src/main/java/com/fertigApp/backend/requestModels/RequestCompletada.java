@@ -3,8 +3,18 @@ package com.fertigApp.backend.requestModels;
 import java.util.Date;
 
 public class RequestCompletada {
+
     private Integer rutina;
     private Date fecha;
+
+    public RequestCompletada(){
+
+    }
+
+    public RequestCompletada(Integer rutina, Date fecha) {
+        this.rutina = rutina;
+        this.fecha = fecha;
+    }
 
     public Integer getRutina() {
         return rutina;
