@@ -43,7 +43,7 @@ public class CompletadaController {
 
         if(rutinaService.findById(id).isPresent()){
             Rutina rutina = rutinaService.findById(id).get();
-            if (rutina.getUsuario().getUsuario().equals(user)) {
+            if (!rutina.getUsuario().getUsuario().equals(user)) {
                 LOGGER.info("Invalid data");
                 return null;
             }
@@ -72,7 +72,6 @@ public class CompletadaController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         completada.setRutina(rutinaService.findById(requestCompletada.getRutina()).get());
         completada.setFecha(requestCompletada.getFecha());
-        rutinaService.findById(requestCompletada.getRutina()).get().getCompletadas().add(completada);
         this.completadaService.save(completada);
         this.rutinaService.save(rutinaService.findById(requestCompletada.getRutina()).get());
         return new ResponseEntity<>(HttpStatus.CREATED);

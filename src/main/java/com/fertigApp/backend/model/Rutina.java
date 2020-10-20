@@ -45,7 +45,7 @@ public class Rutina implements Serializable {
     private int recordatorio;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "rutina")
+    @OneToMany(mappedBy = "rutinaC")
     private List<Completada> completadas;
 
     public int getId() {
