@@ -207,7 +207,8 @@ class TareaControllerTests {
         assertEquals(obtainedTask.getUsuarioT().getUsuario(), requestTarea.getUsuarioT().getUsuario());
         assertEquals(obtainedTask.getNombre(), requestTarea.getNombre());
 
-        this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
         this.tareaService.deleteById(task.getId());

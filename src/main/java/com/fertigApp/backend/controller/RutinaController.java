@@ -58,22 +58,17 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isPresent()){
-            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.get());
-            List<RutinaResponse> rutinaResponses = new ArrayList<>();
-            for(Rutina rutina : rutinas) {
-                List<Completada> completadas;
-                completadas = (List<Completada>) completadaService.findByRutina(rutina);
-                Completada ultimaCompletada = null;
-                if (!completadas.isEmpty())
-                    ultimaCompletada = completadas.get(completadas.size() - 1);
-                rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
-            }
-            return ResponseEntity.ok().body(rutinaResponses);
+        List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.orElse(null));
+        List<RutinaResponse> rutinaResponses = new ArrayList<>();
+        for(Rutina rutina : rutinas) {
+            List<Completada> completadas;
+            completadas = (List<Completada>) completadaService.findByRutina(rutina);
+            Completada ultimaCompletada = null;
+            if (!completadas.isEmpty())
+                ultimaCompletada = completadas.get(completadas.size() - 1);
+            rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
         }
-        LOGGER.info("User not found");
-        return ResponseEntity.badRequest().body(null);
-
+        return ResponseEntity.ok().body(rutinaResponses);
     }
 
     // Método GET para obtener una rutina específica por medio de su ID.
@@ -137,23 +132,20 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) principal;
 
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isPresent()) {
-            rutina.setUsuario(optUsuario.get());
-            rutina.setNombre(requestRutina.getNombre());
-            rutina.setDescripcion(requestRutina.getDescripcion());
-            rutina.setPrioridad(requestRutina.getPrioridad());
-            rutina.setEtiqueta(requestRutina.getEtiqueta());
-            if (requestRutina.getEstimacion() != null)
-                rutina.setEstimacion(requestRutina.getEstimacion());
-            rutina.setRecurrencia(requestRutina.getRecurrencia());
-            if (requestRutina.getRecordatorio() != null)
-                rutina.setRecordatorio(requestRutina.getRecordatorio());
-            rutina.setFechaInicio(requestRutina.getFechaInicio());
-            rutina.setFechaFin(requestRutina.getFechaFin());
-            this.rutinaService.save(rutina);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        rutina.setUsuario(optUsuario.orElse(null));
+        rutina.setNombre(requestRutina.getNombre());
+        rutina.setDescripcion(requestRutina.getDescripcion());
+        rutina.setPrioridad(requestRutina.getPrioridad());
+        rutina.setEtiqueta(requestRutina.getEtiqueta());
+        if (requestRutina.getEstimacion() != null)
+            rutina.setEstimacion(requestRutina.getEstimacion());
+        rutina.setRecurrencia(requestRutina.getRecurrencia());
+        if (requestRutina.getRecordatorio() != null)
+            rutina.setRecordatorio(requestRutina.getRecordatorio());
+        rutina.setFechaInicio(requestRutina.getFechaInicio());
+        rutina.setFechaFin(requestRutina.getFechaFin());
+        this.rutinaService.save(rutina);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.

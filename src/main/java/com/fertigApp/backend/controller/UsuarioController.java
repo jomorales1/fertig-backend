@@ -106,17 +106,14 @@ public class UsuarioController {
         user.setNombre(requestUsuario.getNombre());
         user.setUsuario(requestUsuario.getUsuario());
         user.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
-        if(optUsuario.isPresent()){
-            Usuario usuario = optUsuario.get();
-            usuario.setCorreo(user.getCorreo());
-            usuario.setNombre(user.getNombre());
-            if(!requestUsuario.getPassword().equals(""))
-                usuario.setPassword(user.getPassword());
-            usuarioService.save(usuario);
-            return ResponseEntity.ok().body(usuario);
-        } else {
-            return ResponseEntity.badRequest().body(null);
-        }
+
+        Usuario usuario = optUsuario.orElse(null);
+        usuario.setCorreo(user.getCorreo());
+        usuario.setNombre(user.getNombre());
+        if(!requestUsuario.getPassword().equals(""))
+            usuario.setPassword(user.getPassword());
+        usuarioService.save(usuario);
+        return ResponseEntity.ok().body(usuario);
     }
 
     // Método POST para añadir un registro de tipo "usuario" en la DB.

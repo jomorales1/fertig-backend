@@ -50,12 +50,7 @@ public class EventoController {
     public Iterable<Evento> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-        if (optUsuario.isPresent())
-            return eventoService.findByUsuario(optUsuario.get());
-        else{
-            LOGGER.info("User not found");
-            return null;
-        }
+        return optUsuario.map(eventoService::findByUsuario).orElse(null);
     }
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
@@ -83,12 +78,8 @@ public class EventoController {
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Evento> optionalEvento = eventoService.findById(id);
-        if(optionalEvento.isPresent()){
-            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-            if(optionalUsuario.isEmpty()){
-                LOGGER.info("User not found");
-                return ResponseEntity.badRequest().body(null);
-            }
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalEvento.isPresent() && optionalUsuario.isPresent()){
             Evento evento = optionalEvento.get();
 
             evento.setUsuario(optionalUsuario.get());
@@ -118,23 +109,21 @@ public class EventoController {
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if (optUsuario.isPresent()){
-            evento.setUsuario(optUsuario.get());
-            evento.setNombre(requestEvento.getNombre());
-            evento.setDescripcion(requestEvento.getDescripcion());
-            evento.setPrioridad(requestEvento.getPrioridad());
-            evento.setEtiqueta(requestEvento.getEtiqueta());
-            if (requestEvento.getEstimacion() != null)
-                evento.setEstimacion(requestEvento.getEstimacion());
-            evento.setFechaInicio(requestEvento.getFechaInicio());
-            evento.setFechaFin(requestEvento.getFechaFin());
-            evento.setRecurrencia(requestEvento.getRecurrencia());
-            if (requestEvento.getRecordatorio() != null)
-                evento.setRecordatorio(requestEvento.getRecordatorio());
-            this.eventoService.save(evento);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        evento.setUsuario(optUsuario.orElse(null));
+        evento.setNombre(requestEvento.getNombre());
+        evento.setDescripcion(requestEvento.getDescripcion());
+        evento.setPrioridad(requestEvento.getPrioridad());
+        evento.setEtiqueta(requestEvento.getEtiqueta());
+        if (requestEvento.getEstimacion() != null)
+            evento.setEstimacion(requestEvento.getEstimacion());
+        evento.setFechaInicio(requestEvento.getFechaInicio());
+        evento.setFechaFin(requestEvento.getFechaFin());
+        evento.setRecurrencia(requestEvento.getRecurrencia());
+        if (requestEvento.getRecordatorio() != null)
+            evento.setRecordatorio(requestEvento.getRecordatorio());
+        this.eventoService.save(evento);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Método DELETE para borrar un registro de la tabla "evento" en la DB.

@@ -71,12 +71,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) principal;
 
         Optional<Tarea> optionalTarea = tareaService.findById(id);
-        if(optionalTarea.isPresent()){
-            Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-            if(optionalUsuario.isEmpty()){
-                LOGGER.info("User not found");
-                return ResponseEntity.badRequest().body(null);
-            }
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalTarea.isPresent() && optionalUsuario.isPresent()){
             Tarea tarea = optionalTarea.get();
             tarea.setUsuario(optionalUsuario.get());
             tarea.setNombre(task.getNombre());
@@ -122,22 +118,19 @@ public class TareaController {
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isPresent()){
-            tarea.setUsuario(optUsuario.get());
-            tarea.setDescripcion(requestTarea.getDescripcion());
-            tarea.setEstimacion(requestTarea.getEstimacion());
-            tarea.setEtiqueta(requestTarea.getEtiqueta());
-            tarea.setFechaFin(requestTarea.getFechaFin());
-            tarea.setFechaInicio(requestTarea.getFechaInicio());
-            tarea.setHecha(requestTarea.getHecha());
-            tarea.setNivel(requestTarea.getNivel());
-            tarea.setNombre(requestTarea.getNombre());
-            tarea.setPrioridad(requestTarea.getPrioridad());
-            tarea.setRecordatorio(requestTarea.getRecordatorio());
-            this.tareaService.save(tarea);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        tarea.setUsuario(optUsuario.orElse(null));
+        tarea.setDescripcion(requestTarea.getDescripcion());
+        tarea.setEstimacion(requestTarea.getEstimacion());
+        tarea.setEtiqueta(requestTarea.getEtiqueta());
+        tarea.setFechaFin(requestTarea.getFechaFin());
+        tarea.setFechaInicio(requestTarea.getFechaInicio());
+        tarea.setHecha(requestTarea.getHecha());
+        tarea.setNivel(requestTarea.getNivel());
+        tarea.setNombre(requestTarea.getNombre());
+        tarea.setPrioridad(requestTarea.getPrioridad());
+        tarea.setRecordatorio(requestTarea.getRecordatorio());
+        this.tareaService.save(tarea);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
