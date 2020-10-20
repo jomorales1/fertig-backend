@@ -65,7 +65,7 @@ public class RutinaController {
                 List<Completada> completadas;
                 completadas = (List<Completada>) completadaService.findByRutina(rutina);
                 Completada ultimaCompletada = null;
-                if (completadas.size() > 0)
+                if (!completadas.isEmpty())
                     ultimaCompletada = completadas.get(completadas.size() - 1);
                 rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
             }
