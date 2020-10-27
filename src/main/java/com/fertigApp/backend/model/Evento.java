@@ -27,7 +27,7 @@ public class Evento implements Serializable {
 
     private String etiqueta;
 
-    private Integer estimacion;
+    private Integer duracion;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
@@ -89,12 +89,12 @@ public class Evento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
-        return estimacion;
+    public int getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(int estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
     }
 
     public Date getFechaInicio() {

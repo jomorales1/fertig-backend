@@ -26,6 +26,8 @@ public class Completada implements Serializable {
     @JoinColumn(name="rutina")
     private Rutina rutinaC;
 
+    private boolean hecha;
+
     public int getId() {
         return id;
     }
@@ -45,4 +47,13 @@ public class Completada implements Serializable {
     public void setFecha(Date fecha) {
         this.fecha = fecha;
     }
+
+    public boolean isHecha() {
+        return hecha;
+    }
+
+    public void setHecha(boolean hecha) {
+        this.hecha = hecha;
+    }
+
 }

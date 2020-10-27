@@ -3,10 +3,7 @@ package com.fertigApp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
@@ -39,6 +36,20 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioR")
 	private List<Rutina> rutinas;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "agregador")
+	@JoinTable(name = "amigo",
+				joinColumns = {@JoinColumn(name = "agregador"),
+								@JoinColumn(name = "agregado")})
+	private List<Amigo> amigos;
+
+	@JsonIgnore
+	@ManyToMany
+	@JoinTable(name = "preferido",
+				joinColumns = {@JoinColumn(name = "id_sonido")},
+				inverseJoinColumns = {@JoinColumn(name = "usuario")})
+	private List<Sonido> preferidos;
 
 	public Usuario() { }
 
@@ -103,6 +114,14 @@ public class Usuario implements Serializable {
 
 	public void setRutinas(List<Rutina> rutinas) {
 		this.rutinas = rutinas;
+	}
+
+	public List<Amigo> getAmigos() {
+		return amigos;
+	}
+
+	public void setAmigos(List<Amigo> amigos) {
+		this.amigos = amigos;
 	}
 
 	public boolean isGoogle() {

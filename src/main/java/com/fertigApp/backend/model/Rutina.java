@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class Rutina implements Serializable {
 
     private String etiqueta;
 
-    private int estimacion;
+    private int duracion;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
@@ -43,6 +44,10 @@ public class Rutina implements Serializable {
     private String recurrencia;
 
     private int recordatorio;
+
+    private Time franjaInicio;
+
+    private Time franjaFin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
@@ -96,12 +101,12 @@ public class Rutina implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
-        return estimacion;
+    public int getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(int estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
     }
 
     public Date getFechaInicio() {
@@ -134,6 +139,22 @@ public class Rutina implements Serializable {
 
     public void setRecordatorio(int recordatorio) {
         this.recordatorio = recordatorio;
+    }
+
+    public Time getFranjaInicio() {
+        return franjaInicio;
+    }
+
+    public void setFranjaInicio(Time franjaInicio) {
+        this.franjaInicio = franjaInicio;
+    }
+
+    public Time getFranjaFin() {
+        return franjaFin;
+    }
+
+    public void setFranjaFin(Time franjaFin) {
+        this.franjaFin = franjaFin;
     }
 
     public List<Completada> getCompletadas() {
