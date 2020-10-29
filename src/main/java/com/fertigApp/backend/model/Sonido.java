@@ -1,7 +1,10 @@
 package com.fertigApp.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name = "sonido")
@@ -9,18 +12,10 @@ public class Sonido implements Serializable {
 
     @Id
     @Column(name="id_sonido")
-    @ManyToOne
     private String id;
 
-    public Sonido() {
+    @JsonIgnore
+    @ManyToMany(mappedBy = "sonidos")
+    private List<Usuario> usuarios;
 
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 }

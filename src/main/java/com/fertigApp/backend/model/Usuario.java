@@ -25,9 +25,17 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	private String password;
 
+	@OneToMany(mappedBy = "usuario")
+	private List<TareaDeUsuario> tareas;
+
 	@JsonIgnore
-	@OneToMany(mappedBy = "usuarioT")
-	private List<Tarea> tareas;
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@JoinTable(
+			name = "preferido",
+			joinColumns = {@JoinColumn(name="usuario")},
+			inverseJoinColumns = {@JoinColumn(name="id_sonido")}
+	)
+	List<Sonido> sonidos;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioE")
@@ -37,19 +45,12 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioR")
 	private List<Rutina> rutinas;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "agregador")
-	@JoinTable(name = "amigo",
-				joinColumns = {@JoinColumn(name = "agregador"),
-								@JoinColumn(name = "agregado")})
-	private List<Amigo> amigos;
-
-	@JsonIgnore
-	@ManyToMany
-	@JoinTable(name = "preferido",
-				joinColumns = {@JoinColumn(name = "id_sonido")},
-				inverseJoinColumns = {@JoinColumn(name = "usuario")})
-	private List<Sonido> preferidos;
+//	@JsonIgnore
+//	@OneToMany(mappedBy = "agregador")
+//	@JoinTable(name = "amigo",
+//				joinColumns = {@JoinColumn(name = "agregador"),
+//								@JoinColumn(name = "agregado")})
+//	private List<Amigo> amigos;
 
 	public Usuario() { }
 
@@ -84,14 +85,6 @@ public class Usuario implements Serializable {
 		this.password = password;
 	}
 
-	public List<Tarea> getTareas() {
-		return tareas;
-	}
-
-	public void setTareas(List<Tarea> tareas) {
-		this.tareas = tareas;
-	}
-
 	public String getUsuario() {
 		return usuario;
 	}
@@ -114,14 +107,6 @@ public class Usuario implements Serializable {
 
 	public void setRutinas(List<Rutina> rutinas) {
 		this.rutinas = rutinas;
-	}
-
-	public List<Amigo> getAmigos() {
-		return amigos;
-	}
-
-	public void setAmigos(List<Amigo> amigos) {
-		this.amigos = amigos;
 	}
 
 	public boolean isGoogle() {
