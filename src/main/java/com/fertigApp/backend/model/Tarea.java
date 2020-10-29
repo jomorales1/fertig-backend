@@ -21,6 +21,15 @@ public class Tarea implements Serializable {
     @OneToMany(mappedBy = "tarea")
     private List<TareaDeUsuario> usuariosT;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tarea")
+    //@Column(name = "id_padre")
+    private Tarea parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Tarea> tareas;
+
+
     private String nombre;
 
     private String descripcion;
