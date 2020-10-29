@@ -136,7 +136,10 @@ public class TareaController {
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
     @DeleteMapping(path="/tasks/deleteTask/{id}")
     //@RequestParam
-    public void deleteTarea(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteTarea(@PathVariable Integer id) {
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.tareaService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
