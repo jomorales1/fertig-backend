@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="tarea")
@@ -17,9 +18,8 @@ public class Tarea implements Serializable {
     @Column(name="id_tarea")
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario")
-    private Usuario usuarioT;
+    @OneToMany(mappedBy = "tarea")
+    private List<TareaDeUsuario> usuariosT;
 
     private String nombre;
 
@@ -53,14 +53,6 @@ public class Tarea implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Usuario getUsuarioT() {
-        return usuarioT;
-    }
-
-    public void setUsuario(Usuario usuarioT) {
-        this.usuarioT = usuarioT;
     }
 
     public String getNombre() {
