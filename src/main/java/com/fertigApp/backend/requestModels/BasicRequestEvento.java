@@ -30,9 +30,10 @@ public class BasicRequestEvento implements Serializable {
         LinkedList<Date> fechas = new LinkedList<>();
         //1s;2s;l,x;1m;1a;2h;2s l,x;l-v;1m 15-20;
         switch (recurrencia.charAt(0)){
-            case "A":
+            case 'A':
               for(Date current = fechaInicio; current.before(fechaFin); current=new Date(current.getTime()+3600*24*365));
         }
+        return fechas;
     }
 
     public String getNombre() {

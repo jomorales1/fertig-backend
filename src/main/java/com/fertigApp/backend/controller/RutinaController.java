@@ -4,6 +4,7 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.RutinaResponse;
+import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -86,61 +88,65 @@ public class RutinaController {
         return null;
     }
 
-//    // Método PUT para modificar un registro en la base de datos.
-//    @PutMapping(path="/routines/updateRoutine/{id}")
-//    public ResponseEntity<Rutina> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
-//        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
-//        UserDetails userDetails = (UserDetails) principal;
-//
-//        Optional<Rutina> optionalRutina = rutinaService.findById(id);
-//        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-//        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
-//            Rutina rutina = optionalRutina.get();
-//            rutina.setUsuario(optionalUsuario.get());
-//            rutina.setNombre(routine.getNombre());
-//            rutina.setDescripcion(routine.getDescripcion());
-//            rutina.setPrioridad(routine.getPrioridad());
-//            rutina.setEtiqueta(routine.getEtiqueta());
-//            rutina.setEstimacion(routine.getEstimacion());
-//            rutina.setFechaInicio(routine.getFechaInicio());
-//            rutina.setFechaFin(routine.getFechaFin());
-//            rutina.setRecurrencia(routine.getRecurrencia());
-//            rutina.setRecordatorio(routine.getRecordatorio());
-//            rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
-//            this.rutinaService.save(rutina);
-//            LOGGER.info("Routine replaced");
-//            return ResponseEntity.ok().body(rutina);
-//        } else {
-//            LOGGER.info("Routine not found");
-//            return ResponseEntity.badRequest().body(null);
-//        }
-//    }
+    // Método PUT para modificar un registro en la base de datos.
+    @PutMapping(path="/routines/updateRoutine/{id}")
+    public ResponseEntity<Rutina> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
 
-//    // Método POST para añadir un registro en la tabla "rutina" de la DB.
-//    @PostMapping(path="/routines/addRoutine")
-//    public @ResponseBody ResponseEntity<Void> addNewRutina(@RequestBody RequestRutina requestRutina) {
-//        Rutina rutina = new Rutina();
-//        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
-//        UserDetails userDetails = (UserDetails) principal;
-//
-//        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-//        rutina.setUsuario(optUsuario.orElse(null));
-//        rutina.setNombre(requestRutina.getNombre());
-//        rutina.setDescripcion(requestRutina.getDescripcion());
-//        rutina.setPrioridad(requestRutina.getPrioridad());
-//        rutina.setEtiqueta(requestRutina.getEtiqueta());
-//        if (requestRutina.getEstimacion() != null)
-//            rutina.setEstimacion(requestRutina.getEstimacion());
-//        rutina.setRecurrencia(requestRutina.getRecurrencia());
-//        if (requestRutina.getRecordatorio() != null)
-//            rutina.setRecordatorio(requestRutina.getRecordatorio());
-//        rutina.setFechaInicio(requestRutina.getFechaInicio());
-//        rutina.setFechaFin(requestRutina.getFechaFin());
-//        this.rutinaService.save(rutina);
-//        return new ResponseEntity<>(HttpStatus.CREATED);
-//    }
+        Optional<Rutina> optionalRutina = rutinaService.findById(id);
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
+            Rutina rutina = optionalRutina.get();
+            rutina.setUsuario(optionalUsuario.get());
+            rutina.setNombre(routine.getNombre());
+            rutina.setDescripcion(routine.getDescripcion());
+            rutina.setPrioridad(routine.getPrioridad());
+            rutina.setEtiqueta(routine.getEtiqueta());
+            rutina.setDuracion(routine.getDuracion());
+            rutina.setFechaInicio(routine.getFechaInicio());
+            rutina.setFechaFin(routine.getFechaFin());
+            rutina.setRecurrencia(routine.getRecurrencia());
+            rutina.setRecordatorio(routine.getRecordatorio());
+            rutina.setFranjaInicio(routine.getFranjaInicio());
+            rutina.setFranjaFin(routine.getFranjaFin());
+            rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
+            this.rutinaService.save(rutina);
+            LOGGER.info("Routine replaced");
+            return ResponseEntity.ok().body(rutina);
+        } else {
+            LOGGER.info("Routine not found");
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
+
+    // Método POST para añadir un registro en la tabla "rutina" de la DB.
+    @PostMapping(path="/routines/addRoutine")
+    public @ResponseBody ResponseEntity<Void> addNewRutina(@RequestBody RequestRutina requestRutina) {
+        Rutina rutina = new Rutina();
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
+
+        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
+        rutina.setUsuario(optUsuario.orElse(null));
+        rutina.setNombre(requestRutina.getNombre());
+        rutina.setDescripcion(requestRutina.getDescripcion());
+        rutina.setPrioridad(requestRutina.getPrioridad());
+        rutina.setEtiqueta(requestRutina.getEtiqueta());
+        if (requestRutina.getDuracion() != null)
+            rutina.setDuracion(requestRutina.getDuracion());
+        rutina.setRecurrencia(requestRutina.getRecurrencia());
+        if (requestRutina.getRecordatorio() != null)
+            rutina.setRecordatorio(requestRutina.getRecordatorio());
+        rutina.setFechaInicio(requestRutina.getFechaInicio());
+        rutina.setFechaFin(requestRutina.getFechaFin());
+        rutina.setFranjaInicio(requestRutina.getFranjaInicio());
+        rutina.setFranjaFin(requestRutina.getFranjaFin());
+        this.rutinaService.save(rutina);
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
 
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.
     @DeleteMapping(path="/routines/deleteRoutine/{id}")

@@ -20,4 +20,35 @@ public class TareaDeUsuario implements Serializable {
 
     private boolean admin;
 
+    public IdTareaUsuario getId() {
+        return id;
+    }
+
+    public void setId(IdTareaUsuario id) {
+        this.id = id;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public Tarea getTarea() {
+        return tarea;
+    }
+
+    public void setTarea(Tarea tarea) {
+        this.tarea = tarea;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
+    }
 }

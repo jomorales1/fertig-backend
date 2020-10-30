@@ -4,6 +4,7 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class RequestRutina implements Serializable {
 
     private String etiqueta;
 
-    private Integer estimacion;
+    private Integer duracion;
 
     private Date fechaInicio;
 
@@ -28,6 +29,10 @@ public class RequestRutina implements Serializable {
     private String recurrencia;
 
     private Integer recordatorio;
+
+    private Time franjaInicio;
+
+    private Time franjaFin;
 
     private List<Completada> completadas;
 
@@ -71,12 +76,12 @@ public class RequestRutina implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public Integer getEstimacion() {
-        return estimacion;
+    public Integer getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(Integer estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 
     public Date getFechaInicio() {
@@ -109,6 +114,22 @@ public class RequestRutina implements Serializable {
 
     public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
+    }
+
+    public Time getFranjaInicio() {
+        return franjaInicio;
+    }
+
+    public void setFranjaInicio(Time franjaInicio) {
+        this.franjaInicio = franjaInicio;
+    }
+
+    public Time getFranjaFin() {
+        return franjaFin;
+    }
+
+    public void setFranjaFin(Time franjaFin) {
+        this.franjaFin = franjaFin;
     }
 
     public List<Completada> getCompletadas() {

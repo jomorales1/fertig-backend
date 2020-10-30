@@ -12,7 +12,7 @@ public class RequestEvento implements Serializable {
     private String descripcion;
     private Integer prioridad;
     private String etiqueta;
-    private Integer estimacion;
+    private Integer duracion;
     private Date fechaInicio;
     private Date fechaFin;
     private String recurrencia;
@@ -58,12 +58,12 @@ public class RequestEvento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public Integer getEstimacion() {
-        return estimacion;
+    public Integer getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(Integer estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 
     public Date getFechaInicio() {
