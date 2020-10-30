@@ -9,32 +9,32 @@ public class IdTareaUsuario implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Long idUsuario;
-    private Long idTarea;
+    private String idUsuario;
+    private Integer idTarea;
 
     public IdTareaUsuario() {
 
     }
 
-    public IdTareaUsuario(Long idUsuario, Long idTarea) {
+    public IdTareaUsuario(String idUsuario, Integer idTarea) {
         super();
         this.idUsuario = idUsuario;
         this.idTarea = idTarea;
     }
 
-    public Long getIdUsuario() {
+    public String getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(Long idUsuario) {
+    public void setIdUsuario(String idUsuario) {
         this.idUsuario = idUsuario;
     }
 
-    public Long getIdTarea() {
+    public Integer getIdTarea() {
         return idTarea;
     }
 
-    public void setIdTarea(Long idTarea) {
+    public void setIdTarea(Integer idTarea) {
         this.idTarea = idTarea;
     }
 
