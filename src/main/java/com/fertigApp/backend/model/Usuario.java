@@ -52,6 +52,15 @@ public class Usuario implements Serializable {
 //								@JoinColumn(name = "agregado")})
 //	private List<Amigo> amigos;
 
+    @JsonIgnore
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(
+            name = "amigo",
+            joinColumns = {@JoinColumn(name = "agregador")},
+            inverseJoinColumns = {@JoinColumn(name = "agregado")}
+    )
+    private List<Usuario> amigos;
+
 	public Usuario() { }
 
 	public Usuario(String usuario, String correo, String password, String nombre) {
