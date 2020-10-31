@@ -45,13 +45,6 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioR")
 	private List<Rutina> rutinas;
 
-//	@JsonIgnore
-//	@OneToMany(mappedBy = "agregador")
-//	@JoinTable(name = "amigo",
-//				joinColumns = {@JoinColumn(name = "agregador"),
-//								@JoinColumn(name = "agregado")})
-//	private List<Amigo> amigos;
-
     @JsonIgnore
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(
@@ -59,7 +52,11 @@ public class Usuario implements Serializable {
             joinColumns = {@JoinColumn(name = "agregador")},
             inverseJoinColumns = {@JoinColumn(name = "agregado")}
     )
-    private List<Usuario> amigos;
+    List<Usuario> agregadores;
+
+    @JsonIgnore
+	@ManyToMany(mappedBy = "agregadores")
+	private List<Usuario> agregados;
 
 	public Usuario() { }
 
@@ -132,5 +129,29 @@ public class Usuario implements Serializable {
 
 	public void setFacebook(boolean facebook) {
 		this.facebook = facebook;
+	}
+
+	public List<TareaDeUsuario> getTareas() {
+		return tareas;
+	}
+
+	public void setTareas(List<TareaDeUsuario> tareas) {
+		this.tareas = tareas;
+	}
+
+	public List<Sonido> getSonidos() {
+		return sonidos;
+	}
+
+	public void setSonidos(List<Sonido> sonidos) {
+		this.sonidos = sonidos;
+	}
+
+	public List<Usuario> getAgregadores() {
+		return agregadores;
+	}
+
+	public void setAgregadores(List<Usuario> amigos) {
+		this.agregadores = amigos;
 	}
 }

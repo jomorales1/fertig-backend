@@ -95,7 +95,7 @@ class EventoControllerTests {
         evento.setDescripcion("Event description");
         evento.setPrioridad(1);
         evento.setEtiqueta("Event label");
-        evento.setEstimacion(1);
+        evento.setDuracion(1);
         evento.setRecurrencia("Recurrence");
         evento.setRecordatorio(1);
         evento.setFechaInicio(new Date());
@@ -200,7 +200,7 @@ class EventoControllerTests {
         requestEvento.setDescripcion(event.getDescripcion());
         requestEvento.setPrioridad(event.getPrioridad());
         requestEvento.setEtiqueta(event.getEtiqueta());
-        requestEvento.setEstimacion(event.getEstimacion());
+        requestEvento.setDuracion(event.getDuracion());
         requestEvento.setRecurrencia(event.getRecurrencia());
         requestEvento.setRecordatorio(event.getRecordatorio());
         requestEvento.setFechaInicio(event.getFechaInicio());
@@ -241,7 +241,7 @@ class EventoControllerTests {
         requestEvento.setDescripcion("Event description");
         requestEvento.setPrioridad(1);
         requestEvento.setEtiqueta("Event label");
-        requestEvento.setEstimacion(1);
+        requestEvento.setDuracion(1);
         requestEvento.setRecurrencia("Recurrence");
         requestEvento.setRecordatorio(1);
         requestEvento.setFechaInicio(new Date());

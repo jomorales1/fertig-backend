@@ -78,7 +78,7 @@ class RutinaControllerTests {
         routine.setDescripcion("test_routine_description");
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
-        routine.setEstimacion(90);
+        routine.setDuracion(90);
         routine.setFechaInicio(new Date());
         routine.setFechaFin(new Date());
         routine.setRecurrencia("codification");
@@ -198,7 +198,7 @@ class RutinaControllerTests {
         assertEquals(rutinaObtained.getDescripcion(), rutina.getDescripcion());
         assertEquals(rutinaObtained.getPrioridad(),rutina.getPrioridad());
         assertEquals(rutinaObtained.getEtiqueta(), rutina.getEtiqueta());
-        assertEquals(rutinaObtained.getEstimacion(), rutina.getEstimacion());
+        assertEquals(rutinaObtained.getDuracion(), rutina.getDuracion());
         assertTrue(rutinaObtained.getFechaInicio().compareTo(rutina.getFechaInicio()) < 10);
         assertTrue(rutinaObtained.getFechaFin().compareTo(rutina.getFechaFin()) < 10);
         assertEquals(rutinaObtained.getRecurrencia(), rutina.getRecurrencia());
@@ -230,7 +230,7 @@ class RutinaControllerTests {
         requestRutina.setDescripcion(rutina.getDescripcion());
         requestRutina.setPrioridad(rutina.getPrioridad());
         requestRutina.setEtiqueta(rutina.getEtiqueta());
-        requestRutina.setEstimacion(rutina.getEstimacion());
+        requestRutina.setDuracion(rutina.getDuracion());
         requestRutina.setFechaInicio(requestRutina.getFechaInicio());
         requestRutina.setFechaFin(rutina.getFechaFin());
         requestRutina.setRecurrencia(rutina.getRecurrencia());
@@ -271,7 +271,7 @@ class RutinaControllerTests {
         requestRutina.setDescripcion("test_routine_description");
         requestRutina.setPrioridad(2);
         requestRutina.setEtiqueta("test_routine_tag");
-        requestRutina.setEstimacion(90);
+        requestRutina.setDuracion(90);
         requestRutina.setFechaInicio(new Date());
         requestRutina.setFechaFin(new Date());
         requestRutina.setRecurrencia("codification");

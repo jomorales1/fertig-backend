@@ -1,6 +1,8 @@
 package com.fertigApp.backend.services;
 
+import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.TareaDeUsuarioRepository;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,14 @@ public class TareaDeUsuarioService {
 
     public Optional<TareaDeUsuario> findById(Integer id){
         return tareaDeUsuarioRepository.findById(id);
+    }
+
+    public Iterable<Tarea> findTareasByUsuario(Usuario usuario) {
+        return tareaDeUsuarioRepository.findTareasByUsuario(usuario);
+    }
+
+    public Iterable<TareaDeUsuario> findAllByTarea(Tarea tarea) {
+        return tareaDeUsuarioRepository.findAllByTarea(tarea);
     }
 
     public TareaDeUsuario save(TareaDeUsuario tarea){

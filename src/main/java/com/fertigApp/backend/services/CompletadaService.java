@@ -29,10 +29,11 @@ public class CompletadaService {
         return completadaRepository.findByRutinaC(rutina);
     }
 
-    public void deleteByRutina(Rutina rutina){
-        List<Completada> completadaList = (List<Completada>) completadaRepository.findByRutinaC(rutina);
-        for(Completada completada : completadaList){
-            completadaRepository.deleteById(completada.getId());
-        }
+    public void deleteAllByRutina(Rutina rutina){
+//        List<Completada> completadaList = (List<Completada>) completadaRepository.findByRutinaC(rutina);
+//        for(Completada completada : completadaList){
+//            completadaRepository.deleteById(completada.getId());
+//        }
+        this.completadaRepository.deleteAllByRutinaC(rutina);
     }
 }

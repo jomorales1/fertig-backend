@@ -79,7 +79,7 @@ class CompletadaControllerTest {
         routine.setDescripcion("test_routine_description");
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
-        routine.setEstimacion(90);
+        routine.setDuracion(90);
         routine.setFechaInicio(fechaIncio);
         routine.setFechaFin(fechaFin);
         routine.setRecurrencia("codification");
@@ -144,7 +144,7 @@ class CompletadaControllerTest {
                 .content(objectMapper.writeValueAsString(requestCompletada)))
                 .andExpect(status().isBadRequest());
 
-        completadaService.deleteByRutina(rutina);
+        completadaService.deleteAllByRutina(rutina);
         rutinaService.deleteById(rutina.getId());
         usuarioService.deleteById("test_user");
     }
@@ -175,7 +175,7 @@ class CompletadaControllerTest {
         response = mvcResult.getResponse().getContentAsString();
         assertTrue(response.isEmpty());
 
-        completadaService.deleteByRutina(rutina);
+        completadaService.deleteAllByRutina(rutina);
         rutinaService.deleteById(rutina.getId());
         usuarioService.deleteById("test_user");
     }
@@ -205,7 +205,7 @@ class CompletadaControllerTest {
         response = mvcResult.getResponse().getContentAsString();
         assertTrue(response.isEmpty());
 
-        completadaService.deleteByRutina(rutina);
+        completadaService.deleteAllByRutina(rutina);
         rutinaService.deleteById(rutina.getId());
         usuarioService.deleteById("test_user");
     }

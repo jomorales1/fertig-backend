@@ -12,10 +12,12 @@ public class TareaDeUsuario implements Serializable {
 
     @ManyToOne
     @MapsId("usuario")
+    @JoinColumn(name = "usuario")
     private Usuario usuario;
 
     @ManyToOne
     @MapsId("tarea")
+    @JoinColumn(name = "tarea")
     private Tarea tarea;
 
     private boolean admin;

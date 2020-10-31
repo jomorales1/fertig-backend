@@ -17,6 +17,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,16 +53,12 @@ public class TareaController {
         return this.tareaService.findAll();
     }
 
-
-    // Método GET para obtener todas las tareas de un usuario específico.
-//    @GetMapping(path="/tasks/getTasks")
-//    public Iterable<Tarea> getAllTareasByUsuario() {
-//        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-//        return optUsuario.map(tareaService::findByUsuario).orElse(null);
-//
-//    }
+    @GetMapping(path="/tasks/getTasks")
+    public Iterable<Tarea> getAllTareasByUsuario() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        return this.tareaDeUsuarioService.findTareasByUsuario(usuario);
+    }
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
@@ -119,7 +117,6 @@ public class TareaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
         tarea.setDescripcion(requestTarea.getDescripcion());
         tarea.setEstimacion(requestTarea.getEstimacion());
         tarea.setEtiqueta(requestTarea.getEtiqueta());
@@ -134,16 +131,86 @@ public class TareaController {
             tareaDeUsuario.setUsuario(this.usuarioService.findById(userDetails.getUsername()).get());
         }
         tareaDeUsuario.setTarea(this.tareaService.save(tarea));
+        tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    // TODO: Probar Cascade
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
     @DeleteMapping(path="/tasks/deleteTask/{id}")
     public ResponseEntity<Void> deleteTarea(@PathVariable Integer id) {
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Tarea parent = this.tareaService.findById(id).get();
+        ArrayList<Tarea> primerNivel = (ArrayList<Tarea>) this.tareaService.findAllByPadre(parent);
+        for (Tarea t1 : primerNivel) {
+            ArrayList<Tarea> segundoNivel = (ArrayList<Tarea>) this.tareaService.findAllByPadre(t1);
+            for (Tarea t2 : segundoNivel) {
+                this.tareaService.deleteById(t2.getId());
+            }
+            this.tareaService.deleteById(t1.getId());
+        }
         this.tareaService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    // TODO: Verificar que el usuario sea un colaborador
+    @GetMapping(path = "/tasks/getOwners/{id}")
+    public ResponseEntity<List<Usuario>> getTaskOwners(@PathVariable Integer id) {
+        if (!this.tareaService.findById(id).isPresent())
+            return ResponseEntity.badRequest().body(null);
+        Tarea tarea = this.tareaService.findById(id).get();
+        ArrayList<TareaDeUsuario> tareaDeUsuarios = (ArrayList<TareaDeUsuario>) this.tareaDeUsuarioService.findAllByTarea(tarea);
+        ArrayList<Usuario> owners = new ArrayList<>();
+        for (TareaDeUsuario tareaDeUsuario : tareaDeUsuarios) {
+            owners.add(tareaDeUsuario.getUsuario());
+        }
+        return ResponseEntity.ok(owners);
+    }
+
+    // Método para añadir colaborador
+
+    // TODO: Verificar que sea un administrador y verificar que el usuario a agregar sea un colaborador
+    @PostMapping(path = "/tasks/addOwner/{id}/{username}")
+    public ResponseEntity<Void> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = this.usuarioService.findById(username).get();
+        Tarea tarea = this.tareaService.findById(id).get();
+        TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
+        tareaDeUsuario.setUsuario(usuario);
+        tareaDeUsuario.setTarea(tarea);
+        tareaDeUsuario.setAdmin(true);
+        this.tareaDeUsuarioService.save(tareaDeUsuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/tasks/addSubTask/{id}")
+    public ResponseEntity<Void> addSubTask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Tarea tarea = this.tareaService.findById(id).get();
+        if (tarea.getNivel() > 2) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Tarea subtarea = new Tarea();
+        subtarea.setDescripcion(subTask.getDescripcion());
+        subtarea.setEstimacion(subTask.getEstimacion());
+        subtarea.setEtiqueta(subTask.getEtiqueta());
+        subtarea.setFechaFin(subTask.getFechaFin());
+        subtarea.setFechaInicio(subTask.getFechaInicio());
+        subtarea.setHecha(subTask.getHecha());
+        subtarea.setNivel(tarea.getNivel() + 1);
+        subtarea.setNombre(subTask.getNombre());
+        subtarea.setPrioridad(subTask.getPrioridad());
+        subtarea.setRecordatorio(subTask.getRecordatorio());
+        subtarea.setPadre(tarea);
+        tarea.addSubtarea(subtarea);
+        this.tareaService.save(tarea);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

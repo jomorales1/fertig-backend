@@ -9,8 +9,6 @@ public class RequestTarea {
 
         private int id;
 
-        private Usuario usuarioT;
-
         private String nombre;
 
         private String descripcion;
@@ -39,14 +37,6 @@ public class RequestTarea {
 
         public void setId(int id) {
             this.id = id;
-        }
-
-        public Usuario getUsuarioT() {
-            return usuarioT;
-        }
-
-        public void setUsuarioT(Usuario usuarioT) {
-            this.usuarioT = usuarioT;
         }
 
         public String getNombre() {
