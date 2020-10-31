@@ -15,7 +15,7 @@ public class EventoNextRepetitionResponse extends Recurrente {
 
     public EventoNextRepetitionResponse(Evento evento) {
         super(evento);
-        this.fecha = findFechas(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia(), true).get(0);
+        this.fecha = findSiguiente(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia());
     }
 
     public Date getFecha() {

@@ -19,8 +19,7 @@ public class EventoAllRepetitionsResponse extends Recurrente {
         this.repeticiones = Recurrente.findFechas(
                 evento.getFechaInicio(),
                 evento.getFechaFin(),
-                evento.getRecurrencia(),
-                true
+                evento.getRecurrencia()
         );
     }
 }
