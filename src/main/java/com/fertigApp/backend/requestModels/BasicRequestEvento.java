@@ -54,6 +54,43 @@ public class BasicRequestEvento implements Serializable {
         return fechas;
     }
 
+    public static Date findSiguiente(Date fechaInicio, Date fechaFin, String recurrencia) {
+        Date fecha = new Date();
+        Calendar c = Calendar.getInstance();
+        int periodo = 0;
+        if(recurrencia.charAt(0) == 'E'){
+            int punto = recurrencia.indexOf(".") ;
+            int d = Integer.parseInt(recurrencia.substring(1, punto));
+            int dia = 0;
+            c.setTime(fecha);
+            for(int i = (Calendar.DAY_OF_WEEK+6)%7; c.getTime().compareTo(fecha) < 1; i=(i%7)+1) {
+                c.setTime(fecha);
+                if ((d & 1) == 1) {
+                    c.set(Calendar.DAY_OF_WEEK, (i % 7) + 1);
+                    if (c.getTime().before(fecha)) c.add(Calendar.WEEK_OF_YEAR, 1);
+                    dia = c.get(Calendar.DAY_OF_WEEK);
+                }
+                d = d >> 1;
+            }
+            c.setTime(fechaInicio);
+            c.set(Calendar.DAY_OF_WEEK, dia);
+            if (c.getTime().before(fechaInicio)) c.add(Calendar.WEEK_OF_YEAR, 1);
+            while (c.getTime().before(fecha)) c.add(Calendar.WEEK_OF_YEAR, Integer.parseInt(recurrencia.substring(punto+2)));
+        } else {
+            int d = Integer.parseInt(recurrencia.substring(1));
+            switch (recurrencia.charAt(0)) {
+                case 'A' : periodo = Calendar.YEAR; break;
+                case 'M' : periodo = Calendar.MONTH; break;
+                case 'S' : periodo = Calendar.WEEK_OF_YEAR; break;
+                case 'D' : periodo = Calendar.DAY_OF_YEAR; break;
+                case 'H' : periodo = Calendar.HOUR; break;
+            }
+            c.setTime(fechaInicio);
+            while (c.getTime().before(fecha)) c.add(periodo, d);
+        }
+        return c.getTime();
+    }
+
     private Date add(Date fecha, int n, Character t){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fecha);
