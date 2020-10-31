@@ -1,11 +1,11 @@
 package com.fertigApp.backend.requestModels;
 
+import com.fertigApp.backend.payload.response.Recurrente;
 import com.fertigApp.backend.model.Usuario;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class RequestEvento extends BasicRequestEvento {
+public class RequestEvento extends Recurrente {
 
     private Usuario usuarioE;
     private Date fechaInicio;

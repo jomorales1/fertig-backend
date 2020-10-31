@@ -1,10 +1,16 @@
-package com.fertigApp.backend.model;
+package com.fertigApp.backend.payload.response;
+
+import com.fertigApp.backend.model.Evento;
+import com.fertigApp.backend.model.Rutina;
 
 import java.io.Serializable;
 import java.util.*;
 
-public class Recurrente implements Serializable {
+//Clase principal de la cual heredan los eventos y las rutinas para obtener la fechas y los mensajes de repetición de
+//los eventos y rutinas
+public abstract class Recurrente implements Serializable {
 
+    protected int id;
     protected String nombre;
     protected String descripcion;
     protected Integer prioridad;
@@ -17,6 +23,7 @@ public class Recurrente implements Serializable {
     }
 
     public Recurrente(Evento evento){
+        this.id = evento.getId();
         this.nombre = evento.getNombre();
         this.descripcion = evento.getDescripcion();
         this.prioridad = evento.getPrioridad();
@@ -26,6 +33,7 @@ public class Recurrente implements Serializable {
     }
 
     public Recurrente(Rutina rutina){
+        this.id = rutina.getId();
         this.nombre = rutina.getNombre();
         this.descripcion = rutina.getDescripcion();
         this.prioridad = rutina.getPrioridad();
@@ -60,7 +68,7 @@ public class Recurrente implements Serializable {
         return fechas;
     }
 
-    public static Date add(Date fecha, int n, Character t){
+    protected static Date add(Date fecha, int n, Character t){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(fecha);
         switch (t) {
@@ -73,7 +81,7 @@ public class Recurrente implements Serializable {
         return calendar.getTime();
     }
 
-    protected static String getMensajeRecurrencia(String recurrencia) {
+    public static String getMensajeRecurrencia(String recurrencia) {
         String mensajeRecurrencia;
         if(recurrencia.charAt(0) == 'E'){
             int point = recurrencia.indexOf(".");
@@ -126,6 +134,14 @@ public class Recurrente implements Serializable {
         return mensajeRecurrencia;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getNombre() {
         return nombre;
     }
@@ -164,5 +180,13 @@ public class Recurrente implements Serializable {
 
     public void setDuracion(Integer duracion) {
         this.duracion = duracion;
+    }
+
+    public String getMensajeRecurrencia() {
+        return mensajeRecurrencia;
+    }
+
+    public void setMensajeRecurrencia(String mensajeRecurrencia) {
+        this.mensajeRecurrencia = mensajeRecurrencia;
     }
 }

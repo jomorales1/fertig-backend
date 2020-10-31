@@ -1,19 +1,19 @@
-package com.fertigApp.backend.requestModels;
+package com.fertigApp.backend.payload.response;
 
 import com.fertigApp.backend.model.Evento;
-import com.fertigApp.backend.model.Recurrente;
 
 import java.util.Date;
 
-public class BasicRequestEvento extends Recurrente {
+//Response con la información y la fecha de la proxima repetición de un evento
+public class EventoNextRepetitionResponse extends Recurrente {
 
     private Date fecha;
 
-    public BasicRequestEvento(){
+    public EventoNextRepetitionResponse(){
         super();
     }
 
-    public BasicRequestEvento(Evento evento) {
+    public EventoNextRepetitionResponse(Evento evento) {
         super(evento);
         this.fecha = findFechas(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia(), true).get(0);
     }

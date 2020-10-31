@@ -1,7 +1,7 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.Completada;
-import com.fertigApp.backend.model.Recurrente;
+import com.fertigApp.backend.payload.response.Recurrente;
 import com.fertigApp.backend.model.Usuario;
 
 import java.sql.Time;

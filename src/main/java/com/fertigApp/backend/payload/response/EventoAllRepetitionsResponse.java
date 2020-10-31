@@ -1,22 +1,21 @@
 package com.fertigApp.backend.payload.response;
 
 import com.fertigApp.backend.model.Evento;
-import com.fertigApp.backend.model.Recurrente;
-import com.fertigApp.backend.requestModels.RepeticionEvento;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class EventoResponse {
-    private Evento evento;
+//Response con la información de un evento y las fechas de todas sus repeticiones
+public class EventoAllRepetitionsResponse extends Recurrente {
 
     private List<Date> repeticiones;
 
+    public EventoAllRepetitionsResponse(){
+        super();
+    }
 
-
-    public EventoResponse(Evento evento) {
-        this.evento = evento;
+    public EventoAllRepetitionsResponse(Evento evento) {
+        super(evento);
         this.repeticiones = Recurrente.findFechas(
                 evento.getFechaInicio(),
                 evento.getFechaFin(),
