@@ -29,7 +29,7 @@ public class CompletadaService {
     }
 
     public  Iterable<Completada> findHechaByRutina(Rutina rutina){
-        return completadaRepository.findByRutinaAndHecha(rutina, false);
+        return completadaRepository.findByRutinaCAndHecha(rutina, false);
     };
 
     public void deleteAllByRutina(Rutina rutina){

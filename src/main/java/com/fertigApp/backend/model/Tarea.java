@@ -44,6 +44,9 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer estimacion;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer tiempoInvertido;
+
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
     private Date fechaInicio;

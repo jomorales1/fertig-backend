@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity// This tells Hibernate to make a table out of this class
@@ -66,6 +67,13 @@ public class Usuario implements Serializable {
 		this.correo = correo;
 		this.nombre = nombre;
 		this.password = password;
+	}
+
+	public void addAmigo(Usuario amigo) {
+		if (this.agregados == null) {
+			this.agregados = new ArrayList<>();
+		}
+		this.agregados.add(amigo);
 	}
 
 	public String getCorreo() {
@@ -154,5 +162,13 @@ public class Usuario implements Serializable {
 
 	public void setAgregadores(List<Usuario> amigos) {
 		this.agregadores = amigos;
+	}
+
+	public List<Usuario> getAgregados() {
+		return agregados;
+	}
+
+	public void setAgregados(List<Usuario> agregados) {
+		this.agregados = agregados;
 	}
 }

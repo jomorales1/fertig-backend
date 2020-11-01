@@ -133,7 +133,7 @@ public class TareaController {
         tarea.setFechaFin(requestTarea.getFechaFin());
         tarea.setFechaInicio(requestTarea.getFechaInicio());
         tarea.setHecha(requestTarea.getHecha());
-        tarea.setNivel(requestTarea.getNivel());
+        tarea.setNivel(1);
         tarea.setNombre(requestTarea.getNombre());
         tarea.setPrioridad(requestTarea.getPrioridad());
         tarea.setRecordatorio(requestTarea.getRecordatorio());

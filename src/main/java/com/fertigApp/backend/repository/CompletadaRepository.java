@@ -13,7 +13,7 @@ public interface CompletadaRepository extends CrudRepository<Completada, Integer
 //    @Query("select c from Completada c where c.rutinaC = :rutina and c.hecha = false")
 //    Optional<Completada> findHechaByRutina(@Param("rutina") Rutina rutina);
 
-    Iterable<Completada> findByRutinaAndHecha(Rutina rutina, Boolean hecha);
+    Iterable<Completada> findByRutinaCAndHecha(Rutina rutina, Boolean hecha);
 
     @Transactional
     void deleteAllByRutinaC(Rutina rutinaC);

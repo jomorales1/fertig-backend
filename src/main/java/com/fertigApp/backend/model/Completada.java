@@ -21,6 +21,10 @@ public class Completada implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha;
 
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "fecha_ajustada")
+    private Date fechaAjustada;
+
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name="rutina")
