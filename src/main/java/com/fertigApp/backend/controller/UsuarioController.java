@@ -138,4 +138,39 @@ public class UsuarioController {
         usuarioService.deleteById(userDetails.getUsername());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @GetMapping(path = "/users/getFriends")
+    public ResponseEntity<List<Usuario>> getFriends() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        return ResponseEntity.ok(usuario.getAgregados());
+    }
+
+    @PutMapping(path = "/users/addFriend/{username}")
+    public ResponseEntity<Void> addFriend(@PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = optionalUsuario.orElse(null);
+        Usuario friend = this.usuarioService.findById(username).get();
+        usuario.addAmigo(friend);
+        this.usuarioService.save(usuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/users/deleteFriend/{username}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = optionalUsuario.orElse(null);
+        Usuario friend = this.usuarioService.findById(username).get();
+        usuario.deleteAgregado(friend);
+        this.usuarioService.save(usuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

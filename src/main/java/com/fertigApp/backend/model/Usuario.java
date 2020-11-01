@@ -48,16 +48,16 @@ public class Usuario implements Serializable {
 	private List<Rutina> rutinas;
 
     @JsonIgnore
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(
-            name = "amigo",
-            joinColumns = {@JoinColumn(name = "agregador")},
-            inverseJoinColumns = {@JoinColumn(name = "agregado")}
-    )
+    @ManyToMany(mappedBy = "agregados", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     List<Usuario> agregadores;
 
     @JsonIgnore
-	@ManyToMany(mappedBy = "agregadores")
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@JoinTable(
+			name = "amigo",
+			joinColumns = {@JoinColumn(name = "agregador")},
+			inverseJoinColumns = {@JoinColumn(name = "agregado")}
+	)
 	private List<Usuario> agregados;
 
 	public Usuario() { }
@@ -73,7 +73,40 @@ public class Usuario implements Serializable {
 		if (this.agregados == null) {
 			this.agregados = new ArrayList<>();
 		}
+		amigo.addAgregador(this);
 		this.agregados.add(amigo);
+	}
+
+	public void addAgregador(Usuario agregador) {
+		if (this.agregadores == null) {
+			this.agregadores = new ArrayList<>();
+		}
+		this.agregadores.add(agregador);
+	}
+
+	public void deleteAgregado(Usuario agregado) {
+		int index = -1;
+		for (int i = 0; i < this.agregados.size(); i++) {
+			if (this.agregados.get(i).getUsuario().equals(agregado.getUsuario())) {
+				index = i; break;
+			}
+		}
+		if (index != -1) {
+			this.agregados.remove(index);
+			agregado.deleteAgregador(this);
+		}
+	}
+
+	public void deleteAgregador(Usuario agregador) {
+		int index = -1;
+		for (int i = 0; i < this.agregadores.size(); i++) {
+			if (this.agregadores.get(i).getUsuario().equals(agregador.getUsuario())) {
+				index = i; break;
+			}
+		}
+		if (index != -1) {
+			this.agregadores.remove(index);
+		}
 	}
 
 	public String getCorreo() {
