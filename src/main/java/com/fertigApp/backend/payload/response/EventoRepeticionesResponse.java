@@ -6,17 +6,17 @@ import java.util.Date;
 import java.util.List;
 
 //Response con la información de un evento y las fechas de todas sus repeticiones
-public class EventoAllRepetitionsResponse extends Recurrente {
+public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
 
     private List<Date> repeticiones;
 
-    public EventoAllRepetitionsResponse(){
+    public EventoRepeticionesResponse(){
         super();
     }
 
-    public EventoAllRepetitionsResponse(Evento evento) {
+    public EventoRepeticionesResponse(Evento evento) {
         super(evento);
-        this.repeticiones = Recurrente.findFechas(
+        this.repeticiones = AbstractRecurrenteResponse.findFechas(
                 evento.getFechaInicio(),
                 evento.getFechaFin(),
                 evento.getRecurrencia()

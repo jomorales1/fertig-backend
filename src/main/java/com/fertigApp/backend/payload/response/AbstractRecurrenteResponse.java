@@ -4,11 +4,14 @@ import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 //Clase principal de la cual heredan los eventos y las rutinas para obtener la fechas y los mensajes de repetición de
 //los eventos y rutinas
-public abstract class Recurrente implements Serializable {
+public abstract class AbstractRecurrenteResponse implements Serializable {
 
     protected int id;
     protected String nombre;
@@ -18,11 +21,11 @@ public abstract class Recurrente implements Serializable {
     protected Integer duracion;
     protected String mensajeRecurrencia;
 
-    public Recurrente(){
+    public AbstractRecurrenteResponse(){
 
     }
 
-    public Recurrente(Evento evento){
+    public AbstractRecurrenteResponse(Evento evento){
         this.id = evento.getId();
         this.nombre = evento.getNombre();
         this.descripcion = evento.getDescripcion();
@@ -32,7 +35,7 @@ public abstract class Recurrente implements Serializable {
         this.mensajeRecurrencia = getMensajeRecurrencia(evento.getRecurrencia());
     }
 
-    public Recurrente(Rutina rutina){
+    public AbstractRecurrenteResponse(Rutina rutina){
         this.id = rutina.getId();
         this.nombre = rutina.getNombre();
         this.descripcion = rutina.getDescripcion();
@@ -67,6 +70,8 @@ public abstract class Recurrente implements Serializable {
 
         return fechas;
     }
+
+    //TODO: findFechas overloading para aceptar franjas.
 
     protected static Date add(Date fecha, int n, Character t){
         Calendar calendar = Calendar.getInstance();

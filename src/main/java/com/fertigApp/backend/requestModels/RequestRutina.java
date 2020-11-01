@@ -1,14 +1,14 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.Completada;
-import com.fertigApp.backend.payload.response.Recurrente;
+import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.model.Usuario;
 
 import java.sql.Time;
 import java.util.Date;
 import java.util.List;
 
-public class RequestRutina extends Recurrente {
+public class RequestRutina extends AbstractRecurrenteResponse {
 
     private Usuario usuarioR;
 

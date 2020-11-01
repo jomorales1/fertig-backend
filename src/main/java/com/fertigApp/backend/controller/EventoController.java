@@ -3,6 +3,8 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
+import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -14,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -47,13 +51,29 @@ public class EventoController {
 
     // Método GET para obtener la lista de eventos de un usuario determinado.
     @GetMapping(path="/events/getEvents")
-    public Iterable<Evento> getAllEventosByUsuario() {
+    public Iterable<RecurrenteResponse> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
         if(optUsuario.isEmpty())
             return null;
-        eventoService.findByUsuario(optUsuario.get());
-        return optUsuario.map(eventoService::findByUsuario).orElse(null);
+        List<RecurrenteResponse> eventos = new LinkedList<>();
+        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+            eventos.add(new RecurrenteResponse(evento));
+        }
+        return eventos;
+    }
+
+    @GetMapping(path="/events/getEventsAndRepetitions")
+    public Iterable<EventoRepeticionesResponse> getAllEventosRepeticionesByUsuario() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isEmpty())
+            return null;
+        List<EventoRepeticionesResponse> eventos = new LinkedList<>();
+        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+            eventos.add(new EventoRepeticionesResponse(evento));
+        }
+        return eventos;
     }
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.

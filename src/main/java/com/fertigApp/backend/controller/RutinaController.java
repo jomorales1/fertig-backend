@@ -3,6 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.payload.response.RutinaResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.services.CompletadaService;
@@ -145,7 +146,45 @@ public class RutinaController {
         rutina.setFranjaInicio(requestRutina.getFranjaInicio());
         rutina.setFranjaFin(requestRutina.getFranjaFin());
         this.rutinaService.save(rutina);
+
+        Completada completada = new Completada();
+        completada.setRutina(rutina);
+        completada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
+                        rutina.getFechaFin(),
+                        rutina.getRecurrencia()));
+        completada.setHecha(false);
+        this.completadaService.save(completada);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    //@PutMapping
+    @PatchMapping(path="/routines/checkRoutine/{id}")
+    public ResponseEntity<Void> checkRoutine(@PathVariable Integer id){
+        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
+        UserDetails userDetails = (UserDetails) principal;
+
+        Optional<Rutina> optionalRutina = rutinaService.findById(id);
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
+            ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
+            Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
+            completada.setHecha(true);
+            this.completadaService.save(completada);
+            Completada newCompletada = new Completada();
+            newCompletada.setRutina(optionalRutina.get());
+            newCompletada.setFecha(
+                    AbstractRecurrenteResponse.findSiguiente(optionalRutina.get().getFechaInicio(),
+                            optionalRutina.get().getFechaFin(),
+                            optionalRutina.get().getRecurrencia()));
+            newCompletada.setHecha(false);
+            LOGGER.info("Routine replaced");
+            return ResponseEntity.ok().body(null);
+        } else {
+            LOGGER.info("Routine not found");
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.
