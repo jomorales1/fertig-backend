@@ -1,6 +1,5 @@
 package com.fertigApp.backend.controller;
 
-import com.fertigApp.backend.auth.services.UserDetailsImpl;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
@@ -62,9 +61,15 @@ public class TareaController {
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
-    public Tarea getTarea(@PathVariable Integer id) {
-        Optional<Tarea> optTarea = this.tareaService.findById(id);
-        return (optTarea.orElse(null));
+    public ResponseEntity<Tarea> getTarea(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent())
+            return ResponseEntity.badRequest().body(null);
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Tarea tarea = this.tareaService.findById(id).get();
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return ResponseEntity.badRequest().body(null);
+        return ResponseEntity.ok(tarea);
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
@@ -77,6 +82,8 @@ public class TareaController {
         Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
         if(optionalTarea.isPresent() && optionalUsuario.isPresent()){
             Tarea tarea = optionalTarea.get();
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.get(), tarea).isPresent())
+                return ResponseEntity.badRequest().body(null);
             tarea.setNombre(task.getNombre());
             tarea.setDescripcion(task.getDescripcion());
             tarea.setPrioridad(task.getPrioridad());
@@ -97,15 +104,18 @@ public class TareaController {
 
     @PatchMapping(path="/tasks/checkTask/{id}")
     public ResponseEntity<MessageResponse> checkTarea(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = tareaService.findById(id);
-        if(optionalTarea.isPresent()){
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        if(optionalTarea.isPresent() && optionalUsuario.isPresent()){
             Tarea tarea = optionalTarea.get();
-            UserDetailsImpl principal = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.get(), tarea).isPresent())
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: La tarea no pertenece al usuario"));
             tarea.setHecha(!tarea.getHecha());
             this.tareaService.save(tarea);
             return ResponseEntity.ok().body(null);
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error:Tarea inexistente"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Tarea inexistente"));
         }
     }
 
@@ -136,31 +146,33 @@ public class TareaController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    // TODO: Probar Cascade
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
     @DeleteMapping(path="/tasks/deleteTask/{id}")
     public ResponseEntity<Void> deleteTarea(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
         Tarea parent = this.tareaService.findById(id).get();
-        ArrayList<Tarea> primerNivel = (ArrayList<Tarea>) this.tareaService.findAllByPadre(parent);
-        for (Tarea t1 : primerNivel) {
-            ArrayList<Tarea> segundoNivel = (ArrayList<Tarea>) this.tareaService.findAllByPadre(t1);
-            for (Tarea t2 : segundoNivel) {
-                this.tareaService.deleteById(t2.getId());
-            }
-            this.tareaService.deleteById(t1.getId());
-        }
-        this.tareaService.deleteById(id);
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).get().isAdmin())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        this.tareaDeUsuarioService.deleteAllByTarea(parent);
+        this.tareaService.deleteById(parent.getId());
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    // TODO: Verificar que el usuario sea un colaborador
+    // Método GET para obtener todos los colaboradores de una tarea
     @GetMapping(path = "/tasks/getOwners/{id}")
     public ResponseEntity<List<Usuario>> getTaskOwners(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return ResponseEntity.badRequest().body(null);
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
         Tarea tarea = this.tareaService.findById(id).get();
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return ResponseEntity.badRequest().body(null);
         ArrayList<TareaDeUsuario> tareaDeUsuarios = (ArrayList<TareaDeUsuario>) this.tareaDeUsuarioService.findAllByTarea(tarea);
         ArrayList<Usuario> owners = new ArrayList<>();
         for (TareaDeUsuario tareaDeUsuario : tareaDeUsuarios) {
@@ -169,33 +181,64 @@ public class TareaController {
         return ResponseEntity.ok(owners);
     }
 
-    // Método para añadir colaborador
-
-    // TODO: Verificar que sea un administrador y verificar que el usuario a agregar sea un colaborador
-    @PostMapping(path = "/tasks/addOwner/{id}/{username}")
-    public ResponseEntity<Void> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
+    // Método POST para añadir un administrador
+    @PostMapping(path = "/tasks/addAdmin/{id}/{username}")
+    public ResponseEntity<Void> addTaskAdmin(@PathVariable Integer id, @PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (!this.usuarioService.findById(username).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario admin = this.usuarioService.findById(userDetails.getUsername()).get();
         Usuario usuario = this.usuarioService.findById(username).get();
         Tarea tarea = this.tareaService.findById(id).get();
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).get().isAdmin())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        TareaDeUsuario tareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).get();
+        tareaDeUsuario.setAdmin(true);
+        this.tareaDeUsuarioService.save(tareaDeUsuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // Método POST para añadir un colaborador a una tarea
+    @PostMapping(path = "/tasks/addCollaborator/{id}/{username}")
+    public ResponseEntity<Void> addTaskCollaborator(@PathVariable Integer id, @PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario admin = this.usuarioService.findById(userDetails.getUsername()).get();
+        Usuario usuario = this.usuarioService.findById(username).get();
+        Tarea tarea = this.tareaService.findById(id).get();
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).get().isAdmin())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);
         tareaDeUsuario.setTarea(tarea);
-        tareaDeUsuario.setAdmin(true);
+        tareaDeUsuario.setAdmin(false);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping(path = "/tasks/addSubTask/{id}")
     public ResponseEntity<Void> addSubTask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
         Tarea tarea = this.tareaService.findById(id).get();
         if (tarea.getNivel() > 2) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Tarea subtarea = new Tarea();
         subtarea.setDescripcion(subTask.getDescripcion());
         subtarea.setEstimacion(subTask.getEstimacion());

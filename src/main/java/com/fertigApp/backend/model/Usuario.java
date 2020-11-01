@@ -25,6 +25,7 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	private String password;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "usuario")
 	private List<TareaDeUsuario> tareas;
 

@@ -1,5 +1,6 @@
 package com.fertigApp.backend.services;
 
+import com.fertigApp.backend.model.IdTareaUsuario;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
@@ -33,11 +34,23 @@ public class TareaDeUsuarioService {
         return tareaDeUsuarioRepository.findAllByTarea(tarea);
     }
 
+    public Optional<TareaDeUsuario> findByUsuarioAndTarea(Usuario usuario, Tarea tarea) {
+        return this.tareaDeUsuarioRepository.findByUsuarioAndTarea(usuario, tarea);
+    }
+
     public TareaDeUsuario save(TareaDeUsuario tarea){
         return tareaDeUsuarioRepository.save(tarea);
     }
 
-    public void deleteById(Integer id){
+    public void deleteById(IdTareaUsuario id){
         tareaDeUsuarioRepository.deleteById(id);
+    }
+
+    public void deleteAllByUsuario(Usuario usuario) {
+        this.tareaDeUsuarioRepository.deleteAllByUsuario(usuario);
+    }
+
+    public void deleteAllByTarea(Tarea tarea) {
+        this.tareaDeUsuarioRepository.deleteAllByTarea(tarea);
     }
 }
