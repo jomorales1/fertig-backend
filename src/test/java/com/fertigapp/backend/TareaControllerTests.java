@@ -520,4 +520,44 @@ class TareaControllerTests {
         this.usuarioService.deleteById(user.getUsuario());
     }
 
+    @Test
+    void increaseInvestedTime() throws Exception {
+        String uri = "/tasks/increaseTime/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+        Tarea task = setUp(user);
+
+        this.mockMvc.perform(put(uri + (task.getId() + 1) + "/" + "10").header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        Tarea tarea = new Tarea();
+        tarea.setNombre("Test Task");
+        tarea.setDescripcion("Test description");
+        tarea.setPrioridad(1);
+        tarea.setEtiqueta("Test label");
+        tarea.setEstimacion(4);
+        tarea.setNivel(2);
+        tarea.setHecha(false);
+        tarea.setRecordatorio(2);
+        tarea.setTiempoInvertido(0);
+        tarea = this.tareaService.save(tarea);
+
+        this.mockMvc.perform(put(uri + tarea.getId() + "/" + "10").header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(put(uri + task.getId() + "/" + "10").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        task = this.tareaService.findById(task.getId()).get();
+        assertEquals(task.getTiempoInvertido(), 10);
+
+        this.tareaDeUsuarioService.deleteAllByTarea(task);
+        this.tareaService.deleteById(tarea.getId());
+        this.tareaService.deleteById(task.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
 }

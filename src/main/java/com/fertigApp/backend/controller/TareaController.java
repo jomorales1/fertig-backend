@@ -140,6 +140,7 @@ public class TareaController {
         tarea.setNombre(requestTarea.getNombre());
         tarea.setPrioridad(requestTarea.getPrioridad());
         tarea.setRecordatorio(requestTarea.getRecordatorio());
+        tarea.setTiempoInvertido(0);
         if (this.usuarioService.findById(userDetails.getUsername()).isPresent()) {
             tareaDeUsuario.setUsuario(this.usuarioService.findById(userDetails.getUsername()).get());
         }
@@ -258,8 +259,25 @@ public class TareaController {
         subtarea.setNombre(subTask.getNombre());
         subtarea.setPrioridad(subTask.getPrioridad());
         subtarea.setRecordatorio(subTask.getRecordatorio());
+        subtarea.setTiempoInvertido(0);
         subtarea.setPadre(tarea);
         tarea.addSubtarea(subtarea);
+        this.tareaService.save(tarea);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/tasks/increaseTime/{id}/{time}")
+    public ResponseEntity<Void> increaseInvestedTime(@PathVariable Integer id, @PathVariable Integer time) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Tarea tarea = this.tareaService.findById(id).get();
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Integer newTime = tarea.getTiempoInvertido() + time;
+        tarea.setTiempoInvertido(newTime);
         this.tareaService.save(tarea);
         return new ResponseEntity<>(HttpStatus.OK);
     }
