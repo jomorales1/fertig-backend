@@ -2,11 +2,13 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -185,9 +187,36 @@ public class RutinaController {
                 AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                         rutina.getFechaFin(),
                         rutina.getRecurrencia()));
+        completada.setFechaAjustada(completada.getFecha());
         completada.setHecha(false);
         this.completadaService.save(completada);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @PostMapping(path = "/routines/addSubtask/{id}")
+    public ResponseEntity<Void> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.rutinaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Rutina rutina = this.rutinaService.findById(id).get();
+        Tarea subtarea = new Tarea();
+        subtarea.setDescripcion(requestTarea.getDescripcion());
+        subtarea.setEstimacion(requestTarea.getEstimacion());
+        subtarea.setEtiqueta(requestTarea.getEtiqueta());
+        subtarea.setFechaFin(requestTarea.getFechaFin());
+        subtarea.setFechaInicio(requestTarea.getFechaInicio());
+        subtarea.setHecha(requestTarea.getHecha());
+        subtarea.setNivel(2);
+        subtarea.setNombre(requestTarea.getNombre());
+        subtarea.setPrioridad(requestTarea.getPrioridad());
+        subtarea.setRecordatorio(requestTarea.getRecordatorio());
+        subtarea.setTiempoInvertido(0);
+        subtarea.setRutinaT(rutina);
+        rutina.addSubtarea(subtarea);
+        this.rutinaService.save(rutina);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //@PutMapping

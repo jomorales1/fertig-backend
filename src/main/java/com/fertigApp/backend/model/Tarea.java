@@ -30,7 +30,7 @@ public class Tarea implements Serializable {
     //@Column(name = "id_padre")
     private Tarea padre;
 
-    @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Tarea> subtareas;
 
     private String nombre;
@@ -59,6 +59,11 @@ public class Tarea implements Serializable {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer recordatorio;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "id_rutina")
+    private Rutina rutinaT;
 
     public void addSubtarea(Tarea tarea) {
         if (this.subtareas == null) {
@@ -190,4 +195,13 @@ public class Tarea implements Serializable {
     public void setTiempoInvertido(Integer tiempoInvertido) {
         this.tiempoInvertido = tiempoInvertido;
     }
+
+    public Rutina getRutinaT() {
+        return rutinaT;
+    }
+
+    public void setRutinaT(Rutina rutinaT) {
+        this.rutinaT = rutinaT;
+    }
+
 }
