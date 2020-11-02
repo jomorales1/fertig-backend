@@ -55,7 +55,8 @@ public class TareaController {
     @GetMapping(path="/tasks/getTasks")
     public Iterable<Tarea> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         return this.tareaDeUsuarioService.findTareasByUsuario(usuario);
     }
 
@@ -65,7 +66,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return ResponseEntity.badRequest().body(null);
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         Tarea tarea = this.tareaService.findById(id).get();
         if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
             return ResponseEntity.badRequest().body(null);
@@ -91,8 +93,9 @@ public class TareaController {
             tarea.setEstimacion(task.getEstimacion());
             tarea.setFechaInicio(task.getFechaInicio());
             tarea.setFechaFin(task.getFechaFin());
-            tarea.setNivel(task.getNivel());
             tarea.setHecha(task.getHecha());
+            tarea.setRecordatorio(task.getRecordatorio());
+            tarea.setTiempoInvertido(task.getTiempoInvertido());
             this.tareaService.save(tarea);
             LOGGER.info("Task updated");
             return ResponseEntity.ok().body(tarea);
@@ -152,7 +155,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         Tarea parent = this.tareaService.findById(id).get();
         if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -169,7 +173,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return ResponseEntity.badRequest().body(null);
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         Tarea tarea = this.tareaService.findById(id).get();
         if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
             return ResponseEntity.badRequest().body(null);
@@ -189,7 +194,8 @@ public class TareaController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (!this.usuarioService.findById(username).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario admin = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario admin = optionalUsuario.orElse(null);
         Usuario usuario = this.usuarioService.findById(username).get();
         Tarea tarea = this.tareaService.findById(id).get();
         if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent())
@@ -205,14 +211,15 @@ public class TareaController {
     }
 
     // Método POST para añadir un colaborador a una tarea
-    @PostMapping(path = "/tasks/addCollaborator/{id}/{username}")
-    public ResponseEntity<Void> addTaskCollaborator(@PathVariable Integer id, @PathVariable String username) {
+    @PostMapping(path = "/tasks/addOwner/{id}/{username}")
+    public ResponseEntity<Void> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (!this.usuarioService.findById(username).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario admin = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario admin = optionalUsuario.orElse(null);
         Usuario usuario = this.usuarioService.findById(username).get();
         Tarea tarea = this.tareaService.findById(id).get();
         if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent())
@@ -232,7 +239,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.tareaService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         Tarea tarea = this.tareaService.findById(id).get();
         if (tarea.getNivel() > 2) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -85,28 +85,12 @@ public class Usuario implements Serializable {
 	}
 
 	public void deleteAgregado(Usuario agregado) {
-		int index = -1;
-		for (int i = 0; i < this.agregados.size(); i++) {
-			if (this.agregados.get(i).getUsuario().equals(agregado.getUsuario())) {
-				index = i; break;
-			}
-		}
-		if (index != -1) {
-			this.agregados.remove(index);
-			agregado.deleteAgregador(this);
-		}
+		this.agregados.removeIf(amigo -> amigo.getUsuario().equals(agregado.getUsuario()));
+		agregado.deleteAgregador(this);
 	}
 
 	public void deleteAgregador(Usuario agregador) {
-		int index = -1;
-		for (int i = 0; i < this.agregadores.size(); i++) {
-			if (this.agregadores.get(i).getUsuario().equals(agregador.getUsuario())) {
-				index = i; break;
-			}
-		}
-		if (index != -1) {
-			this.agregadores.remove(index);
-		}
+		this.agregadores.removeIf(amigo -> amigo.getUsuario().equals(agregador.getUsuario()));
 	}
 
 	public String getCorreo() {

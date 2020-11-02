@@ -7,115 +7,115 @@ import java.util.Date;
 
 public class RequestTarea {
 
-        private int id;
+    private int id;
 
-        private String nombre;
+    private String nombre;
 
-        private String descripcion;
+    private String descripcion;
 
-        private Integer prioridad;
+    private Integer prioridad;
 
-        private String etiqueta;
+    private String etiqueta;
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private Integer estimacion;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer estimacion;
 
-        private Date fechaInicio;
+    private Date fechaInicio;
 
-        private Date fechaFin;
+    private Date fechaFin;
 
-        private int nivel;
+    private boolean hecha;
 
-        private boolean hecha;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer recordatorio;
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private Integer recordatorio ;
+    private Integer tiempoInvertido;
 
-        public int getId() {
-            return id;
-        }
+    public int getId() {
+        return id;
+    }
 
-        public void setId(int id) {
-            this.id = id;
-        }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-        public String getNombre() {
-            return nombre;
-        }
+    public String getNombre() {
+        return nombre;
+    }
 
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
-        }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-        public String getDescripcion() {
-            return descripcion;
-        }
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
-        }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-        public int getPrioridad() {
-            return prioridad;
-        }
+    public Integer getPrioridad() {
+        return prioridad;
+    }
 
-        public void setPrioridad(int prioridad) {
-            this.prioridad = prioridad;
-        }
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
 
-        public String getEtiqueta() {
-            return etiqueta;
-        }
+    public String getEtiqueta() {
+        return etiqueta;
+    }
 
-        public void setEtiqueta(String etiqueta) {
-            this.etiqueta = etiqueta;
-        }
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
 
-        public int getEstimacion() {
-            return estimacion;
-        }
+    public Integer getEstimacion() {
+        return estimacion;
+    }
 
-        public void setEstimacion(int estimacion) {
-            this.estimacion = estimacion;
-        }
+    public void setEstimacion(Integer estimacion) {
+        this.estimacion = estimacion;
+    }
 
-        public Date getFechaInicio() {
-            return fechaInicio;
-        }
+    public Date getFechaInicio() {
+        return fechaInicio;
+    }
 
-        public void setFechaInicio(Date fechaInicio) {
-            this.fechaInicio = fechaInicio;
-        }
+    public void setFechaInicio(Date fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
 
-        public Date getFechaFin() {
-            return fechaFin;
-        }
+    public Date getFechaFin() {
+        return fechaFin;
+    }
 
-        public void setFechaFin(Date fechaFin) {
-            this.fechaFin = fechaFin;
-        }
+    public void setFechaFin(Date fechaFin) {
+        this.fechaFin = fechaFin;
+    }
 
-        public int getNivel() {
-            return nivel;
-        }
+    public boolean getHecha() {
+        return hecha;
+    }
 
-        public void setNivel(int nivel) {
-            this.nivel = nivel;
-        }
+    public void setHecha(boolean hecha) {
+        this.hecha = hecha;
+    }
 
-        public boolean getHecha() {
-            return hecha;
-        }
+    public Integer getRecordatorio() {
+        return recordatorio;
+    }
 
-        public void setHecha(boolean hecha) {
-            this.hecha = hecha;
-        }
+    public void setRecordatorio(Integer recordatorio) {
+        this.recordatorio = recordatorio;
+    }
 
-        public int getRecordatorio() {
-            return recordatorio;
-        }
+    public Integer getTiempoInvertido() {
+        return tiempoInvertido;
+    }
 
-        public void setRecordatorio(int recordatorio) {
-            this.recordatorio = recordatorio;
-        }
+    public void setTiempoInvertido(Integer tiempoInvertido) {
+        this.tiempoInvertido = tiempoInvertido;
+    }
 }
