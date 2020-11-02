@@ -35,17 +35,14 @@ public class SonidoController {
 
     @PostMapping(path = "/sounds/addSound")
     public @ResponseBody ResponseEntity<Void> addSound(@RequestBody RequestSonido requestSonido){
-        Preferido preferido = new Preferido();
-        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails) principal;
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        if(this.usuarioService.findById(userDetails.getUsername()).isPresent()){
-            preferido.setUsuario(this.usuarioService.findById(userDetails.getUsername()).get());
-        }
         Usuario usuario = optionalUsuario.orElse(null);
         Sonido sonido = new Sonido();
         sonido.setId(requestSonido.getIdSonido());
         sonido.addUsuario(usuario);
+        Preferido preferido = new Preferido();
+        preferido.setUsuario(usuario);
         preferido.setSonido(this.sonidoService.save(sonido));
         this.preferidoService.add(preferido);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -54,7 +51,8 @@ public class SonidoController {
     @GetMapping(path = "/sounds/getSounds")
     public List<Sonido> getAllSoundsByUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         List<Preferido> preferidos = (List<Preferido>) this.preferidoService.getByUsuario(usuario);
         List<Sonido> sonidos = new ArrayList<>();
         for (Preferido p: preferidos) {
@@ -68,10 +66,10 @@ public class SonidoController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.sonidoService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findByUsuario(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
         Sonido sonido = this.sonidoService.findById(id).get();
-        Optional<Preferido> optionalPreferido = this.preferidoService.findByUsuarioAndSonido(usuario, sonido);
-        if (!optionalPreferido.isPresent())
+        if (!this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sonido);
         this.sonidoService.deleteById(id);
