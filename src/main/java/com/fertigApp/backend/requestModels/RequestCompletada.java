@@ -1,17 +1,18 @@
 package com.fertigApp.backend.requestModels;
 
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 public class RequestCompletada {
 
     private Integer rutina;
-    private Date fecha;
+    private LocalDateTime fecha;
 
     public RequestCompletada(){
 
     }
 
-    public RequestCompletada(Integer rutina, Date fecha) {
+    public RequestCompletada(Integer rutina, LocalDateTime fecha) {
         this.rutina = rutina;
         this.fecha = fecha;
     }
@@ -24,11 +25,11 @@ public class RequestCompletada {
         this.rutina = rutina;
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 }

@@ -4,6 +4,9 @@ import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
@@ -43,6 +46,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.etiqueta = rutina.getEtiqueta();
         this.duracion = rutina.getDuracion();
         this.mensajeRecurrencia = getMensajeRecurrencia(rutina.getRecurrencia());
+
     }
 
     public static List<Date> findFechas(Date fechaInicio, Date fechaFin, String recurrencia){
@@ -71,7 +75,53 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         return fechas;
     }
 
-    //TODO: findFechas overloading para aceptar franjas.
+    public static List<LocalDateTime> findFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia){
+        LinkedList<LocalDateTime> fechas = new LinkedList<>();
+        Character c = recurrencia.charAt(0);
+        if(recurrencia.charAt(0) == 'E'){
+            int punto = recurrencia.indexOf(".");
+            int dias = Integer.parseInt(recurrencia.substring(1, punto));
+            for(int i = 1; i<8;  i = (i%7)+ 1) {
+                if((dias & 1) == 1){
+                    LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+                    fechaI = fechaI.plusDays(i - fechaI.getDayOfWeek().getValue());
+                    fechas.addAll(findFechas(fechaI,fechaFin,recurrencia.substring(punto+1)));
+                }
+                dias = dias >> 1;
+            }
+        } else{
+            int n = Integer.parseInt(recurrencia.substring(1));
+            for(LocalDateTime current = LocalDateTime.from(fechaInicio); current.isBefore(fechaFin); current = add(current,n,c)) {
+                fechas.add(current);
+            }
+        }
+        return fechas;
+    }
+
+    public static List<LocalDateTime> findFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin){
+        LinkedList<LocalDateTime> fechas = new LinkedList<>();
+        if(recurrencia.charAt(0) == 'H'){
+            LocalDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio);
+            LocalDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaFin);
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
+            int d = Integer.parseInt(recurrencia.substring(1));
+            while(fechaI.isBefore(fechaFin)) {
+                if (fechaI.isAfter(franjaI) && fechaI.isBefore(franjaF)) fechas.add(fechaI);
+                fechaI = fechaI.plusHours(d);
+                if(fechaI.isAfter(franjaF)){
+                    franjaI = franjaI.plusDays(1);
+                    franjaF = franjaF.plusDays(1);
+                }
+            }
+        } else{
+            if(fechaInicio.getHour() > franjaInicio.getHour() && duracion < (franjaFin.getHour() - fechaInicio.getHour())){
+                return findFechas(fechaInicio, fechaFin, recurrencia);
+            }
+            return null;
+        }
+        return fechas;
+    }
 
     protected static Date add(Date fecha, int n, Character t){
         Calendar calendar = Calendar.getInstance();
@@ -84,6 +134,18 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             case 'H' -> calendar.add(Calendar.HOUR, n);
         }
         return calendar.getTime();
+    }
+
+    protected static LocalDateTime add(LocalDateTime fecha, int n, Character t){
+        LocalDateTime fechaFinal = LocalDateTime.from(fecha);
+        switch (t) {
+            case 'A' : fechaFinal = fecha.plusYears(n); break;
+            case 'M' : fechaFinal = fecha.plusMonths(n); break;
+            case 'S' : fechaFinal = fecha.plusWeeks(n); break;
+            case 'D' : fechaFinal = fecha.plusDays(n); break;
+            case 'H' : fechaFinal = fecha.plusHours(n); break;
+        }
+        return fechaFinal;
     }
 
     public static Date findSiguiente(Date fechaInicio, Date fechaFin, String recurrencia) {
@@ -120,7 +182,63 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             c.setTime(fechaInicio);
             while (c.getTime().before(fecha)) c.add(periodo, d);
         }
-        return c.getTime();
+        if(c.getTime().before(fechaFin)) return c.getTime();
+        return null;
+    }
+
+    public static LocalDateTime findSiguiente(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia) {
+        LocalDateTime fecha = LocalDateTime.now();
+        int periodo = 0;
+        if(recurrencia.charAt(0) == 'E'){
+            int punto = recurrencia.indexOf(".") ;
+            int d = Integer.parseInt(recurrencia.substring(1, punto));
+            int dia = fecha.getDayOfWeek().getValue() - 1;
+            while(fecha.compareTo(fechaFin)<1) {
+                if (((d >> dia) & 1) == 1) {
+                    break;
+                }
+                dia = (dia+1)%7;
+                fecha = fecha.plusDays(1);
+            }
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            fechaI = fechaI.plusDays(fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
+            if(fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(1);
+            while (fechaI.isBefore(fecha)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
+            if (fechaI.isAfter(fecha)) return fechaI;
+            else return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto));
+        } else {
+            LocalDateTime fechaI = fechaInicio;
+
+            int d = Integer.parseInt(recurrencia.substring(1));
+            while(fechaI.isBefore(fecha)){
+                switch (recurrencia.charAt(0)) {
+                    case 'A' : fechaI = fechaI.plusYears(d); break;
+                    case 'M' : fechaI = fechaI.plusMonths(d); break;
+                    case 'S' : fechaI = fechaI.plusWeeks(d); break;
+                    case 'D' : fechaI = fechaI.plusDays(d); break;
+                    case 'H' : fechaI = fechaI.plusHours(d); break;
+                }
+            }
+            return fechaI;
+        }
+    }
+
+    public static LocalDateTime findSiguiente(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
+        if(recurrencia.charAt(0) == 'H'){
+            LocalDateTime fecha = LocalDateTime.now();
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            LocalDateTime franjaI = LocalDate.now().atTime(franjaInicio);
+            LocalDateTime franjaF = LocalDate.now().atTime(franjaFin);
+            if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
+            int d = Integer.parseInt(recurrencia.substring(1));
+            while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)) fechaI = fechaI.plusHours(d);
+            return fechaI;
+        } else {
+            if(fechaInicio.getHour() > franjaInicio.getHour() && duracion < (franjaFin.getHour() - fechaInicio.getHour())){
+                return findSiguiente(fechaInicio, fechaFin, recurrencia);
+            }
+            return null;
+        }
     }
 
     public static String getMensajeRecurrencia(String recurrencia) {

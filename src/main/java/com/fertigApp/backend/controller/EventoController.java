@@ -51,29 +51,29 @@ public class EventoController {
 
     // Método GET para obtener la lista de eventos de un usuario determinado.
     @GetMapping(path="/events/getEvents")
-    public Iterable<RecurrenteResponse> getAllEventosByUsuario() {
+    public ResponseEntity<Iterable<RecurrenteResponse>> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
         if(optUsuario.isEmpty())
-            return null;
+            return ResponseEntity.badRequest().body(null);
         List<RecurrenteResponse> eventos = new LinkedList<>();
         for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
             eventos.add(new RecurrenteResponse(evento));
         }
-        return eventos;
+        return ResponseEntity.ok().body(eventos);
     }
 
     @GetMapping(path="/events/getEventsAndRepetitions")
-    public Iterable<EventoRepeticionesResponse> getAllEventosRepeticionesByUsuario() {
+    public ResponseEntity<Iterable<EventoRepeticionesResponse>> getAllEventosRepeticionesByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
         if(optUsuario.isEmpty())
-            return null;
+            return ResponseEntity.badRequest().body(null);
         List<EventoRepeticionesResponse> eventos = new LinkedList<>();
         for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
             eventos.add(new EventoRepeticionesResponse(evento));
         }
-        return eventos;
+        return ResponseEntity.ok().body(eventos);
     }
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.

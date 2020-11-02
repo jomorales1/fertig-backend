@@ -4,7 +4,8 @@ import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
-import com.fertigApp.backend.payload.response.RutinaResponse;
+import com.fertigApp.backend.payload.response.RecurrenteResponse;
+import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
@@ -17,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -54,22 +57,53 @@ public class RutinaController {
     }
 
     // Método GET para obtener todas las rutinas de un usuario específico.
+//    @GetMapping(path="/routines/getRoutines")
+//    public ResponseEntity<List<RutinaResponse>> getAllRutinasByUsuario() {
+//        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+//        List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.orElse(null));
+//        List<RutinaResponse> rutinaResponses = new ArrayList<>();
+//        for(Rutina rutina : rutinas) {
+//            List<Completada> completadas;
+//            completadas = (List<Completada>) completadaService.findByRutina(rutina);
+//            Completada ultimaCompletada = null;
+//            if (!completadas.isEmpty())
+//                ultimaCompletada = completadas.get(completadas.size() - 1);
+//            rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
+//        }
+//        return ResponseEntity.ok().body(rutinaResponses);
+//    }
+
     @GetMapping(path="/routines/getRoutines")
-    public ResponseEntity<List<RutinaResponse>> getAllRutinasByUsuario() {
+    public ResponseEntity<List<RecurrenteResponse>> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(null);
         List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.orElse(null));
-        List<RutinaResponse> rutinaResponses = new ArrayList<>();
+        List<RecurrenteResponse> rutinaResponses = new ArrayList<>();
         for(Rutina rutina : rutinas) {
-            List<Completada> completadas;
-            completadas = (List<Completada>) completadaService.findByRutina(rutina);
-            Completada ultimaCompletada = null;
-            if (!completadas.isEmpty())
-                ultimaCompletada = completadas.get(completadas.size() - 1);
-            rutinaResponses.add(new RutinaResponse(rutina,ultimaCompletada));
+            rutinaResponses.add(new RecurrenteResponse(rutina));
         }
         return ResponseEntity.ok().body(rutinaResponses);
+    }
+
+    @GetMapping(path="/routines/getRoutinesAndRepetitions")
+    public ResponseEntity<List<RutinaRepeticionesResponse>> getAllRutinasRepeticionesByUsuario() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(null);
+        List<RutinaRepeticionesResponse> rutinas = new LinkedList<>();
+        for(Rutina rutina : rutinaService.findByUsuario(optUsuario.get())){
+            rutinas.add(new RutinaRepeticionesResponse(rutina,
+                    (List<LocalDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
+                    completadaService.findMaxAjustadaCompletadasByRutina(rutina)));
+        }
+        return ResponseEntity.ok().body(rutinas);
     }
 
     // Método GET para obtener una rutina específica por medio de su ID.
@@ -136,11 +170,9 @@ public class RutinaController {
         rutina.setDescripcion(requestRutina.getDescripcion());
         rutina.setPrioridad(requestRutina.getPrioridad());
         rutina.setEtiqueta(requestRutina.getEtiqueta());
-        if (requestRutina.getDuracion() != null)
-            rutina.setDuracion(requestRutina.getDuracion());
+        rutina.setDuracion(requestRutina.getDuracion());
         rutina.setRecurrencia(requestRutina.getRecurrencia());
-        if (requestRutina.getRecordatorio() != null)
-            rutina.setRecordatorio(requestRutina.getRecordatorio());
+        rutina.setRecordatorio(requestRutina.getRecordatorio());
         rutina.setFechaInicio(requestRutina.getFechaInicio());
         rutina.setFechaFin(requestRutina.getFechaFin());
         rutina.setFranjaInicio(requestRutina.getFranjaInicio());

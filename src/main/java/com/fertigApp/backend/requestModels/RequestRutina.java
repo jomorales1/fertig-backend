@@ -1,28 +1,37 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.Completada;
-import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.model.Usuario;
 
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
-public class RequestRutina extends AbstractRecurrenteResponse {
+public class RequestRutina {
 
     private Usuario usuarioR;
 
-    private Date fechaInicio;
+    private String nombre;
 
-    private Date fechaFin;
+    private String descripcion;
+
+    private Integer prioridad;
+
+    private String etiqueta;
+
+    private Integer duracion;
+
+    private LocalDateTime fechaInicio;
+
+    private LocalDateTime fechaFin;
 
     private String recurrencia;
 
     private Integer recordatorio;
 
-    private Time franjaInicio;
+    private LocalTime franjaInicio;
 
-    private Time franjaFin;
+    private LocalTime franjaFin;
 
     private List<Completada> completadas;
 
@@ -34,19 +43,19 @@ public class RequestRutina extends AbstractRecurrenteResponse {
         this.usuarioR = usuarioR;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -66,19 +75,19 @@ public class RequestRutina extends AbstractRecurrenteResponse {
         this.recordatorio = recordatorio;
     }
 
-    public Time getFranjaInicio() {
+    public LocalTime getFranjaInicio() {
         return franjaInicio;
     }
 
-    public void setFranjaInicio(Time franjaInicio) {
+    public void setFranjaInicio(LocalTime franjaInicio) {
         this.franjaInicio = franjaInicio;
     }
 
-    public Time getFranjaFin() {
+    public LocalTime getFranjaFin() {
         return franjaFin;
     }
 
-    public void setFranjaFin(Time franjaFin) {
+    public void setFranjaFin(LocalTime franjaFin) {
         this.franjaFin = franjaFin;
     }
 
@@ -88,5 +97,45 @@ public class RequestRutina extends AbstractRecurrenteResponse {
 
     public void setCompletadas(List<Completada> completadas) {
         this.completadas = completadas;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Integer getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public String getEtiqueta() {
+        return etiqueta;
+    }
+
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
+
+    public Integer getDuracion() {
+        return duracion;
+    }
+
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 }

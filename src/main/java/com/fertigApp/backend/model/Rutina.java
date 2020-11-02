@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Entity
@@ -33,21 +33,19 @@ public class Rutina implements Serializable {
 
     private int duracion;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
-    private Date fechaInicio;
+    private LocalDateTime fechaInicio;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_fin")
-    private Date fechaFin;
+    private LocalDateTime fechaFin;
 
     private String recurrencia;
 
     private int recordatorio;
 
-    private Time franjaInicio;
+    private LocalTime franjaInicio;
 
-    private Time franjaFin;
+    private LocalTime franjaFin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
@@ -109,19 +107,19 @@ public class Rutina implements Serializable {
         this.duracion = duracion;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -141,19 +139,19 @@ public class Rutina implements Serializable {
         this.recordatorio = recordatorio;
     }
 
-    public Time getFranjaInicio() {
+    public LocalTime getFranjaInicio() {
         return franjaInicio;
     }
 
-    public void setFranjaInicio(Time franjaInicio) {
+    public void setFranjaInicio(LocalTime franjaInicio) {
         this.franjaInicio = franjaInicio;
     }
 
-    public Time getFranjaFin() {
+    public LocalTime getFranjaFin() {
         return franjaFin;
     }
 
-    public void setFranjaFin(Time franjaFin) {
+    public void setFranjaFin(LocalTime franjaFin) {
         this.franjaFin = franjaFin;
     }
 

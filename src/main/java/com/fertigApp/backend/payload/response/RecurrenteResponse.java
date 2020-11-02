@@ -3,12 +3,12 @@ package com.fertigApp.backend.payload.response;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 //Response con la información y la fecha de la proxima repetición de un evento
 public class RecurrenteResponse extends AbstractRecurrenteResponse {
 
-    private Date fecha;
+    private LocalDateTime fecha;
 
     public RecurrenteResponse(){
         super();
@@ -21,14 +21,17 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
 
     public RecurrenteResponse(Rutina rutina) {
         super(rutina);
-        this.fecha = findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia());
+        if(rutina.getRecurrencia().charAt(0)=='H')
+            this.fecha = findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(), rutina.getFranjaInicio(), rutina.getFranjaFin());
+        else
+            this.fecha =  findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia());
     }
 
-    public Date getFecha() {
+    public LocalDateTime getFecha() {
         return fecha;
     }
 
-    public void setFecha(Date fecha) {
+    public void setFecha(LocalDateTime fecha) {
         this.fecha = fecha;
     }
 }

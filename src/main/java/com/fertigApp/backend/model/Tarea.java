@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -47,13 +47,11 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer tiempoInvertido;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_inicio")
-    private Date fechaInicio;
+    private LocalDateTime fechaInicio;
 
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name="fecha_fin")
-    private Date fechaFin;
+    private LocalDateTime fechaFin;
 
     private int nivel;
 
@@ -117,19 +115,19 @@ public class Tarea implements Serializable {
         this.estimacion = estimacion;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

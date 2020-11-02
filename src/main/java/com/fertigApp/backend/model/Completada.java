@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="completada")
@@ -17,13 +17,10 @@ public class Completada implements Serializable {
     @Column(name="id_completada")
     private int id;
 
+    private LocalDateTime fecha;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date fecha;
-
-    @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha_ajustada")
-    private Date fechaAjustada;
+    private LocalDateTime fechaAjustada;
 
     @JsonIgnore
     @ManyToOne
@@ -44,14 +41,6 @@ public class Completada implements Serializable {
         this.rutinaC = rutina;
     }
 
-    public Date getFecha() {
-        return fecha;
-    }
-
-    public void setFecha(Date fecha) {
-        this.fecha = fecha;
-    }
-
     public boolean isHecha() {
         return hecha;
     }
@@ -60,4 +49,27 @@ public class Completada implements Serializable {
         this.hecha = hecha;
     }
 
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public LocalDateTime getFechaAjustada() {
+        return fechaAjustada;
+    }
+
+    public void setFechaAjustada(LocalDateTime fechaAjustada) {
+        this.fechaAjustada = fechaAjustada;
+    }
+
+    public Rutina getRutinaC() {
+        return rutinaC;
+    }
+
+    public void setRutinaC(Rutina rutinaC) {
+        this.rutinaC = rutinaC;
+    }
 }

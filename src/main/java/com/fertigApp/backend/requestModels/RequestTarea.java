@@ -1,9 +1,8 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fertigApp.backend.model.Usuario;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class RequestTarea {
 
@@ -20,9 +19,9 @@ public class RequestTarea {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer estimacion;
 
-    private Date fechaInicio;
+    private LocalDateTime fechaInicio;
 
-    private Date fechaFin;
+    private LocalDateTime fechaFin;
 
     private boolean hecha;
 
@@ -79,19 +78,19 @@ public class RequestTarea {
         this.estimacion = estimacion;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

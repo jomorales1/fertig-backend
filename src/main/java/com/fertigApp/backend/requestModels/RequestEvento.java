@@ -3,13 +3,13 @@ package com.fertigApp.backend.requestModels;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.model.Usuario;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class RequestEvento extends AbstractRecurrenteResponse {
 
     private Usuario usuarioE;
-    private Date fechaInicio;
-    private Date fechaFin;
+    private LocalDateTime fechaInicio;
+    private LocalDateTime fechaFin;
     private String recurrencia;
     private Integer recordatorio;
 
@@ -21,19 +21,19 @@ public class RequestEvento extends AbstractRecurrenteResponse {
         this.usuarioE = usuarioE;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
