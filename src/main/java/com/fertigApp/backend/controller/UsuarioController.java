@@ -168,7 +168,8 @@ public class UsuarioController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Usuario usuario = optionalUsuario.orElse(null);
         Usuario friend = this.usuarioService.findById(username).get();
-        usuario.deleteAgregado(friend);
+        boolean deleted = usuario.deleteAgregado(friend);
+        if (!deleted) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.usuarioService.save(usuario);
         return new ResponseEntity<>(HttpStatus.OK);
     }

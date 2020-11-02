@@ -84,9 +84,10 @@ public class Usuario implements Serializable {
 		this.agregadores.add(agregador);
 	}
 
-	public void deleteAgregado(Usuario agregado) {
-		this.agregados.removeIf(amigo -> amigo.getUsuario().equals(agregado.getUsuario()));
+	public boolean deleteAgregado(Usuario agregado) {
+		boolean result = this.agregados.removeIf(amigo -> amigo.getUsuario().equals(agregado.getUsuario()));
 		agregado.deleteAgregador(this);
+		return result;
 	}
 
 	public void deleteAgregador(Usuario agregador) {
