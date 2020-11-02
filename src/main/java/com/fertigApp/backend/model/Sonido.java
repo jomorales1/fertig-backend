@@ -18,4 +18,22 @@ public class Sonido implements Serializable {
     @ManyToMany(mappedBy = "sonidos")
     private List<Usuario> usuarios;
 
+    public Sonido() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public List<Usuario> getUsuarios() {
+        return usuarios;
+    }
+
+    public void setUsuarios(List<Usuario> usuarios) {
+        this.usuarios = usuarios;
+    }
 }

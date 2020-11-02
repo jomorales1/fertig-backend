@@ -2,18 +2,20 @@ package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.IdPreferido;
 
-public class RequestSonido {
-    private String id_sonido;
+import java.io.Serializable;
 
-    public RequestSonido(String id_sonido) {
-        this.id_sonido = id_sonido;
+public class RequestSonido implements Serializable {
+    private String idSonido;
+
+    public RequestSonido(String idSonido) {
+        this.idSonido = idSonido;
     }
 
-    public String getId_sonido() {
-        return id_sonido;
+    public String getIdSonido() {
+        return idSonido;
     }
 
-    public void setId_sonido(String id_sonido) {
-        this.id_sonido = id_sonido;
+    public void setIdSonido(String idSonido) {
+        this.idSonido = idSonido;
     }
 }

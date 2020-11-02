@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,41 +37,45 @@ public class SonidoController {
         this.preferidoService = preferidoService;
     }
 
-    @PostMapping(path = "sounds/addPrefer/{id}")
-    public @ResponseBody ResponseEntity<Void> addPrefer(@PathVariable String id){
+    @PostMapping(path = "sounds/addSound")
+    public @ResponseBody ResponseEntity<Void> addSound(@RequestBody RequestSonido requestSonido){
         Preferido preferido = new Preferido();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         if(this.usuarioService.findById(userDetails.getUsername()).isPresent()){
             preferido.setUsuario(this.usuarioService.findById(userDetails.getUsername()).get());
         }
-        preferido.setSonido(this.sonidoService.findById(id).get());
+        Sonido sonido = new Sonido();
+        sonido.setId(requestSonido.getIdSonido());
+        preferido.setSonido(this.sonidoService.save(sonido));
         this.preferidoService.add(preferido);
         return new ResponseEntity<>(HttpStatus.CREATED);
-
-    }
-
-    @GetMapping(path = "sounds/getPrefers")
-    public Iterable<Preferido> getPrefersByUsuario(){
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
-        return this.preferidoService.getByUsuario(usuario);
     }
 
     @GetMapping(path = "sounds/getSounds")
-    public Iterable<Sonido> getAllSoundsByUser() {
+    public List<Sonido> getAllSoundsByUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return null;
+        Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
+        List<Preferido> preferidos = (List<Preferido>) this.preferidoService.getByUsuario(usuario);
+        List<Sonido> sonidos = new ArrayList<>();
+        for(Preferido p: preferidos){
+            sonidos.add(this.sonidoService.findById(p.getSonido().getId()).get());
+        }
+        return sonidos;
     }
 
-    @DeleteMapping(path = "sounds/deletePrefer/{id}")
-    public ResponseEntity<Void> deletePreferido(@PathVariable String id) {
+    @DeleteMapping(path = "sounds/deleteSound/{id}")
+    public ResponseEntity<Void> deleteSound(@PathVariable String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.preferidoService.findById(id).isPresent())
+        if (!this.sonidoService.findById(id).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Usuario usuario = this.usuarioService.findById(userDetails.getUsername()).get();
-        this.preferidoService.deleteById(id);
+        Sonido sonido = this.sonidoService.findById(id).get();
+        Optional<Preferido> optionalPreferido = this.preferidoService.findByUsuarioAndSonido(usuario, sonido);
+        if(!optionalPreferido.isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sonido);
+        this.sonidoService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
