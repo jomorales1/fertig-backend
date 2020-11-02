@@ -60,7 +60,7 @@ public class Tarea implements Serializable {
     private boolean hecha;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer recordatorio ;
+    private Integer recordatorio;
 
     public void addSubtarea(Tarea tarea) {
         if (this.subtareas == null) {
@@ -93,11 +93,11 @@ public class Tarea implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -109,11 +109,11 @@ public class Tarea implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
+    public Integer getEstimacion() {
         return estimacion;
     }
 
-    public void setEstimacion(int estimacion) {
+    public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
     }
 
@@ -149,11 +149,11 @@ public class Tarea implements Serializable {
         this.hecha = hecha;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
 
@@ -181,15 +181,15 @@ public class Tarea implements Serializable {
         this.subtareas = subtareas;
     }
 
-    public void setPrioridad(Integer prioridad) {
-        this.prioridad = prioridad;
-    }
-
     public boolean isHecha() {
         return hecha;
     }
 
-    public void setRecordatorio(Integer recordatorio) {
-        this.recordatorio = recordatorio;
+    public Integer getTiempoInvertido() {
+        return tiempoInvertido;
+    }
+
+    public void setTiempoInvertido(Integer tiempoInvertido) {
+        this.tiempoInvertido = tiempoInvertido;
     }
 }

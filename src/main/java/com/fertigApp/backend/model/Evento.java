@@ -73,11 +73,11 @@ public class Evento implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -89,11 +89,11 @@ public class Evento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getDuracion() {
+    public Integer getDuracion() {
         return duracion;
     }
 
-    public void setDuracion(int duracion) {
+    public void setDuracion(Integer duracion) {
         this.duracion = duracion;
     }
 
@@ -121,11 +121,11 @@ public class Evento implements Serializable {
         this.recurrencia = recurrencia;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
 }
