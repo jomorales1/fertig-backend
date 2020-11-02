@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,6 +22,13 @@ public class Sonido implements Serializable {
     public Sonido() {
     }
 
+    public void addUsuario(Usuario usuario) {
+        if (this.usuarios == null) {
+            this.usuarios = new ArrayList<>();
+        }
+        this.usuarios.add(usuario);
+    }
+
     public String getId() {
         return id;
     }
@@ -36,4 +44,5 @@ public class Sonido implements Serializable {
     public void setUsuarios(List<Usuario> usuarios) {
         this.usuarios = usuarios;
     }
+
 }
