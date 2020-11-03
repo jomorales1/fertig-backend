@@ -16,6 +16,11 @@ import java.util.List;
 //los eventos y rutinas
 public abstract class AbstractRecurrenteResponse implements Serializable {
 
+    protected String recurrencia;
+    protected LocalTime franjaInicio;
+    protected LocalTime franjaFin;
+    protected LocalDateTime fechaInicio;
+    protected LocalDateTime fechaFin;
     protected int id;
     protected String nombre;
     protected String descripcion;
@@ -35,6 +40,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.prioridad = evento.getPrioridad();
         this.etiqueta = evento.getEtiqueta();
         this.duracion = evento.getDuracion();
+        this.fechaInicio = evento.getFechaInicio();
+        this.fechaFin = evento.getFechaFin();
+        this.recurrencia = evento.getRecurrencia();
         this.mensajeRecurrencia = getMensajeRecurrencia(evento.getRecurrencia());
     }
 
@@ -45,6 +53,11 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.prioridad = rutina.getPrioridad();
         this.etiqueta = rutina.getEtiqueta();
         this.duracion = rutina.getDuracion();
+        this.fechaInicio = rutina.getFechaInicio();
+        this.fechaFin = rutina.getFechaFin();
+        this.franjaInicio = rutina.getFranjaInicio();
+        this.franjaFin = rutina.getFranjaFin();
+        this.recurrencia = rutina.getRecurrencia();
         this.mensajeRecurrencia = getMensajeRecurrencia(rutina.getRecurrencia());
 
     }
@@ -255,15 +268,15 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                         case 3 -> dias.add("Miercoles");
                         case 4 -> dias.add("Jueves");
                         case 5 -> dias.add("Viernes");
-                        case 6 -> dias.add("Sabado");
-                        case 7 -> dias.add("Domingo");
+                        case 6 -> dias.add("Sabados");
+                        case 7 -> dias.add("Domingos");
                     }
                 }
                 codDias = codDias >> 1;
             }
             mensajeRecurrencia = "Todos los ";
             for(String dia : dias){
-                if(dia.equals(dias.getLast())){
+                if(dia.equals(dias.getLast())&&dias.size()>1){
                     mensajeRecurrencia = mensajeRecurrencia.substring(0, mensajeRecurrencia.length()-2) + " y ";
                 }
                 mensajeRecurrencia += dia + ", ";
@@ -348,5 +361,45 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public void setMensajeRecurrencia(String mensajeRecurrencia) {
         this.mensajeRecurrencia = mensajeRecurrencia;
+    }
+
+    public LocalTime getFranjaInicio() {
+        return franjaInicio;
+    }
+
+    public void setFranjaInicio(LocalTime franjaInicio) {
+        this.franjaInicio = franjaInicio;
+    }
+
+    public LocalTime getFranjaFin() {
+        return franjaFin;
+    }
+
+    public void setFranjaFin(LocalTime franjaFin) {
+        this.franjaFin = franjaFin;
+    }
+
+    public LocalDateTime getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDateTime fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public LocalDateTime getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDateTime fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public String getRecurrencia() {
+        return recurrencia;
+    }
+
+    public void setRecurrencia(String recurrencia) {
+        this.recurrencia = recurrencia;
     }
 }
