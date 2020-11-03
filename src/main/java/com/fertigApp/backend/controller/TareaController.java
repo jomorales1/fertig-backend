@@ -296,8 +296,6 @@ public class TareaController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if (tarea.getPadre() != null || tarea.getNivel() != 1)
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Tarea copy = new Tarea();
         copy.setNombre(tarea.getNombre());
         copy.setDescripcion(tarea.getDescripcion());
