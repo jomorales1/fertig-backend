@@ -128,10 +128,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 }
             }
         } else{
-            if(fechaInicio.getHour() > franjaInicio.getHour() && duracion < (franjaFin.getHour() - fechaInicio.getHour())){
-                return findFechas(fechaInicio, fechaFin, recurrencia);
-            }
-            return null;
+            return findFechas(fechaInicio, fechaFin, recurrencia);
         }
         return fechas;
     }
@@ -244,13 +241,97 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             LocalDateTime franjaF = LocalDate.now().atTime(franjaFin);
             if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
-            while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)) fechaI = fechaI.plusHours(d);
+            while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
+                fechaI = fechaI.plusHours(d);
+                if(fechaI.isAfter(franjaF)){
+                    franjaF = franjaF.plusDays(1);
+                    franjaI = franjaI.plusDays(1);
+                }
+            }
             return fechaI;
         } else {
-            if(fechaInicio.getHour() > franjaInicio.getHour() && duracion < (franjaFin.getHour() - fechaInicio.getHour())){
-                return findSiguiente(fechaInicio, fechaFin, recurrencia);
+            return findSiguiente(fechaInicio, fechaFin, recurrencia);
+        }
+    }
+
+    public static LocalDateTime findAnterior(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia) {
+        LocalDateTime fecha = LocalDateTime.now();
+        int periodo = 0;
+        if(recurrencia.charAt(0) == 'E'){
+            int punto = recurrencia.indexOf(".") ;
+            int d = Integer.parseInt(recurrencia.substring(1, punto));
+            int dia = fecha.getDayOfWeek().getValue() - 1;
+            while(fecha.compareTo(fechaInicio)>0) {
+                if (((d >> dia) & 1) == 1) {
+                    break;
+                }
+                dia = (dia+6)%7;
+                fecha = fecha.minusDays(1);
             }
-            return null;
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            fechaI = fechaI.plusDays(fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
+            if(fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(1);
+            while (fechaI.isBefore(fecha)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
+            //System.out.println(fechaI);
+            fecha = LocalDateTime.now();
+            if(!fechaI.isBefore(fecha)) fechaI = fechaI.minusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
+            if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
+            else if(fecha.isAfter(fechaInicio)) return fechaInicio;
+            else return null;
+        } else {
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+
+            int d = Integer.parseInt(recurrencia.substring(1));
+            while(fechaI.isBefore(fecha)){
+                switch (recurrencia.charAt(0)) {
+                    case 'A' : fechaI = fechaI.plusYears(d); break;
+                    case 'M' : fechaI = fechaI.plusMonths(d); break;
+                    case 'S' : fechaI = fechaI.plusWeeks(d); break;
+                    case 'D' : fechaI = fechaI.plusDays(d); break;
+                    case 'H' : fechaI = fechaI.plusHours(d); break;
+                }
+            }
+            switch (recurrencia.charAt(0)) {
+                case 'A' : fechaI = fechaI.minusYears(d); break;
+                case 'M' : fechaI = fechaI.minusMonths(d); break;
+                case 'S' : fechaI = fechaI.minusWeeks(d); break;
+                case 'D' : fechaI = fechaI.minusDays(d); break;
+                case 'H' : fechaI = fechaI.minusHours(d); break;
+            }
+            if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
+            else if(fecha.isAfter(fechaInicio)) return fechaInicio;
+            else return null;
+        }
+    }
+
+    public static LocalDateTime findAnterior(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
+        if(recurrencia.charAt(0) == 'H'){
+            LocalDateTime fecha = LocalDateTime.now();
+            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            LocalDateTime franjaI = LocalDate.now().atTime(franjaInicio);
+            LocalDateTime franjaF = LocalDate.now().atTime(franjaFin);
+            if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
+            int d = Integer.parseInt(recurrencia.substring(1));
+            while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
+                fechaI = fechaI.plusHours(d);
+                if(fechaI.isAfter(franjaF)){
+                    franjaF = franjaF.plusDays(1);
+                    franjaI = franjaI.plusDays(1);
+                }
+            }
+            while(fechaI.isAfter(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
+                fechaI = fechaI.minusHours(d);
+                if(fechaI.isBefore(franjaI)){
+                    franjaF = franjaF.minusDays(1);
+                    franjaI = franjaI.minusDays(1);
+                }
+            }
+            if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
+                //mejorar condicion
+            else if(fecha.isAfter(fechaInicio)) return fechaInicio;
+            else return null;
+        } else {
+            return findAnterior(fechaInicio, fechaFin, recurrencia);
         }
     }
 

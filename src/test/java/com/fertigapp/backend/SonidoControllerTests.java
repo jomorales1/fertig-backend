@@ -112,70 +112,63 @@ class SonidoControllerTests {
 
     @Test
     void addSound() throws Exception {
-//       String uri = "/sounds/addSound/";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = createUser();
-//        else user = this.usuarioService.findById("test_user").get();
-//        String token = getToken(user);
-//
-//       RequestSonido requestSonido = new RequestSonido();
-//       requestSonido.setIdSonido("id sonido test");
-//       Sonido sonido = new Sonido();
-//       sonido.setId(requestSonido.getIdSonido());
-//       this.sonidoService.save(sonido);
-//       Preferido preferido = new Preferido();
-//       preferido.setSonido(sonido);
-//       preferido.setUsuario(user);
-//       this.preferidoService.add(preferido);
-//
-//        this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestSonido)))
-//                .andExpect(status().isCreated());
-//        List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
-//        for(Sonido s: sonidos){
-//            this.preferidoService.deleteById(s.getId());
-//            this.sonidoService.deleteById(s.getId());
-//        }
-//        this.usuarioService.deleteById(user.getUsuario());
+       String uri = "/sounds/addSound";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+
+       RequestSonido requestSonido = new RequestSonido();
+       requestSonido.setIdSonido("testSound");
+
+        this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestSonido)))
+                .andExpect(status().isCreated());
+        List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
+        for(Sonido s: sonidos){
+            this.preferidoService.deleteAllByUsuarioAndSonido(user, s);
+            this.sonidoService.deleteById(s.getId());
+        }
+        this.usuarioService.deleteById(user.getUsuario());
 
     }
 
     @Test
     void getAllSoundsByUser() throws Exception {
-//        String uri = "/sounds/getSounds/";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = createUser();
-//        else user = this.usuarioService.findById("test_user").get();
-//        String token = getToken(user);
-//        Sonido sonido = setUpSonido(user);
-//
-//        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
-//                .andExpect(status().isOk());
-//        MvcResult mvcResult = resultActions.andReturn();
-//        String response = mvcResult.getResponse().getContentAsString();
-//        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
-//        List<Sonido> sonidos = objectMapper.readValue(response, javaList);
-//        assertNotNull(sonidos);
-//        assertEquals(sonidos.get(0).getId(), sonido.getId());
-//
-//        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
-//        this.usuarioService.deleteById(user.getUsuario());
+        String uri = "/sounds/getSounds";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+        Sonido sonido = setUpSonido(user);
+
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Sonido.class);
+        List<Sonido> sonidos = objectMapper.readValue(response, javaList);
+        assertNotNull(sonidos);
+        assertEquals(sonidos.get(0).getId(), sonido.getId());
+
+        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
     void deleteSound() throws Exception {
-//        String uri = "/sounds/delete/Sound/";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = createUser();
-//        else user = this.usuarioService.findById("test_user").get();
-//        String token = getToken(user);
-//        Sonido sonido = setUpSonido(user);
-//        this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
-//                .andExpect(status().isOk());
-//        this.usuarioService.deleteById(user.getUsuario());
+        String uri = "/sounds/deleteSound/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+        Sonido sonido = setUpSonido(user);
+        this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        this.usuarioService.deleteById(user.getUsuario());
 
     }
 

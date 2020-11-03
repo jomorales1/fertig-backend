@@ -53,9 +53,9 @@ public class RutinaController {
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
     @GetMapping(path="/routines")
-    public @ResponseBody
-    Iterable<Rutina> getAllRutinas() {
-        return this.rutinaService.findAll();
+    public @ResponseBody ResponseEntity<List<Rutina>> getAllRutinas() {
+        List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findAll();
+        return ResponseEntity.ok(rutinas);
     }
 
     // Método GET para obtener todas las rutinas de un usuario específico.
@@ -110,19 +110,20 @@ public class RutinaController {
 
     // Método GET para obtener una rutina específica por medio de su ID.
     @GetMapping(path="/routines/getRoutine/{id}")
-    public Rutina getRutina(@PathVariable Integer id) {
+    public ResponseEntity<Rutina> getRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String username = userDetails.getUsername();
-
-        Optional<Rutina> optRutina = rutinaService.findById(id);
-        if(optRutina.isPresent()){
-            if(optRutina.get().getUsuario().getUsuario().equals(username))
-                return optRutina.get();
-            LOGGER.info("Wrong user");
-            return null;
+        if (!this.rutinaService.findById(id).isPresent()) {
+            LOGGER.error("Error: La rutina no existe");
+            return ResponseEntity.badRequest().body(null);
         }
-        LOGGER.info("Routine not found");
-        return null;
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Rutina rutina = this.rutinaService.findById(id).get();
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.error("Error: La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(null);
+        }
+        return ResponseEntity.ok(rutina);
     }
 
     // Método PUT para modificar un registro en la base de datos.
@@ -230,6 +231,15 @@ public class RutinaController {
         if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
             ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
             Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
+            completada.setFecha(LocalDateTime.now());
+            completada.setFechaAjustada(
+                    AbstractRecurrenteResponse.findAnterior(optionalRutina.get().getFechaInicio(),
+                            optionalRutina.get().getFechaFin(),
+                            optionalRutina.get().getRecurrencia(),
+                            optionalRutina.get().getDuracion(),
+                            optionalRutina.get().getFranjaInicio(),
+                            optionalRutina.get().getFranjaFin())
+            );
             completada.setHecha(true);
             this.completadaService.save(completada);
             Completada newCompletada = new Completada();
@@ -237,9 +247,13 @@ public class RutinaController {
             newCompletada.setFecha(
                     AbstractRecurrenteResponse.findSiguiente(optionalRutina.get().getFechaInicio(),
                             optionalRutina.get().getFechaFin(),
-                            optionalRutina.get().getRecurrencia()));
+                            optionalRutina.get().getRecurrencia(),
+                            optionalRutina.get().getDuracion(),
+                            optionalRutina.get().getFranjaInicio(),
+                            optionalRutina.get().getFranjaFin())
+            );
             newCompletada.setHecha(false);
-            LOGGER.info("Routine replaced");
+            LOGGER.info("Routine repetition checked");
             return ResponseEntity.ok().body(null);
         } else {
             LOGGER.info("Routine not found");
