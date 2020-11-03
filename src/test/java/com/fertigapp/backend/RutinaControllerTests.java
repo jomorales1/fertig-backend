@@ -1,7 +1,9 @@
 package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.services.CompletadaService;
@@ -15,13 +17,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
@@ -60,30 +67,22 @@ class RutinaControllerTests {
         return user;
     }
 
-//    Rutina setUpRutina(Usuario user) {
-//        Rutina routine = new Rutina();
-//
-//        routine.setUsuario(user);
-//        routine.setNombre("test_routine");
-//        routine.setDescripcion("test_routine_description");
-//        routine.setPrioridad(2);
-//        routine.setEtiqueta("test_routine_tag");
-//        routine.setDuracion(90);
-//        routine.setFechaInicio(new Date());
-//        routine.setFechaFin(new Date());
-//        routine.setRecurrencia("codification");
-//        routine.setRecordatorio(60);
-//
-////        Completada completada = new Completada();
-////        completada.setRutina(routine);
-////        completada.setFecha(new Date());
-////        this.completadaService.save(completada);
-//        ArrayList<Completada> completadas = new ArrayList<>();
-////        completadas.add(completada);
-//        routine.setCompletadas(completadas);
-//
-//        return rutinaService.save(routine);
-//    }
+    Rutina setUpRutina(Usuario user) {
+        Rutina routine = new Rutina();
+
+        routine.setUsuario(user);
+        routine.setNombre("test_routine");
+        routine.setDescripcion("test_routine_description");
+        routine.setPrioridad(2);
+        routine.setEtiqueta("test_routine_tag");
+        routine.setDuracion(90);
+        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
+        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setRecurrencia("D2");
+        routine.setRecordatorio(60);
+
+        return rutinaService.save(routine);
+    }
 
     String getToken(Usuario user) throws Exception {
         String token = "";
@@ -113,26 +112,26 @@ class RutinaControllerTests {
     }
 
 
-//    @Test
-//    @WithMockUser(value = "ADMIN")
-//    void getAllRutinas() throws Exception {
-//        String uri = "/routines";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = setUpUsuario();
-//        else user = this.usuarioService.findById("test_user").get();
-//        Rutina rutina = setUpRutina(user);
-//
-//        ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
-//        MvcResult mvcResult = resultActions.andReturn();
-//        String response = mvcResult.getResponse().getContentAsString();
-//        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
-//        List<Rutina> rutinas = objectMapper.readValue(response, javaList);
-//        assertNotNull(rutinas);
-//
-//        this.rutinaService.deleteById(rutina.getId());
-//        this.usuarioService.deleteById(user.getUsuario());
-//    }
+    @Test
+    @WithMockUser(value = "ADMIN")
+    void getAllRutinas() throws Exception {
+        String uri = "/routines";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+
+        ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Rutina.class);
+        List<Rutina> rutinas = objectMapper.readValue(response, javaList);
+        assertNotNull(rutinas);
+
+        this.rutinaService.deleteById(rutina.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
 
 //    @Test
 //    void getAllRutinasByUsuario() throws Exception {
@@ -203,7 +202,7 @@ class RutinaControllerTests {
 //        rutinaService.deleteById(rutina.getId());
 //        usuarioService.deleteById("test_user");
 //    }
-
+//
 //    @Test
 //    void replaceRutina() throws Exception {
 //        String uri = "/routines/updateRoutine/";
@@ -245,7 +244,7 @@ class RutinaControllerTests {
 //        this.rutinaService.deleteById(rutina.getId());
 //        this.usuarioService.deleteById(user.getUsuario());
 //    }
-
+//
 //    @Test
 //    void addNewRutina() throws Exception {
 //        String uri = "/routines/addRoutine";
@@ -262,9 +261,9 @@ class RutinaControllerTests {
 //        requestRutina.setPrioridad(2);
 //        requestRutina.setEtiqueta("test_routine_tag");
 //        requestRutina.setDuracion(90);
-//        requestRutina.setFechaInicio(new Date());
-//        requestRutina.setFechaFin(new Date());
-//        requestRutina.setRecurrencia("codification");
+//        requestRutina.setFechaInicio(LocalDateTime.now().minusWeeks(3));
+//        requestRutina.setFechaFin(LocalDateTime.now().plusWeeks(2));
+//        requestRutina.setRecurrencia("D2");
 //        requestRutina.setRecordatorio(60);
 //        requestRutina.setCompletadas(new ArrayList<>());
 //
@@ -284,23 +283,23 @@ class RutinaControllerTests {
 //        this.usuarioService.deleteById(user.getUsuario());
 //    }
 
-//    @Test
-//    void deleteRutina() throws Exception {
-//        String uri = "/routines/deleteRoutine/";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = setUpUsuario();
-//        else user = this.usuarioService.findById("test_user").get();
-//        Rutina rutina = setUpRutina(user);
-//        String token = getToken(user);
-//
-//        this.mockMvc.perform(delete(uri + rutina.getId()).header("Authorization", "Bearer " + token))
-//                .andExpect(status().isAccepted());
-//
-//        this.mockMvc.perform(delete(uri + rutina.getId() + 1).header("Authorization", "Bearer " + token))
-//                .andExpect(status().isBadRequest());
-//
-//        this.usuarioService.deleteById(user.getUsuario());
-//    }
+    @Test
+    void deleteRutina() throws Exception {
+        String uri = "/routines/deleteRoutine/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+        String token = getToken(user);
+
+        this.mockMvc.perform(delete(uri + rutina.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isAccepted());
+
+        this.mockMvc.perform(delete(uri + rutina.getId() + 1).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.usuarioService.deleteById(user.getUsuario());
+    }
 
 }

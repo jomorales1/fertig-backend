@@ -230,6 +230,15 @@ public class RutinaController {
         if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
             ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
             Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
+            completada.setFecha(LocalDateTime.now());
+            completada.setFechaAjustada(
+                    AbstractRecurrenteResponse.findAnterior(optionalRutina.get().getFechaInicio(),
+                            optionalRutina.get().getFechaFin(),
+                            optionalRutina.get().getRecurrencia(),
+                            optionalRutina.get().getDuracion(),
+                            optionalRutina.get().getFranjaInicio(),
+                            optionalRutina.get().getFranjaFin())
+            );
             completada.setHecha(true);
             this.completadaService.save(completada);
             Completada newCompletada = new Completada();
@@ -237,9 +246,13 @@ public class RutinaController {
             newCompletada.setFecha(
                     AbstractRecurrenteResponse.findSiguiente(optionalRutina.get().getFechaInicio(),
                             optionalRutina.get().getFechaFin(),
-                            optionalRutina.get().getRecurrencia()));
+                            optionalRutina.get().getRecurrencia(),
+                            optionalRutina.get().getDuracion(),
+                            optionalRutina.get().getFranjaInicio(),
+                            optionalRutina.get().getFranjaFin())
+            );
             newCompletada.setHecha(false);
-            LOGGER.info("Routine replaced");
+            LOGGER.info("Routine repetition checked");
             return ResponseEntity.ok().body(null);
         } else {
             LOGGER.info("Routine not found");
