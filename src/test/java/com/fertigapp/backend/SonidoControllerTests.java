@@ -1,11 +1,14 @@
 package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Preferido;
 import com.fertigApp.backend.model.Sonido;
+import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.requestModels.LoginRequest;
+import com.fertigApp.backend.requestModels.RequestSonido;
 import com.fertigApp.backend.services.PreferidoService;
 import com.fertigApp.backend.services.SonidoService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -16,14 +19,17 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
@@ -106,16 +112,70 @@ class SonidoControllerTests {
 
     @Test
     void addSound() throws Exception {
+//       String uri = "/sounds/addSound/";
+//        Usuario user;
+//        if (this.usuarioService.findById("test_user").isEmpty())
+//            user = createUser();
+//        else user = this.usuarioService.findById("test_user").get();
+//        String token = getToken(user);
+//
+//       RequestSonido requestSonido = new RequestSonido();
+//       requestSonido.setIdSonido("id sonido test");
+//       Sonido sonido = new Sonido();
+//       sonido.setId(requestSonido.getIdSonido());
+//       this.sonidoService.save(sonido);
+//       Preferido preferido = new Preferido();
+//       preferido.setSonido(sonido);
+//       preferido.setUsuario(user);
+//       this.preferidoService.add(preferido);
+//
+//        this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
+//                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestSonido)))
+//                .andExpect(status().isCreated());
+//        List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
+//        for(Sonido s: sonidos){
+//            this.preferidoService.deleteById(s.getId());
+//            this.sonidoService.deleteById(s.getId());
+//        }
+//        this.usuarioService.deleteById(user.getUsuario());
 
     }
 
     @Test
     void getAllSoundsByUser() throws Exception {
-
+//        String uri = "/sounds/getSounds/";
+//        Usuario user;
+//        if (this.usuarioService.findById("test_user").isEmpty())
+//            user = createUser();
+//        else user = this.usuarioService.findById("test_user").get();
+//        String token = getToken(user);
+//        Sonido sonido = setUpSonido(user);
+//
+//        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+//                .andExpect(status().isOk());
+//        MvcResult mvcResult = resultActions.andReturn();
+//        String response = mvcResult.getResponse().getContentAsString();
+//        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
+//        List<Sonido> sonidos = objectMapper.readValue(response, javaList);
+//        assertNotNull(sonidos);
+//        assertEquals(sonidos.get(0).getId(), sonido.getId());
+//
+//        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+//        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
     void deleteSound() throws Exception {
+//        String uri = "/sounds/delete/Sound/";
+//        Usuario user;
+//        if (this.usuarioService.findById("test_user").isEmpty())
+//            user = createUser();
+//        else user = this.usuarioService.findById("test_user").get();
+//        String token = getToken(user);
+//        Sonido sonido = setUpSonido(user);
+//        this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
+//                .andExpect(status().isOk());
+//        this.usuarioService.deleteById(user.getUsuario());
 
     }
 
