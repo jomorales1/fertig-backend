@@ -19,8 +19,6 @@ public class RequestTarea {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer estimacion;
 
-    private LocalDateTime fechaInicio;
-
     private LocalDateTime fechaFin;
 
     private boolean hecha;
@@ -76,14 +74,6 @@ public class RequestTarea {
 
     public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
-    }
-
-    public LocalDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
     }
 
     public LocalDateTime getFechaFin() {
