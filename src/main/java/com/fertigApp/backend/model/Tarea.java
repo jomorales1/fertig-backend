@@ -47,9 +47,6 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer tiempoInvertido;
 
-    @Column(name="fecha_inicio")
-    private LocalDateTime fechaInicio;
-
     @Column(name="fecha_fin")
     private LocalDateTime fechaFin;
 
@@ -118,14 +115,6 @@ public class Tarea implements Serializable {
 
     public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
-    }
-
-    public LocalDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(LocalDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
     }
 
     public LocalDateTime getFechaFin() {
