@@ -2,7 +2,6 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.auth.jwt.JwtUtil;
 import com.fertigApp.backend.auth.services.UserDetailsImpl;
-import com.fertigApp.backend.model.Sonido;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.JwtResponse;
 import com.fertigApp.backend.payload.response.MessageResponse;
