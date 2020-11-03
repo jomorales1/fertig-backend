@@ -1,5 +1,6 @@
 package com.fertigApp.backend.controller;
 
+import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
@@ -265,11 +266,15 @@ public class RutinaController {
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<Void> deleteRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Rutina> optRutina = this.rutinaService.findById(id);
-        if (optRutina.isPresent() && optRutina.get().getUsuario().getUsuario().equals(userDetails.getUsername())){
-            this.rutinaService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.rutinaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Rutina rutina = this.rutinaService.findById(id).get();
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario()))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        this.completadaService.deleteAllByRutina(rutina);
+        this.rutinaService.deleteById(rutina.getId());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

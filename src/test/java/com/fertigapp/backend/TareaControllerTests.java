@@ -511,7 +511,7 @@ class TareaControllerTests {
 
         this.mockMvc.perform(post(uri + task.getId()).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaDeUsuarioService.deleteAllByTarea(tarea2);
