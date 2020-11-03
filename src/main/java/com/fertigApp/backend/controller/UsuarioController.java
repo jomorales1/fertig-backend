@@ -69,6 +69,7 @@ public class UsuarioController {
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getUsername(),
+                userDetails.getName(),
                 userDetails.getEmail(),
                 roles));
     }

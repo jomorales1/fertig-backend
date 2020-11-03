@@ -92,6 +92,7 @@ public class GoogleController {
                         LOGGER.info("Un usuario ha iniciado sesión con su cuenta de Google");
                         return ResponseEntity.ok(new JwtResponse(nToken,
                                 userDetails.getUsername(),
+                                user.getNombre(),
                                 user.getCorreo(),
                                 roles));
                     } else {
@@ -132,6 +133,7 @@ public class GoogleController {
                     LOGGER.info("Se ha registrado un usuario a través de Google");
                     return ResponseEntity.ok(new JwtResponse(nToken,
                             userDetails.getUsername(),
+                            user.getNombre(),
                             user.getCorreo(),
                             roles));
                 }

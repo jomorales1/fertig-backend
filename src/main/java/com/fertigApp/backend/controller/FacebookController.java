@@ -79,6 +79,7 @@ public class FacebookController {
                 LOGGER.info("Un usuario ha iniciado sesión con su cuenta de facebook");
                 return ResponseEntity.ok(new JwtResponse(nToken,
                         userDetails.getUsername(),
+                        user.getNombre(),
                         user.getCorreo(),
                         roles));
             } else {
@@ -126,6 +127,7 @@ public class FacebookController {
             LOGGER.info("Se ha registrado un usuario a través de Facebook");
             return ResponseEntity.ok(new JwtResponse(nToken,
                     userDetails.getUsername(),
+                    user.getNombre(),
                     user.getCorreo(),
                     roles));
         }
