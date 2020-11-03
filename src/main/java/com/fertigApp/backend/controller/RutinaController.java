@@ -206,7 +206,6 @@ public class RutinaController {
         subtarea.setEstimacion(requestTarea.getEstimacion());
         subtarea.setEtiqueta(requestTarea.getEtiqueta());
         subtarea.setFechaFin(requestTarea.getFechaFin());
-        subtarea.setFechaInicio(requestTarea.getFechaInicio());
         subtarea.setHecha(requestTarea.getHecha());
         subtarea.setNivel(2);
         subtarea.setNombre(requestTarea.getNombre());

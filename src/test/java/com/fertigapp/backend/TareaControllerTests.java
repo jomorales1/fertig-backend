@@ -560,4 +560,65 @@ class TareaControllerTests {
         this.usuarioService.deleteById(user.getUsuario());
     }
 
+    @Test
+    void copyTask() throws Exception {
+        String uri = "/tasks/copyTask/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+        Tarea task = setUp(user);
+
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("usuario");
+        usuario.setCorreo("correo@test.com");
+        usuario.setNombre("Usuario de prueba");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Tarea tarea = new Tarea();
+        tarea.setNombre("Test Task");
+        tarea.setDescripcion("Test description");
+        tarea.setPrioridad(1);
+        tarea.setEtiqueta("Test label");
+        tarea.setEstimacion(4);
+        tarea.setNivel(2);
+        tarea.setHecha(false);
+        tarea.setRecordatorio(2);
+        tarea.setTiempoInvertido(0);
+        tarea = this.tareaService.save(tarea);
+
+        TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
+        tareaDeUsuario.setUsuario(usuario);
+        tareaDeUsuario.setTarea(tarea);
+        tareaDeUsuario.setAdmin(true);
+        this.tareaDeUsuarioService.save(tareaDeUsuario);
+
+        this.mockMvc.perform(post(uri + (tarea.getId() + 1)).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri + task.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        tarea.setNivel(1);
+        tarea = this.tareaService.save(tarea);
+
+        this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        this.tareaDeUsuarioService.deleteAllByUsuario(user);
+        this.tareaDeUsuarioService.deleteAllByUsuario(usuario);
+        List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
+        for (Tarea tarea1 : tareas) {
+            this.tareaDeUsuarioService.deleteAllByTarea(tarea1);
+            this.tareaService.deleteById(tarea1.getId());
+        }
+        this.usuarioService.deleteById(usuario.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
 }

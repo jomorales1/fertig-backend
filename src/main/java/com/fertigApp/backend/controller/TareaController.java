@@ -53,11 +53,12 @@ public class TareaController {
     }
 
     @GetMapping(path="/tasks/getTasks")
-    public Iterable<Tarea> getAllTareasByUsuario() {
+    public ResponseEntity<List<Tarea>> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        return this.tareaDeUsuarioService.findTareasByUsuario(usuario);
+        List<Tarea> tareas = (List<Tarea>) this.tareaDeUsuarioService.findTareasByUsuario(usuario);
+        return ResponseEntity.ok(tareas);
     }
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
@@ -91,7 +92,6 @@ public class TareaController {
             tarea.setPrioridad(task.getPrioridad());
             tarea.setEtiqueta(task.getEtiqueta());
             tarea.setEstimacion(task.getEstimacion());
-            tarea.setFechaInicio(task.getFechaInicio());
             tarea.setFechaFin(task.getFechaFin());
             tarea.setHecha(task.getHecha());
             tarea.setRecordatorio(task.getRecordatorio());
@@ -134,7 +134,6 @@ public class TareaController {
         tarea.setEstimacion(requestTarea.getEstimacion());
         tarea.setEtiqueta(requestTarea.getEtiqueta());
         tarea.setFechaFin(requestTarea.getFechaFin());
-        tarea.setFechaInicio(requestTarea.getFechaInicio());
         tarea.setHecha(requestTarea.getHecha());
         tarea.setNivel(1);
         tarea.setNombre(requestTarea.getNombre());
@@ -246,14 +245,17 @@ public class TareaController {
         if (tarea.getNivel() > 2) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent() && tarea.getNivel() != 2)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (tarea.getNivel() == 2) {
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea.getPadre()).isPresent())
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Tarea subtarea = new Tarea();
         subtarea.setDescripcion(subTask.getDescripcion());
         subtarea.setEstimacion(subTask.getEstimacion());
         subtarea.setEtiqueta(subTask.getEtiqueta());
         subtarea.setFechaFin(subTask.getFechaFin());
-        subtarea.setFechaInicio(subTask.getFechaInicio());
         subtarea.setHecha(subTask.getHecha());
         subtarea.setNivel(tarea.getNivel() + 1);
         subtarea.setNombre(subTask.getNombre());
@@ -279,6 +281,71 @@ public class TareaController {
         Integer newTime = tarea.getTiempoInvertido() + time;
         tarea.setTiempoInvertido(newTime);
         this.tareaService.save(tarea);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/tasks/copyTask/{id}")
+    public ResponseEntity<Void> copyTask(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Tarea tarea = this.tareaService.findById(id).get();
+        if (tarea.getNivel() != 1)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Tarea copy = new Tarea();
+        copy.setNombre(tarea.getNombre());
+        copy.setDescripcion(tarea.getDescripcion());
+        copy.setPrioridad(tarea.getPrioridad());
+        copy.setEtiqueta(tarea.getEtiqueta());
+        copy.setEstimacion(tarea.getEstimacion());
+        copy.setTiempoInvertido(0);
+        copy.setFechaFin(tarea.getFechaFin());
+        copy.setNivel(tarea.getNivel());
+        copy.setRecordatorio(tarea.getRecordatorio());
+        this.tareaService.save(copy);
+        if (tarea.getSubtareas() != null) {
+            for (Tarea subtareaSN : tarea.getSubtareas()) {
+                Tarea subtarea = new Tarea();
+                subtarea.setNombre(subtareaSN.getNombre());
+                subtarea.setDescripcion(subtareaSN.getDescripcion());
+                subtarea.setPrioridad(subtareaSN.getPrioridad());
+                subtarea.setEtiqueta(subtareaSN.getEtiqueta());
+                subtarea.setEstimacion(subtareaSN.getEstimacion());
+                subtarea.setTiempoInvertido(0);
+                subtarea.setFechaFin(subtareaSN.getFechaFin());
+                subtarea.setNivel(subtareaSN.getNivel());
+                subtarea.setRecordatorio(subtareaSN.getRecordatorio());
+                this.tareaService.save(subtarea);
+                if (subtareaSN.getSubtareas() != null) {
+                    for (Tarea subtareaTN : subtareaSN.getSubtareas()) {
+                        Tarea subtarea1 = new Tarea();
+                        subtarea1.setNombre(subtareaTN.getNombre());
+                        subtarea1.setDescripcion(subtareaTN.getDescripcion());
+                        subtarea1.setPrioridad(subtareaTN.getPrioridad());
+                        subtarea1.setEtiqueta(subtareaTN.getEtiqueta());
+                        subtarea1.setEstimacion(subtareaTN.getEstimacion());
+                        subtarea1.setTiempoInvertido(0);
+                        subtarea1.setFechaFin(subtareaTN.getFechaFin());
+                        subtarea1.setNivel(subtareaTN.getNivel());
+                        subtarea1.setRecordatorio(subtareaTN.getRecordatorio());
+                        subtarea1.setPadre(subtarea);
+                        subtarea.addSubtarea(subtarea1);
+                        subtarea = this.tareaService.save(subtarea);
+                    }
+                }
+                subtarea.setPadre(copy);
+                copy.addSubtarea(subtarea);
+            }
+        }
+        TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
+        tareaDeUsuario.setUsuario(usuario);
+        tareaDeUsuario.setTarea(this.tareaService.save(copy));
+        tareaDeUsuario.setAdmin(true);
+        this.tareaDeUsuarioService.save(tareaDeUsuario);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
