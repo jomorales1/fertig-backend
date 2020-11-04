@@ -179,13 +179,35 @@ public class TareaController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Tarea parent = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
-            LOGGER.info("La tarea no pertenece al usuario");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
+        if (parent.getNivel() == 1) {
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+                LOGGER.info("La tarea no pertenece al usuario");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
+            }
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).get().isAdmin()) {
+                LOGGER.info("El usuario no es administrador de la tarea");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es administrador de la tarea"));
+            }
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).get().isAdmin()) {
-            LOGGER.info("El usuario no es administrador de la tarea");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es administrador de la tarea"));
+        if (parent.getNivel() == 2) {
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent.getPadre()).isPresent()) {
+                LOGGER.info("La tarea no pertenece al usuario");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
+            }
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent.getPadre()).get().isAdmin()) {
+                LOGGER.info("El usuario no es administrador de la tarea");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es administrador de la tarea"));
+            }
+        }
+        if (parent.getNivel() == 3) {
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent.getPadre().getPadre()).isPresent()) {
+                LOGGER.info("La tarea no pertenece al usuario");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
+            }
+            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent.getPadre().getPadre()).get().isAdmin()) {
+                LOGGER.info("El usuario no es administrador de la tarea");
+                return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es administrador de la tarea"));
+            }
         }
         this.tareaDeUsuarioService.deleteAllByTarea(parent);
         this.tareaService.deleteById(parent.getId());
