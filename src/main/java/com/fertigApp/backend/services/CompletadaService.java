@@ -44,4 +44,16 @@ public class CompletadaService {
     public LocalDateTime findMaxAjustadaCompletadasByRutina(Rutina rutina){
         return this.completadaRepository.findMaxAjustadaCompletadasByRutina(rutina);
     }
+
+    public LocalDateTime findFechaNoCompletadaByRutina(Rutina rutina){
+        return this.completadaRepository.findFechaNoCompletadaByRutina(rutina);
+    }
+
+    public void deleteById(Integer id){
+        this.completadaRepository.deleteById(id);
+    }
+
+    public Completada findMaxCompletada(Rutina rutina){
+        return this.completadaRepository.findMaxCompletada(rutina);
+    }
 }

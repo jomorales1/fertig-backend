@@ -19,12 +19,13 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
         this.fecha = findSiguiente(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia());
     }
 
-    public RecurrenteResponse(Rutina rutina) {
+    public RecurrenteResponse(Rutina rutina, LocalDateTime fecha) {
         super(rutina);
-        if(rutina.getRecurrencia().charAt(0)=='H')
-            this.fecha = findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(), rutina.getFranjaInicio(), rutina.getFranjaFin());
-        else
-            this.fecha =  findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia());
+        this.fecha = fecha;
+//        if(rutina.getRecurrencia().charAt(0)=='H')
+//            this.fecha = findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(), rutina.getFranjaInicio(), rutina.getFranjaFin());
+//        else
+//            this.fecha =  findSiguiente(rutina.getFechaInicio(), rutina.getFechaFin(), rutina.getRecurrencia());
     }
 
     public LocalDateTime getFecha() {
