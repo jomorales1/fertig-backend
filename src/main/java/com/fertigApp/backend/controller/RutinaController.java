@@ -161,7 +161,7 @@ public class RutinaController {
 
     // Método POST para añadir un registro en la tabla "rutina" de la DB.
     @PostMapping(path="/routines/addRoutine")
-    public @ResponseBody ResponseEntity<Void> addNewRutina(@RequestBody RequestRutina requestRutina) {
+    public @ResponseBody ResponseEntity<MessageResponse> addNewRutina(@RequestBody RequestRutina requestRutina) {
         Rutina rutina = new Rutina();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
@@ -191,7 +191,7 @@ public class RutinaController {
         completada.setFechaAjustada(completada.getFecha());
         completada.setHecha(false);
         this.completadaService.save(completada);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Rutina creada"));
     }
 
     @PostMapping(path = "/routines/addSubtask/{id}")
@@ -222,7 +222,7 @@ public class RutinaController {
         subtarea.setRutinaT(rutina);
         rutina.addSubtarea(subtarea);
         this.rutinaService.save(rutina);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea de rutina creada"));
     }
 
     //@PutMapping
@@ -288,7 +288,7 @@ public class RutinaController {
         }
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Rutina eliminada"));
     }
 
 }

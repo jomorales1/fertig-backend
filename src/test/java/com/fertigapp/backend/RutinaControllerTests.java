@@ -8,6 +8,7 @@ import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -282,6 +283,66 @@ class RutinaControllerTests {
             this.completadaService.deleteAllByRutina(rutina);
             this.rutinaService.deleteById(rutina.getId());
         }
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    void addSubtask() throws Exception {
+        String uri = "/routines/addSubtask/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+        String token = getToken(user);
+
+        RequestTarea requestTarea = new RequestTarea();
+        requestTarea.setNombre("Test Task");
+        requestTarea.setDescripcion("Test description");
+        requestTarea.setPrioridad(1);
+        requestTarea.setEtiqueta("Test label");
+        requestTarea.setEstimacion(4);
+        requestTarea.setHecha(false);
+        requestTarea.setRecordatorio(2);
+        requestTarea.setTiempoInvertido(0);
+
+        this.mockMvc.perform(post(uri + (rutina.getId() + 1)).header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
+                .andExpect(status().isBadRequest());
+
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("newUser");
+        usuario.setCorreo("new_user@test.com");
+        usuario.setNombre("New User");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Rutina routine = new Rutina();
+        routine.setUsuario(usuario);
+        routine.setNombre("test_routine");
+        routine.setDescripcion("test_routine_description");
+        routine.setPrioridad(2);
+        routine.setEtiqueta("test_routine_tag");
+        routine.setDuracion(90);
+        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
+        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setRecurrencia("D2");
+        routine.setRecordatorio(60);
+        routine = this.rutinaService.save(routine);
+
+        this.mockMvc.perform(post(uri + routine.getId()).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri + rutina.getId()).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
+                .andExpect(status().isCreated());
+
+        this.completadaService.deleteAllByRutina(rutina);
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(rutina.getId());
+        this.rutinaService.deleteById(routine.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
