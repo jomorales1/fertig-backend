@@ -81,11 +81,9 @@ public class RutinaController {
     @GetMapping(path="/routines/getRoutines")
     public ResponseEntity<List<RecurrenteResponse>> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isEmpty())
-            return ResponseEntity.badRequest().body(null);
-        List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(optUsuario.orElse(null));
+        Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuario);
         List<RecurrenteResponse> rutinaResponses = new ArrayList<>();
         for(Rutina rutina : rutinas) {
             rutinaResponses.add(new RecurrenteResponse(rutina));
