@@ -88,9 +88,23 @@ public class TareaController {
         Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
         if(optionalTarea.isPresent()){
             Tarea tarea = optionalTarea.get();
-            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.orElse(null), tarea).isPresent()) {
-                LOGGER.info("La tarea no pertenece al usuario");
-                return ResponseEntity.badRequest().body(null);
+            if (tarea.getNivel() == 1) {
+                if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.orElse(null), tarea).isPresent()) {
+                    LOGGER.info("La tarea no pertenece al usuario");
+                    return ResponseEntity.badRequest().body(null);
+                }
+            }
+            if (tarea.getNivel() == 2) {
+                if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.orElse(null), tarea.getPadre()).isPresent()) {
+                    LOGGER.info("La subtarea no pertenece al usuario");
+                    return ResponseEntity.badRequest().body(null);
+                }
+            }
+            if (tarea.getNivel() == 3) {
+                if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(optionalUsuario.orElse(null), tarea.getPadre().getPadre()).isPresent()) {
+                    LOGGER.info("La subtarea no pertenece al usuario");
+                    return ResponseEntity.badRequest().body(null);
+                }
             }
             tarea.setNombre(task.getNombre());
             tarea.setDescripcion(task.getDescripcion());
