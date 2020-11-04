@@ -1,11 +1,11 @@
 package com.fertigApp.backend.controller;
 
-import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
+import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
@@ -36,7 +36,7 @@ import java.util.logging.Level;
 @RestController
 public class RutinaController {
 
-    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Rutina.class);
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
     private final RutinaService rutinaService;
@@ -96,17 +96,16 @@ public class RutinaController {
     @GetMapping(path="/routines/getRoutinesAndRepetitions")
     public ResponseEntity<List<RutinaRepeticionesResponse>> getAllRutinasRepeticionesByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isEmpty())
-            return ResponseEntity.badRequest().body(null);
-        List<RutinaRepeticionesResponse> rutinas = new LinkedList<>();
-        for(Rutina rutina : rutinaService.findByUsuario(optUsuario.get())){
-            rutinas.add(new RutinaRepeticionesResponse(rutina,
+        Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findByUsuario(usuario);
+        List<RutinaRepeticionesResponse> response = new LinkedList<>();
+        for(Rutina rutina : rutinas){
+            response.add(new RutinaRepeticionesResponse(rutina,
                     (List<LocalDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
                     completadaService.findMaxAjustadaCompletadasByRutina(rutina)));
         }
-        return ResponseEntity.ok().body(rutinas);
+        return ResponseEntity.ok().body(response);
     }
 
     // Método GET para obtener una rutina específica por medio de su ID.
@@ -114,14 +113,14 @@ public class RutinaController {
     public ResponseEntity<Rutina> getRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (!this.rutinaService.findById(id).isPresent()) {
-            LOGGER.error("Error: La rutina no existe");
+            LOGGER.info("La rutina no existe");
             return ResponseEntity.badRequest().body(null);
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Rutina rutina = this.rutinaService.findById(id).get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.error("Error: La rutina no pertenece al usuario");
+            LOGGER.info("La rutina no pertenece al usuario");
             return ResponseEntity.badRequest().body(null);
         }
         return ResponseEntity.ok(rutina);
@@ -133,31 +132,31 @@ public class RutinaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-
-        Optional<Rutina> optionalRutina = rutinaService.findById(id);
-        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
-            Rutina rutina = optionalRutina.get();
-            rutina.setUsuario(optionalUsuario.get());
-            rutina.setNombre(routine.getNombre());
-            rutina.setDescripcion(routine.getDescripcion());
-            rutina.setPrioridad(routine.getPrioridad());
-            rutina.setEtiqueta(routine.getEtiqueta());
-            rutina.setDuracion(routine.getDuracion());
-            rutina.setFechaInicio(routine.getFechaInicio());
-            rutina.setFechaFin(routine.getFechaFin());
-            rutina.setRecurrencia(routine.getRecurrencia());
-            rutina.setRecordatorio(routine.getRecordatorio());
-            rutina.setFranjaInicio(routine.getFranjaInicio());
-            rutina.setFranjaFin(routine.getFranjaFin());
-            rutina.setCompletadas((List<Completada>) completadaService.findByRutina(rutina));
-            this.rutinaService.save(rutina);
-            LOGGER.info("Routine replaced");
-            return ResponseEntity.ok().body(rutina);
-        } else {
-            LOGGER.info("Routine not found");
+        if (!this.rutinaService.findById(id).isPresent()) {
+            LOGGER.info("Rutina no encontrada");
             return ResponseEntity.badRequest().body(null);
         }
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Rutina rutina = this.rutinaService.findById(id).get();
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(null);
+        }
+        rutina.setNombre(routine.getNombre());
+        rutina.setDescripcion(routine.getDescripcion());
+        rutina.setPrioridad(routine.getPrioridad());
+        rutina.setEtiqueta(routine.getEtiqueta());
+        rutina.setDuracion(routine.getDuracion());
+        rutina.setFechaInicio(routine.getFechaInicio());
+        rutina.setFechaFin(routine.getFechaFin());
+        rutina.setRecurrencia(routine.getRecurrencia());
+        rutina.setRecordatorio(routine.getRecordatorio());
+        rutina.setFranjaInicio(routine.getFranjaInicio());
+        rutina.setFranjaFin(routine.getFranjaFin());
+        this.rutinaService.save(rutina);
+        LOGGER.info("Rutina actualizada");
+        return ResponseEntity.ok().body(rutina);
     }
 
     // Método POST para añadir un registro en la tabla "rutina" de la DB.
@@ -196,13 +195,19 @@ public class RutinaController {
     }
 
     @PostMapping(path = "/routines/addSubtask/{id}")
-    public ResponseEntity<Void> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
+    public ResponseEntity<MessageResponse> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.rutinaService.findById(id).isPresent())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.rutinaService.findById(id).isPresent()) {
+            LOGGER.info("Rutina no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
+        }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Rutina rutina = this.rutinaService.findById(id).get();
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
         Tarea subtarea = new Tarea();
         subtarea.setDescripcion(requestTarea.getDescripcion());
         subtarea.setEstimacion(requestTarea.getEstimacion());
@@ -222,59 +227,68 @@ public class RutinaController {
 
     //@PutMapping
     @PatchMapping(path="/routines/checkRoutine/{id}")
-    public ResponseEntity<Void> checkRoutine(@PathVariable Integer id){
+    public ResponseEntity<MessageResponse> checkRoutine(@PathVariable Integer id){
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-
-        Optional<Rutina> optionalRutina = rutinaService.findById(id);
-        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
-            ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
-            Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
-            completada.setFecha(LocalDateTime.now());
-            completada.setFechaAjustada(
-                    AbstractRecurrenteResponse.findAnterior(optionalRutina.get().getFechaInicio(),
-                            optionalRutina.get().getFechaFin(),
-                            optionalRutina.get().getRecurrencia(),
-                            optionalRutina.get().getDuracion(),
-                            optionalRutina.get().getFranjaInicio(),
-                            optionalRutina.get().getFranjaFin())
-            );
-            completada.setHecha(true);
-            this.completadaService.save(completada);
-            Completada newCompletada = new Completada();
-            newCompletada.setRutina(optionalRutina.get());
-            newCompletada.setFecha(
-                    AbstractRecurrenteResponse.findSiguiente(optionalRutina.get().getFechaInicio(),
-                            optionalRutina.get().getFechaFin(),
-                            optionalRutina.get().getRecurrencia(),
-                            optionalRutina.get().getDuracion(),
-                            optionalRutina.get().getFranjaInicio(),
-                            optionalRutina.get().getFranjaFin())
-            );
-            newCompletada.setHecha(false);
-            LOGGER.info("Routine repetition checked");
-            return ResponseEntity.ok().body(null);
-        } else {
-            LOGGER.info("Routine not found");
-            return ResponseEntity.badRequest().body(null);
+        if (!this.rutinaService.findById(id).isPresent()) {
+            LOGGER.info("Rutina no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
         }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findByUsuario(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Rutina rutina = this.rutinaService.findById(id).get();
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
+        ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
+        Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
+        completada.setFecha(LocalDateTime.now());
+        completada.setFechaAjustada(
+                AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
+                        rutina.getFechaFin(),
+                        rutina.getRecurrencia(),
+                        rutina.getDuracion(),
+                        rutina.getFranjaInicio(),
+                        rutina.getFranjaFin())
+        );
+        completada.setHecha(true);
+        this.completadaService.save(completada);
+        Completada newCompletada = new Completada();
+        newCompletada.setRutina(rutina);
+        newCompletada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
+                        rutina.getFechaFin(),
+                        rutina.getRecurrencia(),
+                        rutina.getDuracion(),
+                        rutina.getFranjaInicio(),
+                        rutina.getFranjaFin())
+        );
+        newCompletada.setHecha(false);
+        LOGGER.info("Routine repetition checked");
+        this.completadaService.save(newCompletada);
+        return ResponseEntity.ok().body(new MessageResponse("Routine repetition checked"));
     }
 
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
-    public ResponseEntity<Void> deleteRutina(@PathVariable Integer id) {
+    public ResponseEntity<MessageResponse> deleteRutina(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.rutinaService.findById(id).isPresent())
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!this.rutinaService.findById(id).isPresent()) {
+            LOGGER.info("Rutina no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
+        }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Rutina rutina = this.rutinaService.findById(id).get();
-        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario()))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
 }
