@@ -69,6 +69,10 @@ public class Tarea implements Serializable {
         this.subtareas.add(tarea);
     }
 
+    public boolean deleteSubtarea(Tarea subtarea) {
+        return this.subtareas.removeIf(tarea -> tarea.getId() == subtarea.getId());
+    }
+
     public int getId() {
         return id;
     }

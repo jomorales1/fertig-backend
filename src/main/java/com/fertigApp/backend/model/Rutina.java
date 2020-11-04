@@ -64,6 +64,10 @@ public class Rutina implements Serializable {
         this.subtareas.add(subtarea);
     }
 
+    public boolean deleteSubtarea(Tarea subtarea) {
+        return this.subtareas.removeIf(tarea -> tarea.getId() == subtarea.getId());
+    }
+
     public int getId() {
         return id;
     }

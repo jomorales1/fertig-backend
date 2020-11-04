@@ -12,6 +12,7 @@ import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
+import com.fertigApp.backend.services.TareaService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,11 +45,14 @@ public class RutinaController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
+    private final TareaService tareaService;
+
     private final CompletadaService completadaService;
 
-    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, CompletadaService completadaService) {
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, TareaService tareaService, CompletadaService completadaService) {
         this.rutinaService = rutinaService;
         this.usuarioService = usuarioService;
+        this.tareaService = tareaService;
         this.completadaService = completadaService;
     }
 
@@ -221,6 +225,100 @@ public class RutinaController {
         rutina.addSubtarea(subtarea);
         this.rutinaService.save(rutina);
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea de rutina creada"));
+    }
+
+    @PutMapping(path = "/routines/updateSubtask/{id}")
+    public ResponseEntity<MessageResponse> updateSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent()) {
+            LOGGER.info("Tarea no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Tarea subtask = this.tareaService.findById(id).get();
+        Rutina rutina;
+        if (subtask.getNivel() == 2) {
+            rutina = subtask.getRutinaT();
+        } else {
+            rutina = subtask.getPadre().getRutinaT();
+        }
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
+        subtask.setNombre(requestTarea.getNombre());
+        subtask.setDescripcion(requestTarea.getDescripcion());
+        subtask.setPrioridad(requestTarea.getPrioridad());
+        subtask.setEtiqueta(requestTarea.getEtiqueta());
+        subtask.setEstimacion(requestTarea.getEstimacion());
+        subtask.setFechaFin(requestTarea.getFechaFin());
+        subtask.setHecha(requestTarea.getHecha());
+        subtask.setRecordatorio(requestTarea.getRecordatorio());
+        subtask.setTiempoInvertido(requestTarea.getTiempoInvertido());
+        this.tareaService.save(subtask);
+        return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
+    }
+
+    @PutMapping(path = "/routines/checkSubtask/{id}")
+    public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent()) {
+            LOGGER.info("Tarea no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Tarea subtask = this.tareaService.findById(id).get();
+        Rutina rutina;
+        if (subtask.getNivel() == 2) {
+            rutina = subtask.getRutinaT();
+        } else {
+            rutina = subtask.getPadre().getRutinaT();
+        }
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
+        subtask.setHecha(!subtask.getHecha());
+        this.tareaService.save(subtask);
+        return ResponseEntity.ok(new MessageResponse("Subtarea checkeada"));
+    }
+
+    @DeleteMapping(path = "/routines/deleteSubtask/{id}")
+    public ResponseEntity<MessageResponse> deleteSubtask(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!this.tareaService.findById(id).isPresent()) {
+            LOGGER.info("Tarea no encontrada");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        Tarea subtask = this.tareaService.findById(id).get();
+        Rutina rutina;
+        if (subtask.getNivel() == 2) {
+            rutina = subtask.getRutinaT();
+        } else {
+            rutina = subtask.getPadre().getRutinaT();
+        }
+        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+            LOGGER.info("La rutina no pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+        }
+        if (subtask.getNivel() == 2) {
+            rutina.deleteSubtarea(subtask);
+            subtask.setRutinaT(null);
+            this.tareaService.save(subtask);
+            this.rutinaService.save(rutina);
+        } else {
+            Tarea parent = subtask.getPadre();
+            parent.deleteSubtarea(subtask);
+            subtask.setPadre(null);
+            this.tareaService.save(subtask);
+            this.tareaService.save(parent);
+        }
+        this.tareaService.deleteById(subtask.getId());
+        return ResponseEntity.ok(new MessageResponse("Subtarea eliminada"));
     }
 
     //@PutMapping
