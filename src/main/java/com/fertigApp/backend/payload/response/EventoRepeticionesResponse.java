@@ -22,4 +22,8 @@ public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
                 evento.getRecurrencia()
         );
     }
+
+    public List<LocalDateTime> getRepeticiones(){
+        return repeticiones;
+    }
 }

@@ -94,7 +94,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".");
             int dias = Integer.parseInt(recurrencia.substring(1, punto));
-            for(int i = 1; i<8;  i = (i%7)+ 1) {
+            for(int i = 1; i<8;  i++) {
                 if((dias & 1) == 1){
                     LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
                     fechaI = fechaI.plusDays(i - fechaI.getDayOfWeek().getValue());

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
@@ -23,6 +24,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -104,6 +107,26 @@ class EventoControllerTests {
         return this.eventoService.save(evento);
     }
 
+    Evento createEvent(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin){
+        if (usuarioService.findById(user.getUsuario()).isEmpty()) {
+            this.usuarioService.save(user);
+        }
+
+        Evento evento = new Evento();
+        evento.setUsuario(user);
+        evento.setNombre("Test Event");
+        evento.setDescripcion("Event description");
+        evento.setPrioridad(1);
+        evento.setEtiqueta("Event label");
+        evento.setDuracion(1);
+        evento.setRecurrencia(recurrencia);
+        evento.setRecordatorio(1);
+        evento.setFechaInicio(fechaInicio);
+        evento.setFechaFin(fechaFin);
+
+        return this.eventoService.save(evento);
+    }
+
     @Test
     void contextLoads() {
         assertTrue(true);
@@ -132,30 +155,207 @@ class EventoControllerTests {
         this.usuarioService.deleteById(user.getUsuario());
     }
 
-//    @Test
-//    void getAllEventosByUsuario() throws Exception {
-//        String uri = "/events/getEvents";
-//        Usuario user;
-//        if (this.usuarioService.findById("test_user").isEmpty())
-//            user = createUser();
-//        else user = this.usuarioService.findById("test_user").get();
-//        Evento event = createEvent(user);
-//        String token = getToken(user);
-//
-//        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
-//                .andExpect(status().isOk());
-//        MvcResult mvcResult = resultActions.andReturn();
-//        String response = mvcResult.getResponse().getContentAsString();
-//        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Evento.class);
-//        List<Evento> events = objectMapper.readValue(response, javaList);
-//        assertNotNull(events);
-//        assertEquals(events.get(0).getUsuario().getUsuario(), user.getUsuario());
-//        assertEquals(events.get(0).getNombre(), event.getNombre());
-//        assertEquals(events.get(0).getDescripcion(), event.getDescripcion());
-//
-//        this.eventoService.deleteById(event.getId());
-//        this.usuarioService.deleteById(user.getUsuario());
-//    }
+    @Test
+    void getAllEventosByUsuario() throws Exception {
+        String uri = "/events/getEvents";
+        Usuario user = createUser();
+        Evento event = createEvent(user);
+        String token = getToken(user);
+
+        // Valid request -> status 200 expected
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        //Verificacion de la lista de respuesta
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Evento.class);
+        List<Evento> events = objectMapper.readValue(response, javaList);
+        assertNotNull(events);
+        //assertTrue(events.get(0).getUsuario().getUsuario().equals(user.getUsuario()));
+        assertEquals(events.get(0).getNombre(), event.getNombre());
+        assertEquals(events.get(0).getDescripcion(), event.getDescripcion());
+
+        this.eventoService.deleteById(event.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    void getEventsRepetitions() throws  Exception {
+        String uri = "/events/getEventsAndRepetitions";
+        Usuario user = createUser();
+        String token = getToken(user);
+
+        Evento event;
+        String recurrencia;
+        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2020, 7, 1, 0, 0);
+        LinkedList<LocalDateTime> expectedDates = new LinkedList<>();
+        EventoRepeticionesResponse obtainedEvent;
+        List<LocalDateTime> obtainedDates;
+
+        ResultActions resultActions;
+        MvcResult mvcResult;
+        String response;
+
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, EventoRepeticionesResponse.class);
+        List<EventoRepeticionesResponse> events;
+
+        //RECURRENCIA DIARIA
+        recurrencia = "D1";
+        fechaInicio = LocalDateTime.of(2020, 6, 25, 16, 0);
+        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int day = 25; day <= 30; day++){
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA SEMANAL
+        recurrencia = "S1";
+        fechaInicio = LocalDateTime.of(2020, 6, 2, 16, 0);
+        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int day = 2; day <= 30; day+=7){
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA MENSUAL
+        recurrencia = "M1";
+        fechaInicio = LocalDateTime.of(2020, 1, 28, 16, 0);
+        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int month = 1; month <= 6; month++){
+            expectedDates.add(LocalDateTime.of(2020, month, 28, 16, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA ANUAL
+        recurrencia = "A1";
+        fechaInicio = LocalDateTime.of(2016, 6, 30, 16, 0);
+        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int year = 2016; year <= 2020; year++){
+            expectedDates.add(LocalDateTime.of(year, 6, 30, 16, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA SEMANA
+        recurrencia = "E5.S1";
+        fechaInicio = LocalDateTime.of(2020, 6, 1, 16, 0);
+        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int day = 1; day <= 30; day+=7){
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+        }
+
+        for(int day = 3; day <= 30; day+=7){
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
+        this.usuarioService.deleteById(user.getUsuario());
+    }
 
     @Test
     void getEvento() throws Exception {
