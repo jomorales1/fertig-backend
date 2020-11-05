@@ -1,12 +1,10 @@
 package com.fertigApp.backend.controller;
 
-import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.requestModels.RequestTarea;
-import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.TareaDeUsuarioService;
 import com.fertigApp.backend.services.TareaService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -39,14 +37,11 @@ public class TareaController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    private final RutinaService rutinaService;
-
     private final TareaDeUsuarioService tareaDeUsuarioService;
 
-    public TareaController(TareaService tareaService, UsuarioService usuarioService, RutinaService rutinaService, TareaDeUsuarioService tareaDeUsuarioService) {
+    public TareaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService) {
         this.tareaService = tareaService;
         this.usuarioService = usuarioService;
-        this.rutinaService = rutinaService;
         this.tareaDeUsuarioService = tareaDeUsuarioService;
     }
 
@@ -416,7 +411,13 @@ public class TareaController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        Tarea parent = tarea;
+        if (tarea.getNivel() == 2) {
+            parent = tarea.getPadre();
+        } else if (tarea.getNivel() == 3) {
+            parent = tarea.getPadre().getPadre();
+        }
+        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
