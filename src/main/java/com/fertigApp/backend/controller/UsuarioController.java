@@ -2,12 +2,15 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.auth.jwt.JwtUtil;
 import com.fertigApp.backend.auth.services.UserDetailsImpl;
+import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.JwtResponse;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestUsuario;
 import com.fertigApp.backend.services.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +34,6 @@ import java.util.stream.Collectors;
 @RestController	// This means that this class is a Controller
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UsuarioController {
-
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
@@ -53,7 +55,7 @@ public class UsuarioController {
 
     //Metodo POST para iniciar sesión
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         //se llama al administrador de autenticación para que
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -68,15 +70,22 @@ public class UsuarioController {
 
         return ResponseEntity.ok(new JwtResponse(jwt,
                 userDetails.getUsername(),
+                userDetails.getName(),
                 userDetails.getEmail(),
                 roles));
     }
 
     // Método GET para obtener todas las entidades de tipo "usuario" de la DB.
-    @GetMapping(path="/users/getAllUsers") //Disponible como rol ADMIN
+    @GetMapping(path="/users/getAllUsers")
     public @ResponseBody Iterable<Usuario> getAllUsuarios() {
         // This returns a JSON or XML with the usuarios
         return usuarioService.findAll();
+    }
+    // Método GET para obtener todas las entidades de tipo "usuario" cuyo usuario corresponde con la cadena dada
+    @GetMapping(path="/users/search/{usuario}")
+    public @ResponseBody Iterable<Usuario> getAllUsuarios(@PathVariable String usuario) {
+        // This returns a JSON or XML with the usuarios
+        return usuarioService.findAllByUsuario(usuario);
     }
 
     // Método GET para obtener la información del usuario hace la request.
@@ -89,7 +98,7 @@ public class UsuarioController {
 
     // Método PUT para modificar la información de un usuario en la DB.
     @PutMapping(path="/users/update")
-    public ResponseEntity<?> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
+    public ResponseEntity<Usuario> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
@@ -97,7 +106,7 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(null);
         }
 
-        if (!optUsuario.get().getUsuario().equals(requestUsuario.getUsuario()) && usuarioService.findById(requestUsuario.getUsuario()).isPresent()) {
+        if (optUsuario.isPresent() && !optUsuario.get().getUsuario().equals(requestUsuario.getUsuario())) {
             return ResponseEntity.badRequest().body(null);
         }
 
@@ -106,21 +115,13 @@ public class UsuarioController {
         user.setNombre(requestUsuario.getNombre());
         user.setUsuario(requestUsuario.getUsuario());
         user.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
-        return usuarioService.findById(userDetails.getUsername())
-                .map(usuario -> {
-                    usuario.setCorreo(user.getCorreo());
-                    usuario.setNombre(user.getNombre());
-                    if(!requestUsuario.getPassword().equals(""))
-                        usuario.setPassword(user.getPassword());
-                    usuarioService.save(usuario);
-                    return ResponseEntity.ok().body(usuario);
-                })
-                .orElseGet(() -> ResponseEntity.badRequest().body(null));
+
+        return ResponseEntity.ok().body(usuarioService.save(user));
     }
 
     // Método POST para añadir un registro de tipo "usuario" en la DB.
     @PostMapping(path="/users/addUser") // Map ONLY POST Requests
-    public @ResponseBody ResponseEntity<?> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
+    public @ResponseBody ResponseEntity<MessageResponse> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
         if (usuarioService.existsById(requestUsuario.getUsuario()))
             return ResponseEntity
                     .badRequest()
@@ -142,11 +143,43 @@ public class UsuarioController {
     @DeleteMapping(path="/users/delete")
     public ResponseEntity<Void> deleteUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        try{
-            usuarioService.deleteById(userDetails.getUsername());
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
-        } catch(org.springframework.dao.EmptyResultDataAccessException ex){
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        usuarioService.deleteById(userDetails.getUsername());
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @GetMapping(path = "/users/getFriends")
+    public ResponseEntity<List<Usuario>> getFriends() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(null);
+        return ResponseEntity.ok(usuario.getAgregados());
+    }
+
+    @PutMapping(path = "/users/addFriend/{username}")
+    public ResponseEntity<Void> addFriend(@PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = optionalUsuario.orElse(null);
+        Usuario friend = this.usuarioService.findById(username).get();
+        usuario.addAmigo(friend);
+        this.usuarioService.save(usuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/users/deleteFriend/{username}")
+    public ResponseEntity<Void> deleteFriend(@PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        if (!this.usuarioService.findById(username).isPresent())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = optionalUsuario.orElse(null);
+        Usuario friend = this.usuarioService.findById(username).get();
+        boolean deleted = usuario.deleteAgregado(friend);
+        if (!deleted) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        this.usuarioService.save(usuario);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 }

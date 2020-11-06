@@ -3,11 +3,11 @@ package com.fertigApp.backend.requestModels;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Usuario;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
-public class RequestRutina implements Serializable {
+public class RequestRutina {
 
     private Usuario usuarioR;
 
@@ -19,15 +19,19 @@ public class RequestRutina implements Serializable {
 
     private String etiqueta;
 
-    private Integer estimacion;
+    private Integer duracion;
 
-    private Date fechaInicio;
+    private LocalDateTime fechaInicio;
 
-    private Date fechaFin;
+    private LocalDateTime fechaFin;
 
     private String recurrencia;
 
     private Integer recordatorio;
+
+    private LocalTime franjaInicio;
+
+    private LocalTime franjaFin;
 
     private List<Completada> completadas;
 
@@ -37,6 +41,62 @@ public class RequestRutina implements Serializable {
 
     public void setUsuarioR(Usuario usuarioR) {
         this.usuarioR = usuarioR;
+    }
+
+    public LocalDateTime getFechaInicio() {
+        return fechaInicio;
+    }
+
+    public void setFechaInicio(LocalDateTime fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public LocalDateTime getFechaFin() {
+        return fechaFin;
+    }
+
+    public void setFechaFin(LocalDateTime fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public String getRecurrencia() {
+        return recurrencia;
+    }
+
+    public void setRecurrencia(String recurrencia) {
+        this.recurrencia = recurrencia;
+    }
+
+    public Integer getRecordatorio() {
+        return recordatorio;
+    }
+
+    public void setRecordatorio(Integer recordatorio) {
+        this.recordatorio = recordatorio;
+    }
+
+    public LocalTime getFranjaInicio() {
+        return franjaInicio;
+    }
+
+    public void setFranjaInicio(LocalTime franjaInicio) {
+        this.franjaInicio = franjaInicio;
+    }
+
+    public LocalTime getFranjaFin() {
+        return franjaFin;
+    }
+
+    public void setFranjaFin(LocalTime franjaFin) {
+        this.franjaFin = franjaFin;
+    }
+
+    public List<Completada> getCompletadas() {
+        return completadas;
+    }
+
+    public void setCompletadas(List<Completada> completadas) {
+        this.completadas = completadas;
     }
 
     public String getNombre() {
@@ -71,51 +131,11 @@ public class RequestRutina implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public Integer getEstimacion() {
-        return estimacion;
+    public Integer getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(Integer estimacion) {
-        this.estimacion = estimacion;
-    }
-
-    public Date getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(Date fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public Date getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(Date fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getRecurrencia() {
-        return recurrencia;
-    }
-
-    public void setRecurrencia(String recurrencia) {
-        this.recurrencia = recurrencia;
-    }
-
-    public Integer getRecordatorio() {
-        return recordatorio;
-    }
-
-    public void setRecordatorio(Integer recordatorio) {
-        this.recordatorio = recordatorio;
-    }
-
-    public List<Completada> getCompletadas() {
-        return completadas;
-    }
-
-    public void setCompletadas(List<Completada> completadas) {
-        this.completadas = completadas;
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 }

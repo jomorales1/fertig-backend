@@ -1,10 +1,13 @@
 package com.fertigApp.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name="tarea")
@@ -13,13 +16,22 @@ public class Tarea implements Serializable {
     @Id
     @SequenceGenerator(name = "id_tarea_generator",
         sequenceName = "public.tarea_tarea_id_seq", allocationSize = 1)
-    @GeneratedValue (strategy = GenerationType.SEQUENCE, generator = "id_tarea_generator")
+    @GeneratedValue (strategy = GenerationType.IDENTITY, generator = "id_tarea_generator")
     @Column(name="id_tarea")
     private int id;
 
-    @ManyToOne
-    @JoinColumn(name = "usuario")
-    private Usuario usuarioT;
+    @JsonIgnore
+    @OneToMany(mappedBy = "tarea")
+    private List<TareaDeUsuario> usuariosT;
+
+    @JsonIgnore
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_padre")
+    //@Column(name = "id_padre")
+    private Tarea padre;
+
+    @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Tarea> subtareas;
 
     private String nombre;
 
@@ -32,20 +44,34 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer estimacion;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_inicio")
-    private Date fechaInicio;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer tiempoInvertido;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_fin")
-    private Date fechaFin;
+    @Column(name="fecha_fin", columnDefinition="TIMESTAMP")
+    private LocalDateTime fechaFin;
 
     private int nivel;
 
     private boolean hecha;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer recordatorio ;
+    private Integer recordatorio;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "id_rutina")
+    private Rutina rutinaT;
+
+    public void addSubtarea(Tarea tarea) {
+        if (this.subtareas == null) {
+            this.subtareas = new ArrayList<>();
+        }
+        this.subtareas.add(tarea);
+    }
+
+    public boolean deleteSubtarea(Tarea subtarea) {
+        return this.subtareas.removeIf(tarea -> tarea.getId() == subtarea.getId());
+    }
 
     public int getId() {
         return id;
@@ -53,14 +79,6 @@ public class Tarea implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Usuario getUsuarioT() {
-        return usuarioT;
-    }
-
-    public void setUsuario(Usuario usuarioT) {
-        this.usuarioT = usuarioT;
     }
 
     public String getNombre() {
@@ -79,11 +97,11 @@ public class Tarea implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -95,27 +113,19 @@ public class Tarea implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
+    public Integer getEstimacion() {
         return estimacion;
     }
 
-    public void setEstimacion(int estimacion) {
+    public void setEstimacion(Integer estimacion) {
         this.estimacion = estimacion;
     }
 
-    public Date getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(Date fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -135,11 +145,56 @@ public class Tarea implements Serializable {
         this.hecha = hecha;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
+
+    public List<TareaDeUsuario> getUsuariosT() {
+        return usuariosT;
+    }
+
+    public void setUsuariosT(List<TareaDeUsuario> usuariosT) {
+        this.usuariosT = usuariosT;
+    }
+
+    public Tarea getPadre() {
+        return padre;
+    }
+
+    public void setPadre(Tarea padre) {
+        this.padre = padre;
+    }
+
+    public List<Tarea> getSubtareas() {
+        return subtareas;
+    }
+
+    public void setSubtareas(List<Tarea> subtareas) {
+        this.subtareas = subtareas;
+    }
+
+    public boolean isHecha() {
+        return hecha;
+    }
+
+    public Integer getTiempoInvertido() {
+        return tiempoInvertido;
+    }
+
+    public void setTiempoInvertido(Integer tiempoInvertido) {
+        this.tiempoInvertido = tiempoInvertido;
+    }
+
+    public Rutina getRutinaT() {
+        return rutinaT;
+    }
+
+    public void setRutinaT(Rutina rutinaT) {
+        this.rutinaT = rutinaT;
+    }
+
 }

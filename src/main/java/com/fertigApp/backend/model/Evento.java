@@ -2,7 +2,7 @@ package com.fertigApp.backend.model;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="evento")
@@ -27,15 +27,13 @@ public class Evento implements Serializable {
 
     private String etiqueta;
 
-    private Integer estimacion;
+    private Integer duracion;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_inicio")
-    private Date fechaInicio;
+    @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
+    private LocalDateTime fechaInicio;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_fin")
-    private Date fechaFin;
+    @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
+    private LocalDateTime fechaFin;
 
     private String recurrencia;
 
@@ -73,11 +71,11 @@ public class Evento implements Serializable {
         this.descripcion = descripcion;
     }
 
-    public int getPrioridad() {
+    public Integer getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
+    public void setPrioridad(Integer prioridad) {
         this.prioridad = prioridad;
     }
 
@@ -89,27 +87,27 @@ public class Evento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
-        return estimacion;
+    public Integer getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(int estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -121,11 +119,11 @@ public class Evento implements Serializable {
         this.recurrencia = recurrencia;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
 }

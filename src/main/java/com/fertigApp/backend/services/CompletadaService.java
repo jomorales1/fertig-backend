@@ -5,7 +5,7 @@ import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -25,14 +25,31 @@ public class CompletadaService {
         return completadaRepository.save(completada);
     }
 
-    public Iterable<Completada> findByRutina(Rutina rutina){
-        return completadaRepository.findByRutinaC(rutina);
+    public  Iterable<Completada> findHechaByRutina(Rutina rutina){
+        return completadaRepository.findByRutinaCAndHecha(rutina, false);
     }
 
-    public void deleteByRutina(Rutina rutina){
-        List<Completada> completadaList = (List<Completada>) completadaRepository.findByRutinaC(rutina);
-        for(Completada completada : completadaList){
-            completadaRepository.deleteById(completada.getId());
-        }
+    public void deleteAllByRutina(Rutina rutina){
+        this.completadaRepository.deleteAllByRutinaC(rutina);
+    }
+
+    public Iterable<LocalDateTime> findFechasCompletadasByRutina(Rutina rutina){
+        return this.completadaRepository.findFechasCompletadasByRutina(rutina);
+    }
+
+    public LocalDateTime findMaxAjustadaCompletadasByRutina(Rutina rutina){
+        return this.completadaRepository.findMaxAjustadaCompletadasByRutina(rutina);
+    }
+
+    public LocalDateTime findFechaNoCompletadaByRutina(Rutina rutina){
+        return this.completadaRepository.findFechaNoCompletadaByRutina(rutina);
+    }
+
+    public void deleteById(Integer id){
+        this.completadaRepository.deleteById(id);
+    }
+
+    public Completada findMaxCompletada(Rutina rutina){
+        return this.completadaRepository.findMaxCompletada(rutina);
     }
 }

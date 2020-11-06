@@ -4,8 +4,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="rutina")
@@ -18,6 +21,7 @@ public class Rutina implements Serializable {
     @Column(name="id_rutina")
     private int id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "usuario")
     private Usuario usuarioR;
@@ -30,23 +34,40 @@ public class Rutina implements Serializable {
 
     private String etiqueta;
 
-    private int estimacion;
+    private int duracion;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_inicio")
-    private Date fechaInicio;
+    @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
+    private LocalDateTime fechaInicio;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name="fecha_fin")
-    private Date fechaFin;
+    @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
+    private LocalDateTime fechaFin;
 
     private String recurrencia;
 
     private int recordatorio;
 
+    @Column(name="franja_inicio",columnDefinition = "TIME")
+    private LocalTime franjaInicio;
+
+    @Column(name="franja_fin",columnDefinition = "TIME")
+    private LocalTime franjaFin;
+
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
     private List<Completada> completadas;
+
+    @OneToMany(mappedBy = "rutinaT", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Tarea> subtareas;
+
+    public void addSubtarea(Tarea subtarea) {
+        if (this.subtareas == null)
+            this.subtareas = new HashSet<>();
+        this.subtareas.add(subtarea);
+    }
+
+    public boolean deleteSubtarea(Tarea subtarea) {
+        return this.subtareas.removeIf(tarea -> tarea.getId() == subtarea.getId());
+    }
 
     public int getId() {
         return id;
@@ -96,27 +117,27 @@ public class Rutina implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public int getEstimacion() {
-        return estimacion;
+    public int getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(int estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(int duracion) {
+        this.duracion = duracion;
     }
 
-    public Date getFechaInicio() {
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 
@@ -136,6 +157,22 @@ public class Rutina implements Serializable {
         this.recordatorio = recordatorio;
     }
 
+    public LocalTime getFranjaInicio() {
+        return franjaInicio;
+    }
+
+    public void setFranjaInicio(LocalTime franjaInicio) {
+        this.franjaInicio = franjaInicio;
+    }
+
+    public LocalTime getFranjaFin() {
+        return franjaFin;
+    }
+
+    public void setFranjaFin(LocalTime franjaFin) {
+        this.franjaFin = franjaFin;
+    }
+
     public List<Completada> getCompletadas() {
         return completadas;
     }
@@ -143,4 +180,21 @@ public class Rutina implements Serializable {
     public void setCompletadas(List<Completada> completadas) {
         this.completadas = completadas;
     }
+
+    public Usuario getUsuarioR() {
+        return usuarioR;
+    }
+
+    public void setUsuarioR(Usuario usuarioR) {
+        this.usuarioR = usuarioR;
+    }
+
+    public Set<Tarea> getSubtareas() {
+        return subtareas;
+    }
+
+    public void setSubtareas(Set<Tarea> subtareas) {
+        this.subtareas = subtareas;
+    }
+
 }

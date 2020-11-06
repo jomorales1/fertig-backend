@@ -3,11 +3,9 @@ package com.fertigApp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity// This tells Hibernate to make a table out of this class
@@ -29,8 +27,17 @@ public class Usuario implements Serializable {
 	private String password;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "usuarioT")
-	private List<Tarea> tareas;
+	@OneToMany(mappedBy = "usuario")
+	private List<TareaDeUsuario> tareas;
+
+	@JsonIgnore
+	@ManyToMany(cascade = {CascadeType.ALL})
+	@JoinTable(
+			name = "preferido",
+			joinColumns = {@JoinColumn(name="usuario")},
+			inverseJoinColumns = {@JoinColumn(name="id_sonido")}
+	)
+	List<Sonido> sonidos;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioE")
@@ -40,6 +47,19 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioR")
 	private List<Rutina> rutinas;
 
+    @JsonIgnore
+    @ManyToMany(mappedBy = "agregados", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    List<Usuario> agregadores;
+
+    @JsonIgnore
+	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+	@JoinTable(
+			name = "amigo",
+			joinColumns = {@JoinColumn(name = "agregador")},
+			inverseJoinColumns = {@JoinColumn(name = "agregado")}
+	)
+	private List<Usuario> agregados;
+
 	public Usuario() { }
 
 	public Usuario(String usuario, String correo, String password, String nombre) {
@@ -47,6 +67,31 @@ public class Usuario implements Serializable {
 		this.correo = correo;
 		this.nombre = nombre;
 		this.password = password;
+	}
+
+	public void addAmigo(Usuario amigo) {
+		if (this.agregados == null) {
+			this.agregados = new ArrayList<>();
+		}
+		amigo.addAgregador(this);
+		this.agregados.add(amigo);
+	}
+
+	public void addAgregador(Usuario agregador) {
+		if (this.agregadores == null) {
+			this.agregadores = new ArrayList<>();
+		}
+		this.agregadores.add(agregador);
+	}
+
+	public boolean deleteAgregado(Usuario agregado) {
+		boolean result = this.agregados.removeIf(amigo -> amigo.getUsuario().equals(agregado.getUsuario()));
+		agregado.deleteAgregador(this);
+		return result;
+	}
+
+	public void deleteAgregador(Usuario agregador) {
+		this.agregadores.removeIf(amigo -> amigo.getUsuario().equals(agregador.getUsuario()));
 	}
 
 	public String getCorreo() {
@@ -71,14 +116,6 @@ public class Usuario implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public List<Tarea> getTareas() {
-		return tareas;
-	}
-
-	public void setTareas(List<Tarea> tareas) {
-		this.tareas = tareas;
 	}
 
 	public String getUsuario() {
@@ -119,5 +156,37 @@ public class Usuario implements Serializable {
 
 	public void setFacebook(boolean facebook) {
 		this.facebook = facebook;
+	}
+
+	public List<TareaDeUsuario> getTareas() {
+		return tareas;
+	}
+
+	public void setTareas(List<TareaDeUsuario> tareas) {
+		this.tareas = tareas;
+	}
+
+	public List<Sonido> getSonidos() {
+		return sonidos;
+	}
+
+	public void setSonidos(List<Sonido> sonidos) {
+		this.sonidos = sonidos;
+	}
+
+	public List<Usuario> getAgregadores() {
+		return agregadores;
+	}
+
+	public void setAgregadores(List<Usuario> amigos) {
+		this.agregadores = amigos;
+	}
+
+	public List<Usuario> getAgregados() {
+		return agregados;
+	}
+
+	public void setAgregados(List<Usuario> agregados) {
+		this.agregados = agregados;
 	}
 }

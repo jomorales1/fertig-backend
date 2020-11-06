@@ -1,10 +1,9 @@
 package com.fertigApp.backend.requestModels;
 
-
+//Request para agregar un nuevo usuario mediante nuestro propio registro
 public class LoginRequest {
 
     private String username;
-
 
     private String password;
 

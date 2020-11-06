@@ -20,6 +20,10 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
+    public Iterable<Usuario> findAllByUsuario(String usuario){
+        return usuarioRepository.findAllByUsuario(usuario);
+    }
+
     public Optional<Usuario> findById(String id){
         return usuarioRepository.findById(id);
     }

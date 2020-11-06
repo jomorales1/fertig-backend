@@ -3,6 +3,8 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
+import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
 import com.fertigApp.backend.services.UsuarioService;
@@ -14,6 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -47,20 +51,35 @@ public class EventoController {
 
     // Método GET para obtener la lista de eventos de un usuario determinado.
     @GetMapping(path="/events/getEvents")
-    public Iterable<Evento> getAllEventosByUsuario() {
+    public ResponseEntity<Iterable<RecurrenteResponse>> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-        if (optUsuario.isPresent())
-            return eventoService.findByUsuario(optUsuario.get());
-        else{
-            LOGGER.info("User not found");
-            return null;
+        if(optUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(null);
+        List<RecurrenteResponse> eventos = new LinkedList<>();
+        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+            eventos.add(new RecurrenteResponse(evento));
         }
+        return ResponseEntity.ok().body(eventos);
+    }
+
+    @GetMapping(path="/events/getEventsAndRepetitions")
+    public ResponseEntity<Iterable<EventoRepeticionesResponse>> getAllEventosRepeticionesByUsuario() {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
+        if(optUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(null);
+        List<EventoRepeticionesResponse> eventos = new LinkedList<>();
+        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+            eventos.add(new EventoRepeticionesResponse(evento));
+        }
+        return ResponseEntity.ok().body(eventos);
     }
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
     @GetMapping(path="/events/getEvent/{id}")
     public Evento getEvento(@PathVariable Integer id) {
+        //1s;2s;l,x;1m;1a;2h;2s l,x;l-v;1m 15-20;
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String user = userDetails.getUsername();
 
@@ -78,34 +97,32 @@ public class EventoController {
 
     // Método PUT para actualizar un evento específico.
     @PutMapping(path="/events/updateEvent/{id}")
-    public ResponseEntity<?> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
+    public ResponseEntity<Evento> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        return this.eventoService.findById(id)
-                .map(evento -> {
-                    if(usuarioService.findByUsuario(userDetails.getUsername()).isEmpty()){
-                        LOGGER.info("User not found");
-                        return ResponseEntity.badRequest().body(null);
-                    }
-                    evento.setUsuario(usuarioService.findByUsuario(userDetails.getUsername()).get());
-                    evento.setNombre(event.getNombre());
-                    evento.setDescripcion(event.getDescripcion());
-                    evento.setPrioridad(event.getPrioridad());
-                    evento.setEtiqueta(event.getEtiqueta());
-                    evento.setEstimacion(event.getEstimacion());
-                    evento.setFechaInicio(event.getFechaInicio());
-                    evento.setFechaFin(event.getFechaFin());
-                    evento.setRecurrencia(event.getRecurrencia());
-                    evento.setRecordatorio(event.getRecordatorio());
-                    this.eventoService.save(evento);
-                    LOGGER.info("Event updated");
-                    return ResponseEntity.ok().body(evento);
-                })
-                .orElseGet(() -> {
-                    LOGGER.info("Event not found");
-                    return ResponseEntity.badRequest().body(null);
-                });
+        Optional<Evento> optionalEvento = eventoService.findById(id);
+        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
+        if(optionalEvento.isPresent() && optionalUsuario.isPresent()){
+            Evento evento = optionalEvento.get();
+
+            evento.setUsuario(optionalUsuario.get());
+            evento.setNombre(event.getNombre());
+            evento.setDescripcion(event.getDescripcion());
+            evento.setPrioridad(event.getPrioridad());
+            evento.setEtiqueta(event.getEtiqueta());
+            evento.setDuracion(event.getDuracion());
+            evento.setFechaInicio(event.getFechaInicio());
+            evento.setFechaFin(event.getFechaFin());
+            evento.setRecurrencia(event.getRecurrencia());
+            evento.setRecordatorio(event.getRecordatorio());
+            this.eventoService.save(evento);
+            LOGGER.info("Event updated");
+            return ResponseEntity.ok().body(evento);
+        } else {
+            LOGGER.info("Event not found");
+            return ResponseEntity.badRequest().body(null);
+        }
     }
 
     // Método POST para agregar un evento a la DB.
@@ -116,23 +133,21 @@ public class EventoController {
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if (optUsuario.isPresent()){
-            evento.setUsuario(optUsuario.get());
-            evento.setNombre(requestEvento.getNombre());
-            evento.setDescripcion(requestEvento.getDescripcion());
-            evento.setPrioridad(requestEvento.getPrioridad());
-            evento.setEtiqueta(requestEvento.getEtiqueta());
-            if (requestEvento.getEstimacion() != null)
-                evento.setEstimacion(requestEvento.getEstimacion());
-            evento.setFechaInicio(requestEvento.getFechaInicio());
-            evento.setFechaFin(requestEvento.getFechaFin());
-            evento.setRecurrencia(requestEvento.getRecurrencia());
-            if (requestEvento.getRecordatorio() != null)
-                evento.setRecordatorio(requestEvento.getRecordatorio());
-            this.eventoService.save(evento);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        evento.setUsuario(optUsuario.orElse(null));
+        evento.setNombre(requestEvento.getNombre());
+        evento.setDescripcion(requestEvento.getDescripcion());
+        evento.setPrioridad(requestEvento.getPrioridad());
+        evento.setEtiqueta(requestEvento.getEtiqueta());
+        if (requestEvento.getDuracion() != null)
+            evento.setDuracion(requestEvento.getDuracion());
+        evento.setFechaInicio(requestEvento.getFechaInicio());
+        evento.setFechaFin(requestEvento.getFechaFin());
+        evento.setRecurrencia(requestEvento.getRecurrencia());
+        if (requestEvento.getRecordatorio() != null)
+            evento.setRecordatorio(requestEvento.getRecordatorio());
+        this.eventoService.save(evento);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     // Método DELETE para borrar un registro de la tabla "evento" en la DB.

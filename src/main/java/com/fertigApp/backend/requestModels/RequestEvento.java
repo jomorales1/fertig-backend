@@ -2,29 +2,29 @@ package com.fertigApp.backend.requestModels;
 
 import com.fertigApp.backend.model.Usuario;
 
-import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public class RequestEvento implements Serializable {
+public class RequestEvento {
 
     private Usuario usuarioE;
+
     private String nombre;
+
     private String descripcion;
+
     private Integer prioridad;
+
     private String etiqueta;
-    private Integer estimacion;
-    private Date fechaInicio;
-    private Date fechaFin;
+
+    private Integer duracion;
+
+    private LocalDateTime fechaInicio;
+
+    private LocalDateTime fechaFin;
+
     private String recurrencia;
+
     private Integer recordatorio;
-
-    public Usuario getUsuarioE() {
-        return usuarioE;
-    }
-
-    public void setUsuarioE(Usuario usuarioE) {
-        this.usuarioE = usuarioE;
-    }
 
     public String getNombre() {
         return nombre;
@@ -58,27 +58,35 @@ public class RequestEvento implements Serializable {
         this.etiqueta = etiqueta;
     }
 
-    public Integer getEstimacion() {
-        return estimacion;
+    public Integer getDuracion() {
+        return duracion;
     }
 
-    public void setEstimacion(Integer estimacion) {
-        this.estimacion = estimacion;
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
     }
 
-    public Date getFechaInicio() {
+    public Usuario getUsuarioE() {
+        return usuarioE;
+    }
+
+    public void setUsuarioE(Usuario usuarioE) {
+        this.usuarioE = usuarioE;
+    }
+
+    public LocalDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(Date fechaInicio) {
+    public void setFechaInicio(LocalDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public Date getFechaFin() {
+    public LocalDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

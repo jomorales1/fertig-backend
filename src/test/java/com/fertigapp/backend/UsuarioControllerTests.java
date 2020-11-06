@@ -153,8 +153,12 @@ class UsuarioControllerTests {
         RequestUsuario requestUsuario = new RequestUsuario();
         requestUsuario.setCorreo(user.getCorreo());
         requestUsuario.setNombre(user.getNombre() + "Version 2");
-        requestUsuario.setUsuario(user.getUsuario());
+        requestUsuario.setUsuario(user.getUsuario() + "v2");
         requestUsuario.setPassword("testing");
+        this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
+                        .writeValueAsString(requestUsuario))).andExpect(status().isBadRequest());
+        requestUsuario.setUsuario(user.getUsuario());
         this.mockMvc.perform(put(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper
                         .writeValueAsString(requestUsuario))).andExpect(status().isOk());
@@ -219,8 +223,105 @@ class UsuarioControllerTests {
         String token = getToken(user);
 
         String uri = "/users/delete";
+
         this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
+    }
+
+    @Test
+    void getFriends() throws Exception {
+        String uri = "/users/getFriends";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+
+        Usuario friend = new Usuario();
+        friend.setUsuario("friend");
+        friend.setCorreo("friend@test.com");
+        friend.setNombre("Friend");
+        friend.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(friend);
+        user.addAmigo(friend);
+        this.usuarioService.save(user);
+
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
+        List<Usuario> friends = objectMapper.readValue(response, javaList);
+        assertNotNull(friends);
+        assertEquals(friends.get(0).getUsuario(), friend.getUsuario());
+        assertEquals(friends.get(0).getCorreo(), friend.getCorreo());
+        assertEquals(friends.get(0).getNombre(), friend.getNombre());
+
+        user.deleteAgregado(friend);
+        this.usuarioService.save(user);
+        this.usuarioService.deleteById(friend.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    void addFriend() throws Exception {
+        String uri = "/users/addFriend/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+
+        Usuario friend = new Usuario();
+        friend.setUsuario("friend");
+        friend.setCorreo("friend@test.com");
+        friend.setNombre("Friend");
+        friend.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(friend);
+
+        this.mockMvc.perform(put(uri + friend.getUsuario() + "a").header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(put(uri + friend.getUsuario()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        user = this.usuarioService.findById(user.getUsuario()).get();
+        friend = this.usuarioService.findById(friend.getUsuario()).get();
+        user.deleteAgregado(friend);
+        this.usuarioService.save(user);
+        this.usuarioService.deleteById(friend.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    void deleteFriend() throws Exception {
+        String uri = "/users/deleteFriend/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+
+        Usuario friend = new Usuario();
+        friend.setUsuario("friend");
+        friend.setCorreo("friend@test.com");
+        friend.setNombre("Friend");
+        friend.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(friend);
+
+        this.mockMvc.perform(delete(uri + friend.getUsuario() + "a").header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(delete(uri + friend.getUsuario()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        user.addAmigo(friend);
+        this.usuarioService.save(user);
+        this.mockMvc.perform(delete(uri + friend.getUsuario()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        this.usuarioService.deleteById(friend.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
 }

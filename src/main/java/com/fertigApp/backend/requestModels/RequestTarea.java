@@ -1,131 +1,110 @@
 package com.fertigApp.backend.requestModels;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fertigApp.backend.model.Usuario;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class RequestTarea {
 
-        private int id;
+    private int id;
 
-        private Usuario usuarioT;
+    private String nombre;
 
-        private String nombre;
+    private String descripcion;
 
-        private String descripcion;
+    private Integer prioridad;
 
-        private Integer prioridad;
+    private String etiqueta;
 
-        private String etiqueta;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer estimacion;
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private Integer estimacion;
+    private LocalDateTime fechaFin;
 
-        private Date fechaInicio;
+    private boolean hecha;
 
-        private Date fechaFin;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer recordatorio;
 
-        private int nivel;
+    private Integer tiempoInvertido;
 
-        private boolean hecha;
+    public int getId() {
+        return id;
+    }
 
-        @JsonInclude(JsonInclude.Include.NON_NULL)
-        private Integer recordatorio ;
+    public void setId(int id) {
+        this.id = id;
+    }
 
-        public int getId() {
-            return id;
-        }
+    public String getNombre() {
+        return nombre;
+    }
 
-        public void setId(int id) {
-            this.id = id;
-        }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-        public Usuario getUsuarioT() {
-            return usuarioT;
-        }
+    public String getDescripcion() {
+        return descripcion;
+    }
 
-        public void setUsuarioT(Usuario usuarioT) {
-            this.usuarioT = usuarioT;
-        }
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
 
-        public String getNombre() {
-            return nombre;
-        }
+    public Integer getPrioridad() {
+        return prioridad;
+    }
 
-        public void setNombre(String nombre) {
-            this.nombre = nombre;
-        }
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
 
-        public String getDescripcion() {
-            return descripcion;
-        }
+    public String getEtiqueta() {
+        return etiqueta;
+    }
 
-        public void setDescripcion(String descripcion) {
-            this.descripcion = descripcion;
-        }
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
 
-        public int getPrioridad() {
-            return prioridad;
-        }
+    public Integer getEstimacion() {
+        return estimacion;
+    }
 
-        public void setPrioridad(int prioridad) {
-            this.prioridad = prioridad;
-        }
+    public void setEstimacion(Integer estimacion) {
+        this.estimacion = estimacion;
+    }
 
-        public String getEtiqueta() {
-            return etiqueta;
-        }
+    public LocalDateTime getFechaFin() {
+        return fechaFin;
+    }
 
-        public void setEtiqueta(String etiqueta) {
-            this.etiqueta = etiqueta;
-        }
+    public void setFechaFin(LocalDateTime fechaFin) {
+        this.fechaFin = fechaFin;
+    }
 
-        public int getEstimacion() {
-            return estimacion;
-        }
+    public boolean getHecha() {
+        return hecha;
+    }
 
-        public void setEstimacion(int estimacion) {
-            this.estimacion = estimacion;
-        }
+    public void setHecha(boolean hecha) {
+        this.hecha = hecha;
+    }
 
-        public Date getFechaInicio() {
-            return fechaInicio;
-        }
+    public Integer getRecordatorio() {
+        return recordatorio;
+    }
 
-        public void setFechaInicio(Date fechaInicio) {
-            this.fechaInicio = fechaInicio;
-        }
+    public void setRecordatorio(Integer recordatorio) {
+        this.recordatorio = recordatorio;
+    }
 
-        public Date getFechaFin() {
-            return fechaFin;
-        }
+    public Integer getTiempoInvertido() {
+        return tiempoInvertido;
+    }
 
-        public void setFechaFin(Date fechaFin) {
-            this.fechaFin = fechaFin;
-        }
-
-        public int getNivel() {
-            return nivel;
-        }
-
-        public void setNivel(int nivel) {
-            this.nivel = nivel;
-        }
-
-        public boolean getHecha() {
-            return hecha;
-        }
-
-        public void setHecha(boolean hecha) {
-            this.hecha = hecha;
-        }
-
-        public int getRecordatorio() {
-            return recordatorio;
-        }
-
-        public void setRecordatorio(int recordatorio) {
-            this.recordatorio = recordatorio;
-        }
+    public void setTiempoInvertido(Integer tiempoInvertido) {
+        this.tiempoInvertido = tiempoInvertido;
+    }
 }
