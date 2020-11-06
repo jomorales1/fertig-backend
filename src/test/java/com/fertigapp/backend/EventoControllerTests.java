@@ -6,6 +6,7 @@ import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
+import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
@@ -24,7 +25,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ class EventoControllerTests {
 
     private final ObjectMapper objectMapper = mapperBuilder.build();
 
-    Usuario createUser() {
+    Usuario setUpUsuario() {
         if (this.usuarioService.findById("test_user").isPresent())
             return this.usuarioService.findById("test_user").get();
 
@@ -87,7 +88,7 @@ class EventoControllerTests {
         return token;
     }
 
-    Evento createEvent(Usuario user) {
+    Evento setUpEvento(Usuario user) {
         if (usuarioService.findById(user.getUsuario()).isEmpty()) {
             this.usuarioService.save(user);
         }
@@ -107,7 +108,7 @@ class EventoControllerTests {
         return this.eventoService.save(evento);
     }
 
-    Evento createEvent(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin){
+    Evento setUpEvento(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin){
         if (usuarioService.findById(user.getUsuario()).isEmpty()) {
             this.usuarioService.save(user);
         }
@@ -138,9 +139,9 @@ class EventoControllerTests {
         String uri = "/events";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
+            user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
-        Evento event = createEvent(user);
+        Evento event = setUpEvento(user);
 
         ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
@@ -158,32 +159,133 @@ class EventoControllerTests {
     @Test
     void getAllEventosByUsuario() throws Exception {
         String uri = "/events/getEvents";
-        Usuario user = createUser();
-        Evento event = createEvent(user);
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        // Valid request -> status 200 expected
-        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
+        Evento event;
+        String recurrencia;
+        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2021,1,31,12,0);
+        LocalTime franjaIncio = LocalTime.of(7,0);
+        LocalTime franjaFin  = LocalTime.of(13,0);
+        RecurrenteResponse obtainedEvent;
 
-        //Verificacion de la lista de respuesta
-        MvcResult mvcResult = resultActions.andReturn();
-        String response = mvcResult.getResponse().getContentAsString();
-        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Evento.class);
-        List<Evento> events = objectMapper.readValue(response, javaList);
-        assertNotNull(events);
-        //assertTrue(events.get(0).getUsuario().getUsuario().equals(user.getUsuario()));
-        assertEquals(events.get(0).getNombre(), event.getNombre());
-        assertEquals(events.get(0).getDescripcion(), event.getDescripcion());
+        ResultActions resultActions;
+        MvcResult mvcResult;
+        String response;
+
+        CollectionType javaList =  objectMapper.getTypeFactory().constructCollectionType(List.class, RecurrenteResponse.class);
+        List<RecurrenteResponse> events;
+
+        //RECURRENCIA CADA 12 HORAS
+        recurrencia = "H12";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(obtainedEvent);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
 
         this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA DIARIA
+        recurrencia = "D2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(obtainedEvent);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA CADA 2 SEMANAS
+        recurrencia = "S2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(obtainedEvent);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA MENSUAL
+        recurrencia = "S2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(obtainedEvent);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+
+        this.eventoService.deleteById(event.getId());
+
+        //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA DOS SEMANAS
+        recurrencia = "E5.S2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(obtainedEvent);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,11,12,0));
+
+        this.eventoService.deleteById(event.getId());
+
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
     void getEventsRepetitions() throws  Exception {
         String uri = "/events/getEventsAndRepetitions";
-        Usuario user = createUser();
+        Usuario user = setUpUsuario();
         String token = getToken(user);
 
         Evento event;
@@ -203,7 +305,7 @@ class EventoControllerTests {
         //RECURRENCIA DIARIA
         recurrencia = "D1";
         fechaInicio = LocalDateTime.of(2020, 6, 25, 16, 0);
-        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 25; day <= 30; day++){
             expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
@@ -218,7 +320,7 @@ class EventoControllerTests {
         events = objectMapper.readValue(response, javaList);
 
         obtainedEvent = events.get(0);
-        assertNotNull(events);
+        assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
@@ -233,7 +335,7 @@ class EventoControllerTests {
         //RECURRENCIA SEMANAL
         recurrencia = "S1";
         fechaInicio = LocalDateTime.of(2020, 6, 2, 16, 0);
-        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 2; day <= 30; day+=7){
             expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
@@ -263,7 +365,7 @@ class EventoControllerTests {
         //RECURRENCIA MENSUAL
         recurrencia = "M1";
         fechaInicio = LocalDateTime.of(2020, 1, 28, 16, 0);
-        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int month = 1; month <= 6; month++){
             expectedDates.add(LocalDateTime.of(2020, month, 28, 16, 0));
@@ -293,7 +395,7 @@ class EventoControllerTests {
         //RECURRENCIA ANUAL
         recurrencia = "A1";
         fechaInicio = LocalDateTime.of(2016, 6, 30, 16, 0);
-        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int year = 2016; year <= 2020; year++){
             expectedDates.add(LocalDateTime.of(year, 6, 30, 16, 0));
@@ -323,7 +425,7 @@ class EventoControllerTests {
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA SEMANA
         recurrencia = "E5.S1";
         fechaInicio = LocalDateTime.of(2020, 6, 1, 16, 0);
-        event = createEvent(user, recurrencia, fechaInicio, fechaFin);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 1; day <= 30; day+=7){
             expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
@@ -362,9 +464,9 @@ class EventoControllerTests {
         String uri = "/events/getEvent/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
+            user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
-        Evento event = createEvent(user);
+        Evento event = setUpEvento(user);
         String token = getToken(user);
 
         ResultActions resultActions = this.mockMvc.perform(get(uri + event.getId()).header("Authorization", "Bearer " + token))
@@ -389,9 +491,9 @@ class EventoControllerTests {
         String uri = "/events/updateEvent/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
+            user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
-        Evento event = createEvent(user);
+        Evento event = setUpEvento(user);
         String token = getToken(user);
 
         RequestEvento requestEvento = new RequestEvento();
@@ -431,7 +533,7 @@ class EventoControllerTests {
         String uri = "/events/addEvent";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
+            user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
@@ -466,9 +568,9 @@ class EventoControllerTests {
         String uri = "/events/deleteEvent/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
+            user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
-        Evento event = createEvent(user);
+        Evento event = setUpEvento(user);
         String token = getToken(user);
 
         this.mockMvc.perform(delete(uri + event.getId()).header("Authorization", "Bearer " + token))

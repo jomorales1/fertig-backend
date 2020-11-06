@@ -99,7 +99,7 @@ public class TareaController {
         tarea.setPrioridad(task.getPrioridad());
         tarea.setEtiqueta(task.getEtiqueta());
         tarea.setEstimacion(task.getEstimacion());
-        tarea.setFechaFin(task.getFechaFin());
+        if(task.getFechaFin() != null) tarea.setFechaFin(task.getFechaFin());
         tarea.setHecha(task.getHecha());
         tarea.setRecordatorio(task.getRecordatorio());
         tarea.setTiempoInvertido(task.getTiempoInvertido());
@@ -139,7 +139,7 @@ public class TareaController {
         tarea.setDescripcion(requestTarea.getDescripcion());
         tarea.setEstimacion(requestTarea.getEstimacion());
         tarea.setEtiqueta(requestTarea.getEtiqueta());
-        tarea.setFechaFin(requestTarea.getFechaFin());
+        if(requestTarea.getFechaFin() != null) tarea.setFechaFin(requestTarea.getFechaFin());//.atOffset(ZoneOffset.ofHours(10)).toLocalDateTime());
         tarea.setHecha(requestTarea.getHecha());
         tarea.setNivel(1);
         tarea.setNombre(requestTarea.getNombre());

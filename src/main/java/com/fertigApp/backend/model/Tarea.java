@@ -47,7 +47,7 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer tiempoInvertido;
 
-    @Column(name="fecha_fin")
+    @Column(name="fecha_fin", columnDefinition="TIMESTAMP")
     private LocalDateTime fechaFin;
 
     private int nivel;

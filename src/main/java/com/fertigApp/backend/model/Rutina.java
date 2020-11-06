@@ -6,7 +6,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,18 +36,20 @@ public class Rutina implements Serializable {
 
     private int duracion;
 
-    @Column(name="fecha_inicio")
+    @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
     private LocalDateTime fechaInicio;
 
-    @Column(name="fecha_fin")
+    @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
     private LocalDateTime fechaFin;
 
     private String recurrencia;
 
     private int recordatorio;
 
+    @Column(name="franja_inicio",columnDefinition = "TIME")
     private LocalTime franjaInicio;
 
+    @Column(name="franja_fin",columnDefinition = "TIME")
     private LocalTime franjaFin;
 
     @JsonIgnore

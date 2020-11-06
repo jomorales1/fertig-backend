@@ -3,9 +3,11 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestRutina;
@@ -28,8 +30,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -63,8 +65,10 @@ class RutinaControllerTests {
     private final ObjectMapper objectMapper = mapperBuilder.build();
 
     Usuario setUpUsuario() {
-        Usuario user = new Usuario();
+        if (this.usuarioService.findById("test_user").isPresent())
+            return this.usuarioService.findById("test_user").get();
 
+        Usuario user = new Usuario();
         user.setUsuario("test_user");
         user.setCorreo("test@email.com");
         user.setNombre("Test User");
@@ -89,7 +93,107 @@ class RutinaControllerTests {
         routine.setRecurrencia("D2");
         routine.setRecordatorio(60);
 
-        return rutinaService.save(routine);
+        Completada completada = new Completada();
+        completada.setRutina(routine);
+        completada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
+                        routine.getFechaFin(),
+                        routine.getRecurrencia()));
+        completada.setFechaAjustada(null);
+        completada.setHecha(false);
+        Rutina saved = this.rutinaService.save(routine);
+
+        this.completadaService.save(completada);
+        return saved;
+    }
+
+    Rutina setUpRutina(Usuario user, String recurrencia) {
+        Rutina routine = new Rutina();
+
+        routine.setUsuario(user);
+        routine.setNombre("test_routine");
+        routine.setDescripcion("test_routine_description");
+        routine.setPrioridad(2);
+        routine.setEtiqueta("test_routine_tag");
+        routine.setDuracion(45);
+        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
+        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setRecurrencia(recurrencia);
+        routine.setRecordatorio(60);
+
+        Completada completada = new Completada();
+        completada.setRutina(routine);
+        completada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
+                        routine.getFechaFin(),
+                        routine.getRecurrencia()));
+        completada.setFechaAjustada(null);
+        completada.setHecha(false);
+        Rutina saved = this.rutinaService.save(routine);
+
+        this.completadaService.save(completada);
+        return saved;
+    }
+
+    Rutina setUpRutina(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        Rutina routine = new Rutina();
+
+        routine.setUsuario(user);
+        routine.setNombre("test_routine");
+        routine.setDescripcion("test_routine_description");
+        routine.setPrioridad(2);
+        routine.setEtiqueta("test_routine_tag");
+        routine.setDuracion(45);
+        routine.setFechaInicio(fechaInicio);
+        routine.setFechaFin(fechaFin);
+        routine.setRecurrencia(recurrencia);
+        routine.setRecordatorio(60);
+
+        Completada completada = new Completada();
+        completada.setRutina(routine);
+        completada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
+                        routine.getFechaFin(),
+                        routine.getRecurrencia()));
+        completada.setFechaAjustada(null);
+        completada.setHecha(false);
+        Rutina saved = this.rutinaService.save(routine);
+
+        this.completadaService.save(completada);
+        return saved;
+    }
+
+    Rutina setUpRutina(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin, LocalTime franjaI, LocalTime franjaF) {
+        Rutina routine = new Rutina();
+
+        routine.setUsuario(user);
+        routine.setNombre("test_routine");
+        routine.setDescripcion("test_routine_description");
+        routine.setPrioridad(2);
+        routine.setEtiqueta("test_routine_tag");
+        routine.setDuracion(45);
+        routine.setFechaInicio(fechaInicio);
+        routine.setFechaFin(fechaFin);
+        routine.setRecurrencia(recurrencia);
+        routine.setRecordatorio(60);
+        routine.setFranjaInicio(franjaI);
+        routine.setFranjaFin(franjaF);
+
+        Completada completada = new Completada();
+        completada.setRutina(routine);
+        completada.setFecha(
+                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
+                        routine.getFechaFin(),
+                        routine.getRecurrencia(),
+                        routine.getDuracion(),
+                        routine.getFranjaInicio(),
+                        routine.getFranjaFin()));
+        completada.setFechaAjustada(null);
+        completada.setHecha(false);
+        Rutina saved = this.rutinaService.save(routine);
+
+        this.completadaService.save(completada);
+        return saved;
     }
 
     String getToken(Usuario user) throws Exception {
@@ -113,12 +217,10 @@ class RutinaControllerTests {
         return token;
     }
 
-
     @Test
     void contextLoads(){
         assertTrue(true);
     }
-
 
     @Test
     @WithMockUser(value = "ADMIN")
@@ -140,6 +242,7 @@ class RutinaControllerTests {
         assertEquals(rutinas.get(0).getNombre(), rutina.getNombre());
         assertEquals(rutinas.get(0).getUsuario().getUsuario(), user.getUsuario());
 
+        this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -153,29 +256,125 @@ class RutinaControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        List<Rutina> rutinas = new ArrayList<>();
-        for (int index = 0; index < 5; index++) {
-            rutinas.add(setUpRutina(user));
-        }
+        Rutina routine;
+        String recurrencia;
+        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2021,1,31,12,0);
+        LocalTime franjaIncio = LocalTime.of(7,0);
+        LocalTime franjaFin  = LocalTime.of(13,0);
+        RecurrenteResponse obtainedRoutine;
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+        ResultActions resultActions;
+        MvcResult mvcResult;
+        String response;
+
+        CollectionType javaList =  objectMapper.getTypeFactory().constructCollectionType(List.class, RecurrenteResponse.class);
+        List<RecurrenteResponse> routines;
+
+        //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
+
+        recurrencia = "H13";
+        fechaInicio = LocalDateTime.of(2021,1,1,14,0);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin, franjaIncio, franjaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
-        MvcResult mvcResult = resultActions.andReturn();
-        String response = mvcResult.getResponse().getContentAsString();
-        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, RecurrenteResponse.class);
-        List<RecurrenteResponse> routines = objectMapper.readValue(response, javaList);
-        assertNotNull(routines);
-        assertEquals(routines.size(), rutinas.size());
-        routines.sort(Comparator.comparingInt(o -> o.getId()));
-        for (int index = 0; index < routines.size(); index++) {
-            assertEquals(routines.get(index).getId(), rutinas.get(index).getId());
-            assertEquals(routines.get(index).getNombre(), rutinas.get(index).getNombre());
-            assertEquals(routines.get(index).getDescripcion(), rutinas.get(index).getDescripcion());
-        }
-        for (Rutina rutina : rutinas) {
-            this.rutinaService.deleteById(rutina.getId());
-        }
-        this.usuarioService.deleteById(user.getUsuario());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        routines = objectMapper.readValue(response, javaList);
+
+        obtainedRoutine = routines.get(0);
+        assertNotNull(obtainedRoutine);
+        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,4,7,0));
+
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(routine.getId());
+
+        //RECURRENCIA DIARIA
+        recurrencia = "D2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        routines = objectMapper.readValue(response, javaList);
+
+        obtainedRoutine = routines.get(0);
+        assertNotNull(obtainedRoutine);
+        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(routine.getId());
+
+        //RECURRENCIA SEMANAL
+        recurrencia = "S2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        routines = objectMapper.readValue(response, javaList);
+
+        obtainedRoutine = routines.get(0);
+        assertNotNull(obtainedRoutine);
+        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(routine.getId());
+
+        //RECURRENCIA MENSUAL
+        recurrencia = "M1";
+        fechaInicio = LocalDateTime.of(2020,12,1,12,0);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        routines = objectMapper.readValue(response, javaList);
+
+        obtainedRoutine = routines.get(0);
+        assertNotNull(obtainedRoutine);
+        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2020,12,1,12,0));
+
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(routine.getId());
+
+        //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA 2 SEMANAS
+        recurrencia = "E5.S2";
+        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
+
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        routines = objectMapper.readValue(response, javaList);
+
+        obtainedRoutine = routines.get(0);
+        assertNotNull(obtainedRoutine);
+        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,11,12,0));
+
+        this.completadaService.deleteAllByRutina(routine);
+        this.rutinaService.deleteById(routine.getId());
     }
 
     @Test
@@ -217,10 +416,12 @@ class RutinaControllerTests {
         this.mockMvc.perform(get(uri + "/" + newRutina.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.rutinaService.deleteById(newRutina.getId());
+        this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(newRutina);
+        this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
-        this.usuarioService.deleteById("test_user");
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
@@ -273,8 +474,10 @@ class RutinaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestRutina)))
                 .andExpect(status().isBadRequest());
 
-        this.rutinaService.deleteById(newRutina.getId());
+        this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(newRutina);
+        this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -371,8 +574,8 @@ class RutinaControllerTests {
                 .andExpect(status().isCreated());
 
         this.completadaService.deleteAllByRutina(rutina);
-        this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
         this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
@@ -462,6 +665,8 @@ class RutinaControllerTests {
 
         this.tareaService.deleteById(subtarea.getId());
         this.tareaService.deleteById(newSubtarea.getId());
+        this.completadaService.deleteAllByRutina(rutina);
+        this.completadaService.deleteAllByRutina(newRutina);
         this.rutinaService.deleteById(rutina.getId());
         this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
@@ -527,7 +732,9 @@ class RutinaControllerTests {
         assertTrue(subtarea.getHecha());
         this.tareaService.deleteById(subtarea.getId());
         this.tareaService.deleteById(newSubtarea.getId());
+        this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(newRutina);
         this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
@@ -589,7 +796,9 @@ class RutinaControllerTests {
                 .andExpect(status().isOk());
 
         this.tareaService.deleteById(newSubtarea.getId());
+        this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(newRutina);
         this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
@@ -622,6 +831,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(delete(uri + newRutina.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.completadaService.deleteAllByRutina(newRutina);
         this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());

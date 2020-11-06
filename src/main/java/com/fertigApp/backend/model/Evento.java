@@ -29,10 +29,10 @@ public class Evento implements Serializable {
 
     private Integer duracion;
 
-    @Column(name="fecha_inicio")
+    @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
     private LocalDateTime fechaInicio;
 
-    @Column(name="fecha_fin")
+    @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
     private LocalDateTime fechaFin;
 
     private String recurrencia;

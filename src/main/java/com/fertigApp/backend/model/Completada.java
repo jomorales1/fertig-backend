@@ -17,9 +17,10 @@ public class Completada implements Serializable {
     @Column(name="id_completada")
     private int id;
 
+    @Column(columnDefinition="TIMESTAMP")
     private LocalDateTime fecha;
 
-    @Column(name = "fecha_ajustada")
+    @Column(name = "fecha_ajustada", columnDefinition="TIMESTAMP")
     private LocalDateTime fechaAjustada;
 
     @JsonIgnore
