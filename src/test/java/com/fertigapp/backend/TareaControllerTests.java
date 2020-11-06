@@ -1019,11 +1019,39 @@ class TareaControllerTests {
         tarea.setPrioridad(1);
         tarea.setEtiqueta("Test label");
         tarea.setEstimacion(4);
-        tarea.setNivel(2);
+        tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
         tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
+
+        Tarea subtask1 = new Tarea();
+        subtask1.setNombre("Test Subtask 1");
+        subtask1.setDescripcion("Test description");
+        subtask1.setPrioridad(1);
+        subtask1.setEtiqueta("Test label");
+        subtask1.setEstimacion(4);
+        subtask1.setNivel(2);
+        subtask1.setHecha(false);
+        subtask1.setRecordatorio(2);
+        subtask1.setTiempoInvertido(0);
+        subtask1.setPadre(tarea);
+        tarea.addSubtarea(subtask1);
+        tarea = this.tareaService.save(tarea);
+
+        Tarea subtask2 = new Tarea();
+        subtask2.setNombre("Test Subtask 2");
+        subtask2.setDescripcion("Test description");
+        subtask2.setPrioridad(1);
+        subtask2.setEtiqueta("Test label");
+        subtask2.setEstimacion(4);
+        subtask2.setNivel(3);
+        subtask2.setHecha(false);
+        subtask2.setRecordatorio(2);
+        subtask2.setTiempoInvertido(0);
+        subtask2.setPadre(tarea.getSubtareas().get(0));
+        tarea.getSubtareas().get(0).addSubtarea(subtask2);
+        this.tareaService.save(tarea.getSubtareas().get(0));
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);
@@ -1034,14 +1062,11 @@ class TareaControllerTests {
         this.mockMvc.perform(post(uri + (tarea.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(post(uri + subtask1.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         this.mockMvc.perform(post(uri + task.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
-
-        tarea.setNivel(1);
-        tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
@@ -1051,7 +1076,8 @@ class TareaControllerTests {
         List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
         for (Tarea tarea1 : tareas) {
             this.tareaDeUsuarioService.deleteAllByTarea(tarea1);
-            this.tareaService.deleteById(tarea1.getId());
+            if (this.tareaService.findById(tarea1.getId()).isPresent())
+                this.tareaService.deleteById(tarea1.getId());
         }
         this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
