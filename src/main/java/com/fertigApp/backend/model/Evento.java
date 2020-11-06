@@ -17,27 +17,27 @@ public class Evento implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "usuario")
-    private Usuario usuarioE;
+    protected Usuario usuarioE;
 
-    private String nombre;
+    protected String nombre;
 
-    private String descripcion;
+    protected String descripcion;
 
-    private Integer prioridad;
+    protected Integer prioridad;
 
-    private String etiqueta;
+    protected String etiqueta;
 
-    private Integer duracion;
+    protected Integer duracion;
 
     @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
-    private LocalDateTime fechaInicio;
+    protected LocalDateTime fechaInicio;
 
     @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
-    private LocalDateTime fechaFin;
+    protected LocalDateTime fechaFin;
 
-    private String recurrencia;
+    protected String recurrencia;
 
-    private Integer recordatorio;
+    protected Integer recordatorio;
 
     public int getId() {
         return id;

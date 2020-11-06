@@ -13,11 +13,11 @@ import java.util.List;
 public class Usuario implements Serializable {
 
 	@Id
-	private String usuario;
+	protected String usuario;
 
-	private String correo;
+	protected String correo;
 
-	private String nombre;
+	protected String nombre;
 
 	private boolean google;
 

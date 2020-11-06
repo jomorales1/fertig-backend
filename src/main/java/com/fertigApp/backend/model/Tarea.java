@@ -33,26 +33,26 @@ public class Tarea implements Serializable {
     @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Tarea> subtareas;
 
-    private String nombre;
+    protected String nombre;
 
-    private String descripcion;
+    protected String descripcion;
 
-    private Integer prioridad;
+    protected Integer prioridad;
 
-    private String etiqueta;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer estimacion;
+    protected String etiqueta;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Integer tiempoInvertido;
+    protected Integer estimacion;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    protected Integer tiempoInvertido;
 
     @Column(name="fecha_fin", columnDefinition="TIMESTAMP")
-    private LocalDateTime fechaFin;
+    protected LocalDateTime fechaFin;
 
     private int nivel;
 
-    private boolean hecha;
+    protected boolean hecha;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Integer recordatorio;
