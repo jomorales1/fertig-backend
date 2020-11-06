@@ -37,12 +37,4 @@ public class Sonido implements Serializable {
         this.id = id;
     }
 
-    public List<Usuario> getUsuarios() {
-        return usuarios;
-    }
-
-    public void setUsuarios(List<Usuario> usuarios) {
-        this.usuarios = usuarios;
-    }
-
 }

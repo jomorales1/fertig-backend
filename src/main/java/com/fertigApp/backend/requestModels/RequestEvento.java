@@ -1,17 +1,70 @@
 package com.fertigApp.backend.requestModels;
 
-import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.model.Usuario;
 
 import java.time.LocalDateTime;
 
-public class RequestEvento extends AbstractRecurrenteResponse {
+public class RequestEvento {
 
     private Usuario usuarioE;
+
+    private String nombre;
+
+    private String descripcion;
+
+    private Integer prioridad;
+
+    private String etiqueta;
+
+    private Integer duracion;
+
     private LocalDateTime fechaInicio;
+
     private LocalDateTime fechaFin;
+
     private String recurrencia;
+
     private Integer recordatorio;
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Integer getPrioridad() {
+        return prioridad;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public String getEtiqueta() {
+        return etiqueta;
+    }
+
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
+
+    public Integer getDuracion() {
+        return duracion;
+    }
+
+    public void setDuracion(Integer duracion) {
+        this.duracion = duracion;
+    }
 
     public Usuario getUsuarioE() {
         return usuarioE;

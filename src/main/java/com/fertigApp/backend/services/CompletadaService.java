@@ -25,13 +25,9 @@ public class CompletadaService {
         return completadaRepository.save(completada);
     }
 
-    public Iterable<Completada> findByRutina(Rutina rutina){
-        return completadaRepository.findByRutinaC(rutina);
-    }
-
     public  Iterable<Completada> findHechaByRutina(Rutina rutina){
         return completadaRepository.findByRutinaCAndHecha(rutina, false);
-    };
+    }
 
     public void deleteAllByRutina(Rutina rutina){
         this.completadaRepository.deleteAllByRutinaC(rutina);

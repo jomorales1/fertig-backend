@@ -48,7 +48,7 @@ public class FacebookController {
     }
 
     @PostMapping(path="/login/oauth2/code/facebook")
-    public ResponseEntity<?>  facebook(@RequestParam String Token) {
+    public ResponseEntity<JwtResponse>  facebook(@RequestParam String Token) {
         Facebook facebook = new FacebookTemplate(Token);
         final String[] fields = {"email", "name"};
         User facebookUser = facebook.fetchObject("me", User.class, fields);
@@ -84,7 +84,7 @@ public class FacebookController {
                         roles));
             } else {
                 LOGGER.info("Se ha intentado iniciar sesión con Facebook a una cuenta no asociada");
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cuenta usada por otra persona sin estar vinculada con Facebook :/");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Message","Cuenta usada por otra persona sin estar vinculada con Facebook").body(null);
             }
         } else {
 
