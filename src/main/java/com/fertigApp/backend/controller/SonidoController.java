@@ -56,7 +56,8 @@ public class SonidoController {
         List<Preferido> preferidos = (List<Preferido>) this.preferidoService.getByUsuario(usuario);
         List<Sonido> sonidos = new ArrayList<>();
         for (Preferido p: preferidos) {
-            sonidos.add(this.sonidoService.findById(p.getSonido().getId()).get());
+            Optional<Sonido> optionalSonido = this.sonidoService.findById(p.getSonido().getId());
+            sonidos.add(optionalSonido.orElse(new Sonido()));
         }
         return sonidos;
     }
@@ -64,12 +65,13 @@ public class SonidoController {
     @DeleteMapping(path = "/sounds/deleteSound/{id}")
     public ResponseEntity<Void> deleteSound(@PathVariable String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.sonidoService.findById(id).isPresent())
+        Optional<Sonido> optionalSonido = this.sonidoService.findById(id);
+        if (optionalSonido.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         Optional<Usuario> optionalUsuario = this.usuarioService.findByUsuario(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Sonido sonido = this.sonidoService.findById(id).get();
-        if (!this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isPresent())
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Sonido sonido = optionalSonido.get();
+        if (this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sonido);
         this.sonidoService.deleteById(id);

@@ -151,7 +151,7 @@ public class UsuarioController {
     public ResponseEntity<List<Usuario>> getFriends() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         return ResponseEntity.ok(usuario.getAgregados());
     }
 
@@ -159,10 +159,11 @@ public class UsuarioController {
     public ResponseEntity<Void> addFriend(@PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        if (!this.usuarioService.findById(username).isPresent())
+        Optional<Usuario> optionalUsuario1 = this.usuarioService.findById(username);
+        if (optionalUsuario1.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario usuario = optionalUsuario.orElse(null);
-        Usuario friend = this.usuarioService.findById(username).get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Usuario friend = optionalUsuario1.get();
         usuario.addAmigo(friend);
         this.usuarioService.save(usuario);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -172,10 +173,11 @@ public class UsuarioController {
     public ResponseEntity<Void> deleteFriend(@PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        if (!this.usuarioService.findById(username).isPresent())
+        Optional<Usuario> optionalUsuario1 = this.usuarioService.findById(username);
+        if (optionalUsuario1.isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        Usuario usuario = optionalUsuario.orElse(null);
-        Usuario friend = this.usuarioService.findById(username).get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Usuario friend = optionalUsuario1.get();
         boolean deleted = usuario.deleteAgregado(friend);
         if (!deleted) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.usuarioService.save(usuario);

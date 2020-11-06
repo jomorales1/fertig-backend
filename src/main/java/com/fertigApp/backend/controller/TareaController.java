@@ -64,14 +64,15 @@ public class TareaController {
     @GetMapping(path="/tasks/getTask/{id}")
     public ResponseEntity<Tarea> getTarea(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(null);
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(null);
         }
@@ -83,14 +84,15 @@ public class TareaController {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(null);
         }
         Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        Tarea tarea = optionalTarea.get();
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(null);
         }
@@ -111,14 +113,15 @@ public class TareaController {
     @PatchMapping(path="/tasks/checkTask/{id}")
     public ResponseEntity<MessageResponse> checkTarea(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: La tarea no pertenece al usuario"));
         }
@@ -158,18 +161,20 @@ public class TareaController {
     @DeleteMapping(path="/tasks/deleteTask/{id}")
     public ResponseEntity<MessageResponse> deleteTarea(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario,tarea).isPresent()) {
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
+        Optional<TareaDeUsuario> optionalTareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
+        if (optionalTareaDeUsuario.isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario,tarea).get().isAdmin()) {
+        if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info("El usuario no es un administrador de la tarea");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un administrador de la tarea"));
         }
@@ -182,14 +187,15 @@ public class TareaController {
     @GetMapping(path = "/tasks/getOwners/{id}")
     public ResponseEntity<List<Usuario>> getTaskOwners(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(null);
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(null);
         }
@@ -205,31 +211,35 @@ public class TareaController {
     @PostMapping(path = "/tasks/addAdmin/{id}/{username}")
     public ResponseEntity<MessageResponse> addTaskAdmin(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
-        if (!this.usuarioService.findById(username).isPresent()) {
+        Optional<Usuario> optional = this.usuarioService.findById(username);
+        if (optional.isEmpty()) {
             LOGGER.info("Usuario no encontrado");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario admin = optionalUsuario.orElse(null);
-        Usuario usuario = this.usuarioService.findById(username).get();
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent()) {
+        Usuario admin = optionalUsuario.orElse(new Usuario());
+        Usuario usuario = optional.get();
+        Tarea tarea = optionalTarea.get();
+        Optional<TareaDeUsuario> optionalTareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea);
+        Optional<TareaDeUsuario> optionalTareaDeUsuario1 = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
+        if (optionalTareaDeUsuario.isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
+        if (optionalTareaDeUsuario1.isEmpty()) {
             LOGGER.info("El nuevo usuario no es un colaborador");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).get().isAdmin()) {
+        if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info("El usuario no es un administrador de la tarea");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un administrador de la tarea"));
         }
-        TareaDeUsuario tareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).get();
+        TareaDeUsuario tareaDeUsuario = optionalTareaDeUsuario1.get();
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         return ResponseEntity.ok(new MessageResponse("Administrador agregado"));
@@ -239,23 +249,26 @@ public class TareaController {
     @PostMapping(path = "/tasks/addOwner/{id}/{username}")
     public ResponseEntity<MessageResponse> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
-        if (!this.usuarioService.findById(username).isPresent()) {
+        Optional<Usuario> optional = this.usuarioService.findById(username);
+        if (optional.isEmpty()) {
             LOGGER.info("Usuario no encontrado");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario admin = optionalUsuario.orElse(null);
-        Usuario usuario = this.usuarioService.findById(username).get();
-        Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).isPresent()) {
+        Usuario admin = optionalUsuario.orElse(new Usuario());
+        Usuario usuario = optional.get();
+        Tarea tarea = optionalTarea.get();
+        Optional<TareaDeUsuario> optionalTareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea);
+        if (optionalTareaDeUsuario.isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea).get().isAdmin()) {
+        if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info("El usuario no es un administrador de la tarea");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un administrador de la tarea"));
         }
@@ -270,13 +283,14 @@ public class TareaController {
     @PostMapping(path = "/tasks/addSubTask/{id}")
     public ResponseEntity<MessageResponse> addSubTask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
         if (tarea.getNivel() > 2) {
             LOGGER.info("Profundidad invalida, nivel máximo debe ser igual a 3");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: profundidad invalida, nivel máximo debe ser igual a 3"));
@@ -293,7 +307,7 @@ public class TareaController {
             } else if (tarea.getNivel() == 3) {
                 parent = tarea.getPadre().getPadre();
             }
-            if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+            if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
                 LOGGER.info("La tarea no pertenece al usuario");
                 return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
             }
@@ -318,20 +332,21 @@ public class TareaController {
     @PutMapping(path = "/tasks/updateSubtask/{id}")
     public ResponseEntity<MessageResponse> updateSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        Tarea subtask = this.tareaService.findById(id).get();
+        Tarea subtask = optionalTarea.get();
         Tarea parent;
         if (subtask.getNivel() == 2) {
             parent = subtask.getPadre();
         } else {
             parent = subtask.getPadre().getPadre();
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
@@ -351,20 +366,21 @@ public class TareaController {
     @PutMapping(path = "/tasks/checkSubtask/{id}")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        Tarea subtask = this.tareaService.findById(id).get();
+        Tarea subtask = optionalTarea.get();
         Tarea parent;
         if (subtask.getNivel() == 2) {
             parent = subtask.getPadre();
         } else {
             parent = subtask.getPadre().getPadre();
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
@@ -376,20 +392,21 @@ public class TareaController {
     @DeleteMapping(path = "/tasks/deleteSubtask/{id}")
     public ResponseEntity<MessageResponse> deleteSubtask(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        Tarea subtask = this.tareaService.findById(id).get();
+        Tarea subtask = optionalTarea.get();
         Tarea parent;
         if (subtask.getNivel() == 2) {
             parent = subtask.getPadre();
         } else {
             parent = subtask.getPadre().getPadre();
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
@@ -404,20 +421,21 @@ public class TareaController {
     @PutMapping(path = "/tasks/increaseTime/{id}/{time}")
     public ResponseEntity<MessageResponse> increaseInvestedTime(@PathVariable Integer id, @PathVariable Integer time) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
+        Tarea tarea = optionalTarea.get();
         Tarea parent = tarea;
         if (tarea.getNivel() == 2) {
             parent = tarea.getPadre();
         } else if (tarea.getNivel() == 3) {
             parent = tarea.getPadre().getPadre();
         }
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isPresent()) {
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
             LOGGER.info("La tarea no pertenece al usuario");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea no pertenece al usuario"));
         }
@@ -430,13 +448,14 @@ public class TareaController {
     @PostMapping(path = "/tasks/copyTask/{id}")
     public ResponseEntity<MessageResponse> copyTask(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!this.tareaService.findById(id).isPresent()) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
             LOGGER.info("Tarea no encontrada");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea tarea = this.tareaService.findById(id).get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Tarea tarea = optionalTarea.get();
         if (tarea.getNivel() != 1) {
             LOGGER.info("La tarea especificada es una subtarea");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: la tarea especificada es una subtarea"));
