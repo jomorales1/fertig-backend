@@ -68,7 +68,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".");
             int dias = Integer.parseInt(recurrencia.substring(1, punto));
-            for(int i = 1; i<8;  i++) {
+            for(long i = 1; i<8;  i++) {
                 if((dias & 1) == 1){
                     LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
                     fechaI = fechaI.plusDays(i - fechaI.getDayOfWeek().getValue());
@@ -147,7 +147,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 fecha = fecha.plusDays(1);
             }
             LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
-            fechaI = fechaI.plusDays(fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
+            fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             while (fechaI.isBefore(fecha) || fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             if (fechaI.isAfter(fecha)) return fechaI;
             else return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto));
@@ -211,7 +211,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 fecha = fecha.minusDays(1);
             }
             LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
-            fechaI = fechaI.plusDays(fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
+            fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             if(fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(1);
             while (fechaI.isBefore(fecha)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             //System.out.println(fechaI);
