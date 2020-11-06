@@ -2,12 +2,15 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.auth.jwt.JwtUtil;
 import com.fertigApp.backend.auth.services.UserDetailsImpl;
+import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.JwtResponse;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestUsuario;
 import com.fertigApp.backend.services.UsuarioService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +34,6 @@ import java.util.stream.Collectors;
 @RestController	// This means that this class is a Controller
 //@RequestMapping(path="/demo") // This means URL's start with /demo (after Application path)
 public class UsuarioController {
-
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
@@ -74,10 +76,16 @@ public class UsuarioController {
     }
 
     // Método GET para obtener todas las entidades de tipo "usuario" de la DB.
-    @GetMapping(path="/users/getAllUsers") //Disponible como rol ADMIN
+    @GetMapping(path="/users/getAllUsers")
     public @ResponseBody Iterable<Usuario> getAllUsuarios() {
         // This returns a JSON or XML with the usuarios
         return usuarioService.findAll();
+    }
+    // Método GET para obtener todas las entidades de tipo "usuario" cuyo usuario corresponde con la cadena dada
+    @GetMapping(path="/users/search/{usuario}")
+    public @ResponseBody Iterable<Usuario> getAllUsuarios(@PathVariable String usuario) {
+        // This returns a JSON or XML with the usuarios
+        return usuarioService.findAllByUsuario(usuario);
     }
 
     // Método GET para obtener la información del usuario hace la request.
