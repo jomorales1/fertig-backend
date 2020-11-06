@@ -548,6 +548,13 @@ class TareaControllerTests {
         relation.setTarea(tarea);
         relation.setAdmin(false);
         this.tareaDeUsuarioService.save(relation);
+
+        TareaDeUsuario relation1 = new TareaDeUsuario();
+        relation1.setUsuario(newAdmin);
+        relation1.setTarea(tarea);
+        relation1.setAdmin(false);
+        this.tareaDeUsuarioService.save(relation1);
+
         this.mockMvc.perform(post(uri + tarea.getId() + "/" + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
@@ -718,7 +725,7 @@ class TareaControllerTests {
         Tarea task = setUp(user);
 
         Tarea subtarea = new Tarea();
-        subtarea.setNombre("Test Subtask L2");
+        subtarea.setNombre("Test Subtask A");
         subtarea.setDescripcion("Test description");
         subtarea.setPrioridad(1);
         subtarea.setEtiqueta("Test label");
@@ -729,7 +736,7 @@ class TareaControllerTests {
         subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
-        task = this.tareaService.save(task);
+        this.tareaService.save(task);
 
         RequestTarea requestTarea = new RequestTarea();
         requestTarea.setNombre(subtarea.getNombre() + " v2");
@@ -754,7 +761,7 @@ class TareaControllerTests {
         Tarea newTarea = setUp(newUser);
 
         Tarea newSubtarea = new Tarea();
-        newSubtarea.setNombre("Test Subtask L2");
+        newSubtarea.setNombre("Test Subtask B");
         newSubtarea.setDescripcion("Test description");
         newSubtarea.setPrioridad(1);
         newSubtarea.setEtiqueta("Test label");
@@ -764,13 +771,27 @@ class TareaControllerTests {
         newSubtarea.setRecordatorio(2);
         newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
-        newTarea = this.tareaService.save(newTarea);
+        newTarea.addSubtarea(newSubtarea);
+        this.tareaService.save(newTarea);
 
-        this.mockMvc.perform(put(uri + (newTarea.getId() + 1)).header("Authorization", "Bearer " + token)
+        List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
+        int indexA = -1, indexB = -1;
+        for (Tarea tarea : tareas) {
+            if (tarea.getNombre().equals(subtarea.getNombre()))
+                indexA = tarea.getId();
+            if (tarea.getNombre().equals(newSubtarea.getNombre()))
+                indexB = tarea.getId();
+        }
+
+        assertEquals(tareas.size(), 4);
+
+        this.mockMvc.perform(put(uri + indexB).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token)
+        assertEquals(newSubtarea.getNombre(), this.tareaService.findById(indexB).get().getNombre());
+
+        this.mockMvc.perform(put(uri + indexA).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isOk());
 
@@ -793,7 +814,7 @@ class TareaControllerTests {
         Tarea task = setUp(user);
 
         Tarea subtarea = new Tarea();
-        subtarea.setNombre("Test Subtask L2");
+        subtarea.setNombre("Test Subtask A");
         subtarea.setDescripcion("Test description");
         subtarea.setPrioridad(1);
         subtarea.setEtiqueta("Test label");
@@ -804,7 +825,7 @@ class TareaControllerTests {
         subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
-        task = this.tareaService.save(task);
+        this.tareaService.save(task);
 
         this.mockMvc.perform(put(uri + (task.getId() + 2)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
@@ -818,7 +839,7 @@ class TareaControllerTests {
         Tarea newTarea = setUp(newUser);
 
         Tarea newSubtarea = new Tarea();
-        newSubtarea.setNombre("Test Subtask L2");
+        newSubtarea.setNombre("Test Subtask B");
         newSubtarea.setDescripcion("Test description");
         newSubtarea.setPrioridad(1);
         newSubtarea.setEtiqueta("Test label");
@@ -828,21 +849,31 @@ class TareaControllerTests {
         newSubtarea.setRecordatorio(2);
         newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
-        newTarea = this.tareaService.save(newTarea);
+        newTarea.addSubtarea(newSubtarea);
+        this.tareaService.save(newTarea);
 
-        this.mockMvc.perform(put(uri + (newTarea.getId() + 1)).header("Authorization", "Bearer " + token))
+        List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
+        int indexA = -1, indexB = -1;
+        for (Tarea tarea : tareas) {
+            if (tarea.getNombre().equals(subtarea.getNombre()))
+                indexA = tarea.getId();
+            if (tarea.getNombre().equals(newSubtarea.getNombre()))
+                indexB = tarea.getId();
+        }
+
+        this.mockMvc.perform(put(uri + indexB).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri + indexA).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
-        subtarea = this.tareaService.findById(task.getId() + 1).get();
+        subtarea = this.tareaService.findById(indexA).get();
         assertTrue(subtarea.getHecha());
 
-        this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri + (indexA)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
-        subtarea = this.tareaService.findById(task.getId() + 1).get();
+        subtarea = this.tareaService.findById(indexA).get();
         assertFalse(subtarea.getHecha());
 
         this.tareaDeUsuarioService.deleteAllByTarea(task);
@@ -864,7 +895,7 @@ class TareaControllerTests {
 
         Tarea task = setUp(user);
         Tarea subtarea = new Tarea();
-        subtarea.setNombre("Test Subtask L2");
+        subtarea.setNombre("Test Subtask A");
         subtarea.setDescripcion("Test description");
         subtarea.setPrioridad(1);
         subtarea.setEtiqueta("Test label");
@@ -875,7 +906,7 @@ class TareaControllerTests {
         subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
-        task = this.tareaService.save(task);
+        this.tareaService.save(task);
 
         this.mockMvc.perform(delete(uri + (task.getId() + 2)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
@@ -889,7 +920,7 @@ class TareaControllerTests {
         Tarea newTarea = setUp(newUser);
 
         Tarea newSubtarea = new Tarea();
-        newSubtarea.setNombre("Test Subtask L2");
+        newSubtarea.setNombre("Test Subtask B");
         newSubtarea.setDescripcion("Test description");
         newSubtarea.setPrioridad(1);
         newSubtarea.setEtiqueta("Test label");
@@ -899,12 +930,22 @@ class TareaControllerTests {
         newSubtarea.setRecordatorio(2);
         newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
-        newTarea = this.tareaService.save(newTarea);
+        newTarea.addSubtarea(newSubtarea);
+        this.tareaService.save(newTarea);
 
-        this.mockMvc.perform(delete(uri + (newTarea.getId() + 1)).header("Authorization", "Bearer " + token))
+        List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();
+        int indexA = -1, indexB = -1;
+        for (Tarea tarea : tareas) {
+            if (tarea.getNombre().equals(subtarea.getNombre()))
+                indexA = tarea.getId();
+            if (tarea.getNombre().equals(newSubtarea.getNombre()))
+                indexB = tarea.getId();
+        }
+
+        this.mockMvc.perform(delete(uri + indexB).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(delete(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri + indexA).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
 
         this.tareaDeUsuarioService.deleteAllByTarea(newTarea);
