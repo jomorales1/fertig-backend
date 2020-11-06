@@ -107,12 +107,33 @@ class UsuarioControllerTests {
     void getAllUsuarios() throws Exception {
         String uri = "/users/getAllUsers";
         ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
-        //assertThat(resultActions.andExpect(status().isOk()));
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
         List<Usuario> users = objectMapper.readValue(response, javaList);
         assertNotNull(users);
+    }
+
+    @Test
+    void getAllUsuariosByPrefix() throws Exception {
+        String uri = "/users/search/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+
+        ResultActions resultActions = this.mockMvc.perform(get(uri + "test")
+            .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
+        List<Usuario> users = objectMapper.readValue(response, javaList);
+        assertEquals(users.size(), 1);
+        assertEquals(users.get(0).getUsuario(), user.getUsuario());
+
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test

@@ -730,6 +730,13 @@ class RutinaControllerTests {
 
         subtarea = this.tareaService.findById(subtarea.getId()).get();
         assertTrue(subtarea.getHecha());
+
+        this.mockMvc.perform(put(uri + subtarea.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        subtarea = this.tareaService.findById(subtarea.getId()).get();
+        assertFalse(subtarea.getHecha());
+
         this.tareaService.deleteById(subtarea.getId());
         this.tareaService.deleteById(newSubtarea.getId());
         this.completadaService.deleteAllByRutina(rutina);

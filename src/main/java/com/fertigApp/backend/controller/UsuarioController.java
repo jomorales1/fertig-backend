@@ -2,15 +2,12 @@ package com.fertigApp.backend.controller;
 
 import com.fertigApp.backend.auth.jwt.JwtUtil;
 import com.fertigApp.backend.auth.services.UserDetailsImpl;
-import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.JwtResponse;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestUsuario;
 import com.fertigApp.backend.services.UsuarioService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -100,22 +97,19 @@ public class UsuarioController {
     @PutMapping(path="/users/update")
     public ResponseEntity<Usuario> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
-        if(usuarioService.existsByCorreo(requestUsuario.getCorreo()) && optUsuario.isPresent() && !optUsuario.get().getCorreo().equals(requestUsuario.getCorreo())){
+        Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        if (this.usuarioService.existsByCorreo(requestUsuario.getCorreo()) && !usuario.getCorreo().equals(requestUsuario.getCorreo())){
             return ResponseEntity.badRequest().body(null);
         }
-
-        if (optUsuario.isPresent() && !optUsuario.get().getUsuario().equals(requestUsuario.getUsuario())) {
+        if (!usuario.getUsuario().equals(requestUsuario.getUsuario())) {
             return ResponseEntity.badRequest().body(null);
         }
-
         Usuario user = new Usuario();
         user.setCorreo(requestUsuario.getCorreo());
         user.setNombre(requestUsuario.getNombre());
         user.setUsuario(requestUsuario.getUsuario());
         user.setPassword(passwordEncoder.encode(requestUsuario.getPassword()));
-
         return ResponseEntity.ok().body(usuarioService.save(user));
     }
 

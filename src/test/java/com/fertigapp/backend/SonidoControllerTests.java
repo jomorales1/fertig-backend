@@ -166,10 +166,35 @@ class SonidoControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
         Sonido sonido = setUpSonido(user);
+
         this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
-        this.usuarioService.deleteById(user.getUsuario());
 
+        this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("newUser");
+        usuario.setCorreo("new_user@test.com");
+        usuario.setNombre("New User");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Sonido sound = new Sonido();
+        sound.setId("testSound");
+        sound.addUsuario(usuario);
+        sound = this.sonidoService.save(sound);
+        Preferido preferido = new Preferido();
+        preferido.setUsuario(usuario);
+        preferido.setSonido(sound);
+
+        this.mockMvc.perform(delete(uri + sound.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sound);
+        this.sonidoService.deleteById(sound.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
 }

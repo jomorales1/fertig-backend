@@ -476,13 +476,24 @@ class EventoControllerTests {
         Evento obtainedEvent = this.objectMapper.readValue(response, Evento.class);
         assertNotNull(obtainedEvent);
 
-        resultActions = this.mockMvc.perform(get(uri + (event.getId() + 1)).header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
-        mvcResult = resultActions.andReturn();
-        response = mvcResult.getResponse().getContentAsString();
-        assertTrue(response.isEmpty());
+        this.mockMvc.perform(get(uri + (event.getId() + 1)).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
 
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("newUser");
+        usuario.setCorreo("new_user@test.com");
+        usuario.setNombre("New User");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Evento evento = setUpEvento(usuario);
+
+        this.mockMvc.perform(get(uri + evento.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.eventoService.deleteById(evento.getId());
         this.eventoService.deleteById(event.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -524,7 +535,22 @@ class EventoControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestEvento)))
                 .andExpect(status().isBadRequest());
 
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("newUser");
+        usuario.setCorreo("new_user@test.com");
+        usuario.setNombre("New User");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Evento evento = setUpEvento(usuario);
+
+        this.mockMvc.perform(put(uri + evento.getId()).header("Authorization", "Bearer " + token)
+                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestEvento)))
+                .andExpect(status().isBadRequest());
+
+        this.eventoService.deleteById(evento.getId());
         this.eventoService.deleteById(event.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -579,6 +605,20 @@ class EventoControllerTests {
         this.mockMvc.perform(delete(uri + (event.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("newUser");
+        usuario.setCorreo("new_user@test.com");
+        usuario.setNombre("New User");
+        usuario.setPassword(passwordEncoder.encode("testing"));
+        this.usuarioService.save(usuario);
+
+        Evento evento = setUpEvento(usuario);
+
+        this.mockMvc.perform(delete(uri + evento.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.eventoService.deleteById(evento.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 

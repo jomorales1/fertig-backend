@@ -1,6 +1,5 @@
 package com.fertigApp.backend.controller;
 
-import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
@@ -29,7 +28,7 @@ import java.util.logging.Level;
 @RestController
 public class EventoController {
 
-    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Evento.class);
 
     // Repositorio responsable del manejo de la tabla "evento" en la DB.
     private final EventoService eventoService;
@@ -53,11 +52,10 @@ public class EventoController {
     @GetMapping(path="/events/getEvents")
     public ResponseEntity<Iterable<RecurrenteResponse>> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isEmpty())
-            return ResponseEntity.badRequest().body(null);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         List<RecurrenteResponse> eventos = new LinkedList<>();
-        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+        for(Evento evento : this.eventoService.findByUsuario(usuario)){
             eventos.add(new RecurrenteResponse(evento));
         }
         return ResponseEntity.ok().body(eventos);
@@ -66,11 +64,10 @@ public class EventoController {
     @GetMapping(path="/events/getEventsAndRepetitions")
     public ResponseEntity<Iterable<EventoRepeticionesResponse>> getAllEventosRepeticionesByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
-        if(optUsuario.isEmpty())
-            return ResponseEntity.badRequest().body(null);
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         List<EventoRepeticionesResponse> eventos = new LinkedList<>();
-        for(Evento evento : eventoService.findByUsuario(optUsuario.get())){
+        for(Evento evento : eventoService.findByUsuario(usuario)){
             eventos.add(new EventoRepeticionesResponse(evento));
         }
         return ResponseEntity.ok().body(eventos);
@@ -78,21 +75,21 @@ public class EventoController {
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
     @GetMapping(path="/events/getEvent/{id}")
-    public Evento getEvento(@PathVariable Integer id) {
+    public ResponseEntity<Evento> getEvento(@PathVariable Integer id) {
         //1s;2s;l,x;1m;1a;2h;2s l,x;l-v;1m 15-20;
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String user = userDetails.getUsername();
-
-        Optional<Evento> optEvento = this.eventoService.findById(id);
-        if (optEvento.isPresent()){
-            if (!optEvento.get().getUsuario().getUsuario().equals(user)) {
-                LOGGER.info("Wrong user");
-                return null;
-            }
-            return optEvento.get();
+        Optional<Evento> optionalEvento = this.eventoService.findById(id);
+        if (optionalEvento.isEmpty()) {
+            LOGGER.info("Evento no encontrado");
+            return ResponseEntity.badRequest().body(null);
         }
-        LOGGER.info("Event not found");
-        return null;
+        Evento evento = optionalEvento.get();
+        String username = userDetails.getUsername();
+        if (!evento.getUsuario().getUsuario().equals(username)) {
+            LOGGER.info("El evento no pertenece al usuario");
+            return ResponseEntity.badRequest().body(null);
+        }
+        return ResponseEntity.ok(evento);
     }
 
     // Método PUT para actualizar un evento específico.
@@ -102,27 +99,28 @@ public class EventoController {
         java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Evento> optionalEvento = eventoService.findById(id);
-        Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-        if(optionalEvento.isPresent() && optionalUsuario.isPresent()){
-            Evento evento = optionalEvento.get();
-
-            evento.setUsuario(optionalUsuario.get());
-            evento.setNombre(event.getNombre());
-            evento.setDescripcion(event.getDescripcion());
-            evento.setPrioridad(event.getPrioridad());
-            evento.setEtiqueta(event.getEtiqueta());
-            evento.setDuracion(event.getDuracion());
-            evento.setFechaInicio(event.getFechaInicio());
-            evento.setFechaFin(event.getFechaFin());
-            evento.setRecurrencia(event.getRecurrencia());
-            evento.setRecordatorio(event.getRecordatorio());
-            this.eventoService.save(evento);
-            LOGGER.info("Event updated");
-            return ResponseEntity.ok().body(evento);
-        } else {
-            LOGGER.info("Event not found");
+        if (optionalEvento.isEmpty()) {
+            LOGGER.info("Evento no encontrado");
             return ResponseEntity.badRequest().body(null);
         }
+        String username = userDetails.getUsername();
+        Evento evento = optionalEvento.get();
+        if (!evento.getUsuario().getUsuario().equals(username)) {
+            LOGGER.info("El evento no pertenece al usuario");
+            return ResponseEntity.badRequest().body(null);
+        }
+        evento.setNombre(event.getNombre());
+        evento.setDescripcion(event.getDescripcion());
+        evento.setPrioridad(event.getPrioridad());
+        evento.setEtiqueta(event.getEtiqueta());
+        evento.setDuracion(event.getDuracion());
+        evento.setFechaInicio(event.getFechaInicio());
+        evento.setFechaFin(event.getFechaFin());
+        evento.setRecurrencia(event.getRecurrencia());
+        evento.setRecordatorio(event.getRecordatorio());
+        this.eventoService.save(evento);
+        LOGGER.info("Evento actualizado");
+        return ResponseEntity.ok().body(evento);
     }
 
     // Método POST para agregar un evento a la DB.
@@ -154,13 +152,18 @@ public class EventoController {
     @DeleteMapping(path="/events/deleteEvent/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Evento> optEvento = this.eventoService.findById(id);
-        if(optEvento.isPresent()){
-            if (!optEvento.get().getUsuario().getUsuario().equals(userDetails.getUsername()))
-                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-            this.eventoService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+        Optional<Evento> optionalEvento = this.eventoService.findById(id);
+        if (optionalEvento.isEmpty()) {
+            LOGGER.info("Evento no encontrado");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        String username = userDetails.getUsername();
+        Evento evento = optionalEvento.get();
+        if (!evento.getUsuario().getUsuario().equals(username)) {
+            LOGGER.info("El evento no pertenece al usuario");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        this.eventoService.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }
