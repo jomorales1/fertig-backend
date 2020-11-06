@@ -24,37 +24,37 @@ public class Rutina implements Serializable {
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "usuario")
-    private Usuario usuarioR;
+    protected Usuario usuarioR;
 
-    private String nombre;
+    protected String nombre;
 
-    private String descripcion;
+    protected String descripcion;
 
-    private int prioridad;
+    protected int prioridad;
 
-    private String etiqueta;
+    protected String etiqueta;
 
-    private int duracion;
+    protected int duracion;
 
     @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
-    private LocalDateTime fechaInicio;
+    protected LocalDateTime fechaInicio;
 
     @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
-    private LocalDateTime fechaFin;
+    protected LocalDateTime fechaFin;
 
-    private String recurrencia;
+    protected String recurrencia;
 
-    private int recordatorio;
+    protected int recordatorio;
 
     @Column(name="franja_inicio",columnDefinition = "TIME")
-    private LocalTime franjaInicio;
+    protected LocalTime franjaInicio;
 
     @Column(name="franja_fin",columnDefinition = "TIME")
-    private LocalTime franjaFin;
+    protected LocalTime franjaFin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
-    private List<Completada> completadas;
+    protected List<Completada> completadas;
 
     @OneToMany(mappedBy = "rutinaT", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Tarea> subtareas;
