@@ -388,15 +388,15 @@ public class RutinaController {
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<MessageResponse> deleteRutina(@PathVariable Integer id) {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Rutina rutina = optionalRutina.get();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
-        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
+        if (!optionalRutina.get().getUsuario().getUsuario().equals(usuario.getUsuario())) {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
