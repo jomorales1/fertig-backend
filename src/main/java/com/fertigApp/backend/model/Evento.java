@@ -43,20 +43,28 @@ public class Evento implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Usuario getUsuario() {
         return usuarioE;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public void setUsuario(Usuario usuario) {
         this.usuarioE = usuario;
     }
 
+    public Integer getPrioridad() {
+        return prioridad;
+    }
+
     public String getNombre() {
         return nombre;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
     }
 
     public void setNombre(String nombre) {
@@ -69,14 +77,6 @@ public class Evento implements Serializable {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public Integer getPrioridad() {
-        return prioridad;
-    }
-
-    public void setPrioridad(Integer prioridad) {
-        this.prioridad = prioridad;
     }
 
     public String getEtiqueta() {
@@ -96,15 +96,15 @@ public class Evento implements Serializable {
     }
 
     public OffsetDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(OffsetDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
+        return this.fechaInicio;
     }
 
     public OffsetDateTime getFechaFin() {
         return fechaFin;
+    }
+
+    public void setFechaInicio(OffsetDateTime fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
     public void setFechaFin(OffsetDateTime fechaFin) {
@@ -112,15 +112,15 @@ public class Evento implements Serializable {
     }
 
     public String getRecurrencia() {
-        return recurrencia;
+        return this.recurrencia;
+    }
+
+    public Integer getRecordatorio() {
+        return this.recordatorio;
     }
 
     public void setRecurrencia(String recurrencia) {
         this.recurrencia = recurrencia;
-    }
-
-    public Integer getRecordatorio() {
-        return recordatorio;
     }
 
     public void setRecordatorio(Integer recordatorio) {
