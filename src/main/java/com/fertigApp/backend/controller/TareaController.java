@@ -242,19 +242,19 @@ public class TareaController {
     @PostMapping(path = "/tasks/addOwner/{id}/{username}")
     public ResponseEntity<MessageResponse> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
-        if (optionalTarea.isEmpty()) {
-            LOGGER.info(TAR_NO_ENCONTRADA);
-            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
-        }
         Optional<Usuario> optional = this.usuarioService.findById(username);
         if (optional.isEmpty()) {
             LOGGER.info("Usuario no encontrado");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
         }
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
+        }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario admin = optionalUsuario.orElse(new Usuario());
         Usuario usuario = optional.get();
+        Usuario admin = optionalUsuario.orElse(new Usuario());
         Tarea tarea = optionalTarea.get();
         Optional<TareaDeUsuario> optionalTareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea);
         if (optionalTareaDeUsuario.isEmpty()) {
