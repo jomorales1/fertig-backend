@@ -303,6 +303,37 @@ class EventoControllerTests {
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, EventoRepeticionesResponse.class);
         List<EventoRepeticionesResponse> events;
 
+        //RECURRENCIA POR HORAS
+        recurrencia = "H12";
+        fechaInicio = LocalDateTime.of(2020, 6, 28, 0, 0);
+        event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
+
+        for(int day = 28; day <= 30; day++){
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 0, 0));
+            expectedDates.add(LocalDateTime.of(2020, 6, day, 12, 0));
+        }
+
+        // Valid request -> status 200 expected
+        resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+
+        events = objectMapper.readValue(response, javaList);
+
+        obtainedEvent = events.get(0);
+        assertNotNull(events);
+        assertEquals(obtainedEvent.getNombre(), event.getNombre());
+        assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
+        obtainedDates = obtainedEvent.getRepeticiones();
+
+        assertTrue(obtainedDates.size() == expectedDates.size());
+        for(LocalDateTime date : expectedDates){
+            assertTrue(obtainedDates.contains(date));
+        }
+        expectedDates.clear();
+        this.eventoService.deleteById(event.getId());
+
         //RECURRENCIA DIARIA
         recurrencia = "D1";
         fechaInicio = OffsetDateTime.of(2020, 6, 25, 16, 0,0,0, ZoneOffset.UTC);

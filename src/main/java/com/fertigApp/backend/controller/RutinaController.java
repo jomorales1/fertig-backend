@@ -372,15 +372,15 @@ public class RutinaController {
             ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
             if (!completadas.isEmpty()) completadaService.deleteById(completadas.get(0).getId());
             Completada completada = completadaService.findMaxCompletada(optionalRutina.get());
-            if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
+            if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede descheckear"));
             completada.setFechaAjustada(null);
             completada.setHecha(false);
             this.completadaService.save(completada);
             LOGGER.info("Routine repetition unchecked");
-            return ResponseEntity.ok().body(null);
+            return ResponseEntity.ok().body(new MessageResponse("Routine repetition unchecked"));
         } else {
             LOGGER.info("Routine not found");
-            return ResponseEntity.badRequest().body(null);
+            return ResponseEntity.badRequest().body(new MessageResponse("Routine not found"));
         }
     }
 
