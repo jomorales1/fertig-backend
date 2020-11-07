@@ -94,7 +94,7 @@ class RutinaControllerTests {
         routine.setRecordatorio(60);
 
         Completada completada = new Completada();
-        completada.setRutina(routine);
+        completada.setRutinaC(routine);
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
@@ -122,7 +122,7 @@ class RutinaControllerTests {
         routine.setRecordatorio(60);
 
         Completada completada = new Completada();
-        completada.setRutina(routine);
+        completada.setRutinaC(routine);
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
@@ -150,7 +150,7 @@ class RutinaControllerTests {
         routine.setRecordatorio(60);
 
         Completada completada = new Completada();
-        completada.setRutina(routine);
+        completada.setRutinaC(routine);
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
@@ -180,7 +180,7 @@ class RutinaControllerTests {
         routine.setFranjaFin(franjaF);
 
         Completada completada = new Completada();
-        completada.setRutina(routine);
+        completada.setRutinaC(routine);
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),

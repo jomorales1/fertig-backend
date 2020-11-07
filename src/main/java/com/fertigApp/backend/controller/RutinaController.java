@@ -39,8 +39,9 @@ public class RutinaController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Rutina.class);
 
-    private static final String NO_PERTENECE = "La rutina no pertenece al usuario";
+    private static final String RUT_NO_PERTENECE = "La rutina no pertenece al usuario";
     private static final String RUT_NO_ENCONTRADA = "Rutina no encontrada";
+    private static final String TAR_NO_ENCONTRADA = "Tarea no encontrada";
 
     // Repositorio responsable del manejo de la tabla "rutina" en la DB.
     private final RutinaService rutinaService;
@@ -122,7 +123,7 @@ public class RutinaController {
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
+            LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(null);
         }
         return ResponseEntity.ok(rutina);
@@ -143,7 +144,7 @@ public class RutinaController {
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
+            LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(null);
         }
         rutina.setNombre(routine.getNombre());
@@ -186,7 +187,7 @@ public class RutinaController {
         this.rutinaService.save(rutina);
 
         Completada completada = new Completada();
-        completada.setRutina(rutina);
+        completada.setRutinaC(rutina);
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                         rutina.getFechaFin(),
@@ -203,14 +204,14 @@ public class RutinaController {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         Tarea subtarea = new Tarea();
         subtarea.setDescripcion(requestTarea.getDescripcion());
@@ -234,8 +235,8 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
-            LOGGER.info("Tarea no encontrada");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -247,8 +248,8 @@ public class RutinaController {
             rutina = subtask.getPadre().getRutinaT();
         }
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         subtask.setNombre(requestTarea.getNombre());
         subtask.setDescripcion(requestTarea.getDescripcion());
@@ -268,8 +269,8 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
-            LOGGER.info("Tarea no encontrada");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -281,8 +282,8 @@ public class RutinaController {
             rutina = subtask.getPadre().getRutinaT();
         }
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         subtask.setHecha(!subtask.getHecha());
         this.tareaService.save(subtask);
@@ -294,8 +295,8 @@ public class RutinaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
-            LOGGER.info("Tarea no encontrada");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: tarea no encontrada"));
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -307,8 +308,8 @@ public class RutinaController {
             rutina = subtask.getPadre().getRutinaT();
         }
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         if (subtask.getNivel() == 2) {
             rutina.deleteSubtarea(subtask);
@@ -335,19 +336,18 @@ public class RutinaController {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findByUsuario(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
         Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
         if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
-        //completada.setFecha(la misma fecha);
         LocalDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
                 rutina.getFechaFin(),
                 rutina.getRecurrencia(),
@@ -358,7 +358,7 @@ public class RutinaController {
         completada.setHecha(true);
         this.completadaService.save(completada);
         Completada newCompletada = new Completada();
-        newCompletada.setRutina(rutina);
+        newCompletada.setRutinaC(rutina);
         newCompletada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                         rutina.getFechaFin(),
@@ -386,7 +386,6 @@ public class RutinaController {
             if (!completadas.isEmpty()) completadaService.deleteById(completadas.get(0).getId());
             Completada completada = completadaService.findMaxCompletada(optionalRutina.get());
             if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
-            //completada.setFecha(la misma fecha);
             completada.setFechaAjustada(null);
             completada.setHecha(false);
             this.completadaService.save(completada);
@@ -405,14 +404,14 @@ public class RutinaController {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: rutina no encontrada"));
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina no pertenece al usuario"));
+            LOGGER.info(RUT_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());

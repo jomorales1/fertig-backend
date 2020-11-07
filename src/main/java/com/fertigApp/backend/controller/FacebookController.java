@@ -91,7 +91,7 @@ public class FacebookController {
             Usuario user = new Usuario();
             user.setCorreo(facebookEmail);
             user.setNombre(facebookUser.getName());
-            user.setPassword(new String(""));
+            user.setPassword("");
             user.setFacebook(true);
             user.setGoogle(false);
 

@@ -3,7 +3,6 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
-import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
@@ -252,7 +251,7 @@ class TareaControllerTests {
         assertNotNull(obtainedTask);
         assertEquals(obtainedTask.getId(), task.getId());
         assertEquals(obtainedTask.getNombre(), requestTarea.getNombre());
-        assertEquals(obtainedTask.getNivel(), 1);
+        assertEquals(1,obtainedTask.getNivel());
 
         this.mockMvc.perform(put(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -783,7 +782,7 @@ class TareaControllerTests {
                 indexB = tarea.getId();
         }
 
-        assertEquals(tareas.size(), 4);
+        assertEquals(4, tareas.size());
 
         this.mockMvc.perform(put(uri + indexB).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))

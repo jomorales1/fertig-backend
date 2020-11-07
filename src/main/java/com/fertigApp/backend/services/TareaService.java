@@ -36,7 +36,4 @@ public class TareaService {
         tareaRepository.deleteById(id);
     }
 
-//    public Iterable<Tarea> findByUsuario(Usuario usuario){
-//        return tareaRepository.findByUsuarioT(usuario);
-//    }
 }

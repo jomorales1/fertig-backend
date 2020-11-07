@@ -28,7 +28,10 @@ import java.util.logging.Level;
 @RestController
 public class EventoController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Evento.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(EventoController.class);
+
+    private static final String EV_NO_ENCONTRADO = "Evento no encontrado";
+    private static final String EV_NO_PERTENECE = "El evento no pertenece al usuario";
 
     // Repositorio responsable del manejo de la tabla "evento" en la DB.
     private final EventoService eventoService;
@@ -80,13 +83,13 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Evento> optionalEvento = this.eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
-            LOGGER.info("Evento no encontrado");
+            LOGGER.info(EV_NO_ENCONTRADO);
             return ResponseEntity.badRequest().body(null);
         }
         Evento evento = optionalEvento.get();
         String username = userDetails.getUsername();
         if (!evento.getUsuario().getUsuario().equals(username)) {
-            LOGGER.info("El evento no pertenece al usuario");
+            LOGGER.info(EV_NO_PERTENECE);
             return ResponseEntity.badRequest().body(null);
         }
         return ResponseEntity.ok(evento);
@@ -100,13 +103,13 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) principal;
         Optional<Evento> optionalEvento = eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
-            LOGGER.info("Evento no encontrado");
+            LOGGER.info(EV_NO_ENCONTRADO);
             return ResponseEntity.badRequest().body(null);
         }
         String username = userDetails.getUsername();
         Evento evento = optionalEvento.get();
         if (!evento.getUsuario().getUsuario().equals(username)) {
-            LOGGER.info("El evento no pertenece al usuario");
+            LOGGER.info(EV_NO_PERTENECE);
             return ResponseEntity.badRequest().body(null);
         }
         evento.setNombre(event.getNombre());
@@ -154,13 +157,13 @@ public class EventoController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Evento> optionalEvento = this.eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
-            LOGGER.info("Evento no encontrado");
+            LOGGER.info(EV_NO_ENCONTRADO);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         String username = userDetails.getUsername();
         Evento evento = optionalEvento.get();
         if (!evento.getUsuario().getUsuario().equals(username)) {
-            LOGGER.info("El evento no pertenece al usuario");
+            LOGGER.info(EV_NO_PERTENECE);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         this.eventoService.deleteById(id);

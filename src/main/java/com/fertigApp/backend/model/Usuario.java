@@ -13,7 +13,7 @@ import java.util.List;
 public class Usuario implements Serializable {
 
 	@Id
-	protected String usuario;
+	private String usuario;
 
 	protected String correo;
 

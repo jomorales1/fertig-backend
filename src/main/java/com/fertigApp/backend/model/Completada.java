@@ -34,12 +34,12 @@ public class Completada implements Serializable {
         return id;
     }
 
-    public Rutina getRutina() {
+    public Rutina getRutinaC() {
         return rutinaC;
     }
 
-    public void setRutina(Rutina rutina) {
-        this.rutinaC = rutina;
+    public void setRutinaC(Rutina rutinaC) {
+        this.rutinaC = rutinaC;
     }
 
     public boolean isHecha() {
@@ -64,13 +64,5 @@ public class Completada implements Serializable {
 
     public void setFechaAjustada(LocalDateTime fechaAjustada) {
         this.fechaAjustada = fechaAjustada;
-    }
-
-    public Rutina getRutinaC() {
-        return rutinaC;
-    }
-
-    public void setRutinaC(Rutina rutinaC) {
-        this.rutinaC = rutinaC;
     }
 }

@@ -54,7 +54,7 @@ public class Rutina implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
-    protected List<Completada> completadas;
+    private List<Completada> completadas;
 
     @OneToMany(mappedBy = "rutinaT", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Tarea> subtareas;

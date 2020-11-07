@@ -14,9 +14,6 @@ import java.time.LocalDateTime;
 public interface CompletadaRepository extends CrudRepository<Completada, Integer> {
     Iterable<Completada> findByRutinaC(Rutina rutina);
 
-//    @Query("select c from Completada c where c.rutinaC = :rutina and c.hecha = false")
-//    Optional<Completada> findHechaByRutina(@Param("rutina") Rutina rutina);
-
     Iterable<Completada> findByRutinaCAndHecha(Rutina rutina, Boolean hecha);
 
     @Query("select c.fecha from Completada c where c.rutinaC = :rutina and c.hecha = true")

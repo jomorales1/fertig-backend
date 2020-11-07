@@ -7,8 +7,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,11 +27,11 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     protected Integer duracion;
     protected String mensajeRecurrencia;
 
-    public AbstractRecurrenteResponse(){
+    protected AbstractRecurrenteResponse(){
 
     }
 
-    public AbstractRecurrenteResponse(Evento evento){
+    protected AbstractRecurrenteResponse(Evento evento){
         this.id = evento.getId();
         this.nombre = evento.getNombre();
         this.descripcion = evento.getDescripcion();
@@ -46,7 +44,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.mensajeRecurrencia = getMensajeRecurrencia(evento.getRecurrencia());
     }
 
-    public AbstractRecurrenteResponse(Rutina rutina){
+    protected AbstractRecurrenteResponse(Rutina rutina){
         this.id = rutina.getId();
         this.nombre = rutina.getNombre();
         this.descripcion = rutina.getDescripcion();
@@ -107,19 +105,6 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         return fechas;
     }
 
-    protected static Date add(Date fecha, int n, Character t){
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(fecha);
-        switch (t) {
-            case 'A' -> calendar.add(Calendar.YEAR, n);
-            case 'M' -> calendar.add(Calendar.MONTH, n);
-            case 'S' -> calendar.add(Calendar.WEEK_OF_YEAR, n);
-            case 'D' -> calendar.add(Calendar.DAY_OF_YEAR, n);
-            case 'H' -> calendar.add(Calendar.HOUR, n);
-        }
-        return calendar.getTime();
-    }
-
     protected static LocalDateTime add(LocalDateTime fecha, int n, Character t){
         LocalDateTime fechaFinal = LocalDateTime.from(fecha);
         switch (t) {
@@ -128,6 +113,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             case 'S' : fechaFinal = fecha.plusWeeks(n); break;
             case 'D' : fechaFinal = fecha.plusDays(n); break;
             case 'H' : fechaFinal = fecha.plusHours(n); break;
+            default: fechaFinal = fecha.plusHours(0); break;
         }
         return fechaFinal;
     }
@@ -139,10 +125,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
             int dia = fecha.getDayOfWeek().getValue() - 1;
-            while(fecha.compareTo(fechaFin)<1) {
-                if (((d >> dia) & 1) == 1) {
-                    break;
-                }
+            while(fecha.compareTo(fechaFin)<1 && ((d >> dia) & 1) != 1) {
                 dia = (dia+1)%7;
                 fecha = fecha.plusDays(1);
             }
@@ -150,19 +133,12 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             while (fechaI.isBefore(fecha) || fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             if (fechaI.isAfter(fecha)) return fechaI;
-            else return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto));
+            return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto));
         } else {
             LocalDateTime fechaI = fechaInicio;
-
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha)){
-                switch (recurrencia.charAt(0)) {
-                    case 'A' : fechaI = fechaI.plusYears(d); break;
-                    case 'M' : fechaI = fechaI.plusMonths(d); break;
-                    case 'S' : fechaI = fechaI.plusWeeks(d); break;
-                    case 'D' : fechaI = fechaI.plusDays(d); break;
-                    case 'H' : fechaI = fechaI.plusHours(d); break;
-                }
+                fechaI = add(fechaI,d,recurrencia.charAt(0));
             }
             return fechaI;
         }
@@ -214,32 +190,19 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             if(fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(1);
             while (fechaI.isBefore(fecha)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
-            //System.out.println(fechaI);
             fecha = LocalDateTime.now();
             if(!fechaI.isBefore(fecha)) fechaI = fechaI.minusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
             else if(fecha.isAfter(fechaInicio)) return fechaInicio;
-            else return null;
+            return null;
         } else {
             LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
 
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha)){
-                switch (recurrencia.charAt(0)) {
-                    case 'A' : fechaI = fechaI.plusYears(d); break;
-                    case 'M' : fechaI = fechaI.plusMonths(d); break;
-                    case 'S' : fechaI = fechaI.plusWeeks(d); break;
-                    case 'D' : fechaI = fechaI.plusDays(d); break;
-                    case 'H' : fechaI = fechaI.plusHours(d); break;
-                }
+                fechaI = add(fechaI,d,recurrencia.charAt(0));
             }
-            switch (recurrencia.charAt(0)) {
-                case 'A' : fechaI = fechaI.minusYears(d); break;
-                case 'M' : fechaI = fechaI.minusMonths(d); break;
-                case 'S' : fechaI = fechaI.minusWeeks(d); break;
-                case 'D' : fechaI = fechaI.minusDays(d); break;
-                case 'H' : fechaI = fechaI.minusHours(d); break;
-            }
+            fechaI = add(fechaI,-d,recurrencia.charAt(0));
             if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
             else if(fecha.isAfter(fechaInicio)) return fechaInicio;
             else return null;
@@ -271,7 +234,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
                 //mejorar condicion
             else if(fecha.isAfter(fechaInicio)) return fechaInicio;
-            else return null;
+            return null;
         } else {
             return findAnterior(fechaInicio, fechaFin, recurrencia);
         }
@@ -292,7 +255,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                         case 4 -> dias.add("Jueves");
                         case 5 -> dias.add("Viernes");
                         case 6 -> dias.add("Sabados");
-                        case 7 -> dias.add("Domingos");
+                        default -> dias.add("Domingos");
                     }
                 }
                 codDias = codDias >> 1;
@@ -314,7 +277,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                     case 'M' -> mensajeRecurrencia += "mes";
                     case 'S' -> mensajeRecurrencia += "semana";
                     case 'D' -> mensajeRecurrencia += "dia";
-                    case 'H' -> mensajeRecurrencia += "hora";
+                    default -> mensajeRecurrencia += "hora";
                 }
             } else {
                 mensajeRecurrencia += recurrencia.substring(1) + " ";
@@ -323,7 +286,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                     case 'M' -> mensajeRecurrencia += "meses";
                     case 'S' -> mensajeRecurrencia += "semanas";
                     case 'D' -> mensajeRecurrencia += "dias";
-                    case 'H' -> mensajeRecurrencia += "horas";
+                    default -> mensajeRecurrencia += "horas";
                 }
             }
         }

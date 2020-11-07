@@ -130,7 +130,7 @@ class UsuarioControllerTests {
         String response = mvcResult.getResponse().getContentAsString();
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
         List<Usuario> users = objectMapper.readValue(response, javaList);
-        assertEquals(users.size(), 1);
+        assertEquals(1,users.size());
         assertEquals(users.get(0).getUsuario(), user.getUsuario());
 
         this.usuarioService.deleteById(user.getUsuario());

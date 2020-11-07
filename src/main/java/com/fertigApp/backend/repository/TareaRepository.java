@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TareaRepository extends CrudRepository<Tarea, Integer> {
-//    Iterable<Tarea> findByUsuarioT(Usuario usuario);
     Iterable<Tarea> findAllByPadre(Tarea padre);
 }

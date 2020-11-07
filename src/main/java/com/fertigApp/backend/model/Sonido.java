@@ -19,9 +19,6 @@ public class Sonido implements Serializable {
     @ManyToMany(mappedBy = "sonidos")
     private List<Usuario> usuarios;
 
-    public Sonido() {
-    }
-
     public void addUsuario(Usuario usuario) {
         if (this.usuarios == null) {
             this.usuarios = new ArrayList<>();
