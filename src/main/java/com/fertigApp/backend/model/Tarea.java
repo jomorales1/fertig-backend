@@ -76,64 +76,32 @@ public class Tarea implements Serializable {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getNombre() {
         return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
     }
 
     public String getDescripcion() {
         return descripcion;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
     public Integer getPrioridad() {
         return prioridad;
-    }
-
-    public void setPrioridad(Integer prioridad) {
-        this.prioridad = prioridad;
     }
 
     public String getEtiqueta() {
         return etiqueta;
     }
 
-    public void setEtiqueta(String etiqueta) {
-        this.etiqueta = etiqueta;
-    }
-
     public Integer getEstimacion() {
         return estimacion;
-    }
-
-    public void setEstimacion(Integer estimacion) {
-        this.estimacion = estimacion;
     }
 
     public OffsetDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(OffsetDateTime fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
     public int getNivel() {
         return nivel;
-    }
-
-    public void setNivel(int nivel) {
-        this.nivel = nivel;
     }
 
     public boolean getHecha() {
@@ -156,24 +124,12 @@ public class Tarea implements Serializable {
         return usuariosT;
     }
 
-    public void setUsuariosT(List<TareaDeUsuario> usuariosT) {
-        this.usuariosT = usuariosT;
-    }
-
     public Tarea getPadre() {
         return padre;
     }
 
-    public void setPadre(Tarea padre) {
-        this.padre = padre;
-    }
-
     public List<Tarea> getSubtareas() {
         return subtareas;
-    }
-
-    public void setSubtareas(List<Tarea> subtareas) {
-        this.subtareas = subtareas;
     }
 
     public boolean isHecha() {
@@ -184,16 +140,60 @@ public class Tarea implements Serializable {
         return tiempoInvertido;
     }
 
-    public void setTiempoInvertido(Integer tiempoInvertido) {
-        this.tiempoInvertido = tiempoInvertido;
-    }
-
     public Rutina getRutinaT() {
         return rutinaT;
     }
 
     public void setRutinaT(Rutina rutinaT) {
         this.rutinaT = rutinaT;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public void setPrioridad(Integer prioridad) {
+        this.prioridad = prioridad;
+    }
+
+    public void setEtiqueta(String etiqueta) {
+        this.etiqueta = etiqueta;
+    }
+
+    public void setEstimacion(Integer estimacion) {
+        this.estimacion = estimacion;
+    }
+
+    public void setFechaFin(OffsetDateTime fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public void setNivel(int nivel) {
+        this.nivel = nivel;
+    }
+
+    public void setUsuariosT(List<TareaDeUsuario> usuariosT) {
+        this.usuariosT = usuariosT;
+    }
+
+    public void setPadre(Tarea padre) {
+        this.padre = padre;
+    }
+
+    public void setSubtareas(List<Tarea> subtareas) {
+        this.subtareas = subtareas;
+    }
+
+    public void setTiempoInvertido(Integer tiempoInvertido) {
+        this.tiempoInvertido = tiempoInvertido;
     }
 
 }

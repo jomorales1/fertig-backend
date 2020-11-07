@@ -125,28 +125,12 @@ public class Rutina implements Serializable {
         this.duracion = duracion;
     }
 
-    public OffsetDateTime getFechaInicio() {
-        return fechaInicio;
-    }
-
-    public void setFechaInicio(OffsetDateTime fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public OffsetDateTime getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(OffsetDateTime fechaFin) {
-        this.fechaFin = fechaFin;
+    public void setRecurrencia(String recurrencia) {
+        this.recurrencia = recurrencia;
     }
 
     public String getRecurrencia() {
         return recurrencia;
-    }
-
-    public void setRecurrencia(String recurrencia) {
-        this.recurrencia = recurrencia;
     }
 
     public int getRecordatorio() {
@@ -195,6 +179,22 @@ public class Rutina implements Serializable {
 
     public void setSubtareas(Set<Tarea> subtareas) {
         this.subtareas = subtareas;
+    }
+
+    public void setFechaInicio(OffsetDateTime fechaInicio) {
+        this.fechaInicio = fechaInicio;
+    }
+
+    public void setFechaFin(OffsetDateTime fechaFin) {
+        this.fechaFin = fechaFin;
+    }
+
+    public OffsetDateTime getFechaFin() {
+        return fechaFin;
+    }
+
+    public OffsetDateTime getFechaInicio() {
+        return fechaInicio;
     }
 
 }
