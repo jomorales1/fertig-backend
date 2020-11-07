@@ -30,11 +30,11 @@ public class RutinaRepeticionesResponse extends AbstractRecurrenteResponse  {
         //futuras: fechas: inicio: fechaideal de la ultima completada fin: la del front
     }
 
-    public List<LocalDateTime> getCompletadas() {
+    public List<OffsetDateTime> getCompletadas() {
         return completadas;
     }
 
-    public List<LocalDateTime> getFuturas() {
+    public List<OffsetDateTime> getFuturas() {
         return futuras;
     }
 }

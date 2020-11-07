@@ -305,12 +305,12 @@ class EventoControllerTests {
 
         //RECURRENCIA POR HORAS
         recurrencia = "H12";
-        fechaInicio = LocalDateTime.of(2020, 6, 28, 0, 0);
+        fechaInicio = OffsetDateTime.of(2020, 6, 28, 0, 0, 0, 0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 28; day <= 30; day++){
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 0, 0));
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 12, 0));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 0, 0, 0, 0, ZoneOffset.UTC));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 12, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -328,7 +328,7 @@ class EventoControllerTests {
         obtainedDates = obtainedEvent.getRepeticiones();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();

@@ -29,6 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
@@ -396,8 +397,8 @@ class RutinaControllerTests {
         assertEquals(rutinaObtained.getPrioridad(),rutina.getPrioridad());
         assertEquals(rutinaObtained.getEtiqueta(), rutina.getEtiqueta());
         assertEquals(rutinaObtained.getDuracion(), rutina.getDuracion());
-        assertTrue(rutinaObtained.getFechaInicio().compareTo(rutina.getFechaInicio()) < 10);
-        assertTrue(rutinaObtained.getFechaFin().compareTo(rutina.getFechaFin()) < 10);
+        assertTrue(rutinaObtained.getFechaInicio().compareTo(rutina.getFechaInicio()) <= 15);
+        assertTrue(rutinaObtained.getFechaFin().compareTo(rutina.getFechaFin()) <= 15);
         assertEquals(rutinaObtained.getRecurrencia(), rutina.getRecurrencia());
         assertEquals(rutinaObtained.getRecordatorio(), rutina.getRecordatorio());
 
@@ -417,10 +418,10 @@ class RutinaControllerTests {
 
         Rutina rutina;
         String recurrencia;
-        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2021, 7, 1, 0, 0);
-        LinkedList<LocalDateTime> expectedDates = new LinkedList<>();
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021, 7, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        LinkedList<OffsetDateTime> expectedDates = new LinkedList<>();
         RutinaRepeticionesResponse obtainedRoutine;
-        List<LocalDateTime> obtainedDates;
+        List<OffsetDateTime> obtainedDates;
 
         ResultActions resultActions;
         MvcResult mvcResult;
@@ -431,11 +432,11 @@ class RutinaControllerTests {
 
         //RECURRENCIA DIARIA
         recurrencia = "D1";
-        fechaInicio = LocalDateTime.of(2021, 6, 25, 16, 0);
+        fechaInicio = OffsetDateTime.of(2021, 6, 25, 16, 0, 0, 0, ZoneOffset.UTC);
         rutina = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 25; day <= 30; day++){
-            expectedDates.add(LocalDateTime.of(2021, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2021, 6, day, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -453,7 +454,7 @@ class RutinaControllerTests {
         obtainedDates = obtainedRoutine.getFuturas();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -462,11 +463,11 @@ class RutinaControllerTests {
 
         //RECURRENCIA SEMANAL
         recurrencia = "S1";
-        fechaInicio = LocalDateTime.of(2021, 6, 2, 16, 0);
+        fechaInicio = OffsetDateTime.of(2021, 6, 2, 16, 0, 0, 0, ZoneOffset.UTC);
         rutina = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 2; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2021, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2021, 6, day, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -484,7 +485,7 @@ class RutinaControllerTests {
         obtainedDates = obtainedRoutine.getFuturas();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -493,11 +494,11 @@ class RutinaControllerTests {
 
         //RECURRENCIA MENSUAL
         recurrencia = "M1";
-        fechaInicio = LocalDateTime.of(2021, 1, 28, 16, 0);
+        fechaInicio = OffsetDateTime.of(2021, 1, 28, 16, 0, 0, 0, ZoneOffset.UTC);
         rutina = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         for(int month = 1; month <= 6; month++){
-            expectedDates.add(LocalDateTime.of(2021, month, 28, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2021, month, 28, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -515,7 +516,7 @@ class RutinaControllerTests {
         obtainedDates = obtainedRoutine.getFuturas();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -524,11 +525,11 @@ class RutinaControllerTests {
 
         //RECURRENCIA ANUAL
         recurrencia = "A1";
-        fechaInicio = LocalDateTime.of(2021, 6, 30, 16, 0);
+        fechaInicio = OffsetDateTime.of(2021, 6, 30, 16, 0, 0, 0, ZoneOffset.UTC);
         rutina = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         for(int year = 2021; year <= 2021; year++){
-            expectedDates.add(LocalDateTime.of(year, 6, 30, 16, 0));
+            expectedDates.add(OffsetDateTime.of(year, 6, 30, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -546,7 +547,7 @@ class RutinaControllerTests {
         obtainedDates = obtainedRoutine.getFuturas();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -555,15 +556,15 @@ class RutinaControllerTests {
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA SEMANA
         recurrencia = "E5.S1";
-        fechaInicio = LocalDateTime.of(2021, 6, 7, 16, 0);
+        fechaInicio = OffsetDateTime.of(2021, 6, 7, 16, 0, 0, 0, ZoneOffset.UTC);
         rutina = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 7; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2021, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2021, 6, day, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         for(int day = 9; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2021, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2021, 6, day, 16, 0, 0, 0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -581,7 +582,7 @@ class RutinaControllerTests {
         obtainedDates = obtainedRoutine.getFuturas();
 
         assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -1004,7 +1005,7 @@ class RutinaControllerTests {
         mvcResult = resultActions.andReturn();
         response = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("{\"message\":\"Error: rutina no encontrada\"}", response );
+        assertEquals("{\"message\":\"Rutina no encontrada\"}", response );
 
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
