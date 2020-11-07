@@ -357,7 +357,6 @@ public class TareaController {
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
         Tarea subtask = optionalTarea.get();
         Tarea parent;
         if (subtask.getNivel() == 2) {
@@ -365,6 +364,7 @@ public class TareaController {
         } else {
             parent = subtask.getPadre().getPadre();
         }
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
             LOGGER.info(TAR_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));

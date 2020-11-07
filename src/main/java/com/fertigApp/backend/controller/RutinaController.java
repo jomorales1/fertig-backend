@@ -189,15 +189,15 @@ public class RutinaController {
 
     @PostMapping(path = "/routines/addSubtask/{id}")
     public ResponseEntity<MessageResponse> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
@@ -227,8 +227,6 @@ public class RutinaController {
             LOGGER.info(TAR_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
         Tarea subtask = optionalTarea.get();
         Rutina rutina;
         if (subtask.getNivel() == 2) {
@@ -236,6 +234,8 @@ public class RutinaController {
         } else {
             rutina = subtask.getPadre().getRutinaT();
         }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
@@ -243,8 +243,8 @@ public class RutinaController {
         subtask.setNombre(requestTarea.getNombre());
         subtask.setDescripcion(requestTarea.getDescripcion());
         subtask.setPrioridad(requestTarea.getPrioridad());
-        subtask.setEtiqueta(requestTarea.getEtiqueta());
         subtask.setEstimacion(requestTarea.getEstimacion());
+        subtask.setEtiqueta(requestTarea.getEtiqueta());
         subtask.setFechaFin(requestTarea.getFechaFin());
         subtask.setHecha(requestTarea.getHecha());
         subtask.setRecordatorio(requestTarea.getRecordatorio());
@@ -255,21 +255,21 @@ public class RutinaController {
 
     @PutMapping(path = "/routines/checkSubtask/{id}")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
             LOGGER.info(TAR_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
-        Tarea subtask = optionalTarea.get();
         Rutina rutina;
+        Tarea subtask = optionalTarea.get();
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         if (subtask.getNivel() == 2) {
             rutina = subtask.getRutinaT();
         } else {
             rutina = subtask.getPadre().getRutinaT();
         }
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
@@ -387,15 +387,15 @@ public class RutinaController {
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.
     @DeleteMapping(path="/routines/deleteRoutine/{id}")
     public ResponseEntity<MessageResponse> deleteRutina(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info(RUT_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
         }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
         if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
