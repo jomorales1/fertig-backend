@@ -1,6 +1,5 @@
 package com.fertigApp.backend.services;
 
-import com.fertigApp.backend.model.IdPreferido;
 import com.fertigApp.backend.model.Preferido;
 import com.fertigApp.backend.model.Sonido;
 import com.fertigApp.backend.model.Usuario;

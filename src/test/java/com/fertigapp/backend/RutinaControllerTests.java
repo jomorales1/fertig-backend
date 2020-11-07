@@ -29,8 +29,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,8 +89,8 @@ class RutinaControllerTests {
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
         routine.setDuracion(90);
-        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        routine.setFechaFin(OffsetDateTime.now().plusWeeks(2));
         routine.setRecurrencia("D2");
         routine.setRecordatorio(60);
 
@@ -116,8 +117,8 @@ class RutinaControllerTests {
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
         routine.setDuracion(45);
-        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        routine.setFechaFin(OffsetDateTime.now().plusWeeks(2));
         routine.setRecurrencia(recurrencia);
         routine.setRecordatorio(60);
 
@@ -135,7 +136,7 @@ class RutinaControllerTests {
         return saved;
     }
 
-    Rutina setUpRutina(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+    Rutina setUpRutina(Usuario user, String recurrencia, OffsetDateTime fechaInicio, OffsetDateTime fechaFin) {
         Rutina routine = new Rutina();
 
         routine.setUsuario(user);
@@ -163,7 +164,7 @@ class RutinaControllerTests {
         return saved;
     }
 
-    Rutina setUpRutina(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin, LocalTime franjaI, LocalTime franjaF) {
+    Rutina setUpRutina(Usuario user, String recurrencia, OffsetDateTime fechaInicio, OffsetDateTime fechaFin, LocalTime franjaI, LocalTime franjaF) {
         Rutina routine = new Rutina();
 
         routine.setUsuario(user);
@@ -258,7 +259,7 @@ class RutinaControllerTests {
 
         Rutina routine;
         String recurrencia;
-        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2021,1,31,12,0);
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
         LocalTime franjaIncio = LocalTime.of(7,0);
         LocalTime franjaFin  = LocalTime.of(13,0);
         RecurrenteResponse obtainedRoutine;
@@ -273,7 +274,7 @@ class RutinaControllerTests {
         //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
 
         recurrencia = "H13";
-        fechaInicio = LocalDateTime.of(2021,1,1,14,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,14,0,0,0, ZoneOffset.UTC);
         routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin, franjaIncio, franjaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -287,14 +288,14 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,4,7,0));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,4,7,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
         //RECURRENCIA DIARIA
         recurrencia = "D2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -308,14 +309,14 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
         //RECURRENCIA SEMANAL
         recurrencia = "S2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -329,14 +330,14 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
         //RECURRENCIA MENSUAL
         recurrencia = "M1";
-        fechaInicio = LocalDateTime.of(2020,12,1,12,0);
+        fechaInicio = OffsetDateTime.of(2020,12,1,12,0,0,0, ZoneOffset.UTC);
         routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -350,14 +351,14 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2020,12,1,12,0));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2020,12,1,12,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA 2 SEMANAS
         recurrencia = "E5.S2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -371,7 +372,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), LocalDateTime.of(2021,1,11,12,0));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
@@ -498,8 +499,8 @@ class RutinaControllerTests {
         requestRutina.setPrioridad(2);
         requestRutina.setEtiqueta("test_routine_tag");
         requestRutina.setDuracion(90);
-        requestRutina.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        requestRutina.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        requestRutina.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        requestRutina.setFechaFin(OffsetDateTime.now().plusWeeks(2));
         requestRutina.setRecurrencia("D2");
         requestRutina.setRecordatorio(60);
         requestRutina.setCompletadas(new ArrayList<>());
@@ -559,8 +560,8 @@ class RutinaControllerTests {
         routine.setPrioridad(2);
         routine.setEtiqueta("test_routine_tag");
         routine.setDuracion(90);
-        routine.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        routine.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        routine.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        routine.setFechaFin(OffsetDateTime.now().plusWeeks(2));
         routine.setRecurrencia("D2");
         routine.setRecordatorio(60);
         routine = this.rutinaService.save(routine);

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,11 +36,11 @@ public class Rutina implements Serializable {
 
     protected int duracion;
 
-    @Column(name="fecha_inicio",columnDefinition="TIMESTAMP")
-    protected LocalDateTime fechaInicio;
+    @Column(name="fecha_inicio",columnDefinition="DATETIME")
+    protected OffsetDateTime fechaInicio;
 
-    @Column(name="fecha_fin",columnDefinition="TIMESTAMP")
-    protected LocalDateTime fechaFin;
+    @Column(name="fecha_fin",columnDefinition="DATETIME")
+    protected OffsetDateTime fechaFin;
 
     protected String recurrencia;
 
@@ -125,19 +125,19 @@ public class Rutina implements Serializable {
         this.duracion = duracion;
     }
 
-    public LocalDateTime getFechaInicio() {
+    public OffsetDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(LocalDateTime fechaInicio) {
+    public void setFechaInicio(OffsetDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDateTime getFechaFin() {
+    public OffsetDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDateTime fechaFin) {
+    public void setFechaFin(OffsetDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

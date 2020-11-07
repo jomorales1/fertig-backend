@@ -79,7 +79,6 @@ public class EventoController {
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
     @GetMapping(path="/events/getEvent/{id}")
     public ResponseEntity<Evento> getEvento(@PathVariable Integer id) {
-        //1s;2s;l,x;1m;1a;2h;2s l,x;l-v;1m 15-20;
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Evento> optionalEvento = this.eventoService.findById(id);
         if (optionalEvento.isEmpty()) {

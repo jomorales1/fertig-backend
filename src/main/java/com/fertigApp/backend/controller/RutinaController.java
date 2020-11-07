@@ -22,7 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,7 +104,7 @@ public class RutinaController {
         List<RutinaRepeticionesResponse> response = new LinkedList<>();
         for(Rutina rutina : rutinas){
             response.add(new RutinaRepeticionesResponse(rutina,
-                    (List<LocalDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
+                    (List<OffsetDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
                     completadaService.findMaxAjustadaCompletadasByRutina(rutina)));
         }
         return ResponseEntity.ok().body(response);
@@ -348,7 +348,7 @@ public class RutinaController {
         ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
         Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
         if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
-        LocalDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
+        OffsetDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
                 rutina.getFechaFin(),
                 rutina.getRecurrencia(),
                 rutina.getDuracion(),

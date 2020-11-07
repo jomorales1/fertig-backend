@@ -5,8 +5,8 @@ import com.fertigApp.backend.model.Rutina;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,8 +17,8 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     protected String recurrencia;
     protected LocalTime franjaInicio;
     protected LocalTime franjaFin;
-    protected LocalDateTime fechaInicio;
-    protected LocalDateTime fechaFin;
+    protected OffsetDateTime fechaInicio;
+    protected OffsetDateTime fechaFin;
     protected int id;
     protected String nombre;
     protected String descripcion;
@@ -60,15 +60,15 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     }
 
-    public static List<LocalDateTime> findFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia){
-        LinkedList<LocalDateTime> fechas = new LinkedList<>();
+    public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia){
+        LinkedList<OffsetDateTime> fechas = new LinkedList<>();
         Character c = recurrencia.charAt(0);
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".");
             int dias = Integer.parseInt(recurrencia.substring(1, punto));
             for(long i = 1; i<8;  i++) {
                 if((dias & 1) == 1){
-                    LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+                    OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
                     fechaI = fechaI.plusDays(i - fechaI.getDayOfWeek().getValue());
                     fechas.addAll(findFechas(fechaI,fechaFin,recurrencia.substring(punto+1)));
                 }
@@ -76,19 +76,19 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             }
         } else{
             int n = Integer.parseInt(recurrencia.substring(1));
-            for(LocalDateTime current = LocalDateTime.from(fechaInicio); current.isBefore(fechaFin); current = add(current,n,c)) {
+            for(OffsetDateTime current = OffsetDateTime.from(fechaInicio); current.isBefore(fechaFin); current = add(current,n,c)) {
                 fechas.add(current);
             }
         }
         return fechas;
     }
 
-    public static List<LocalDateTime> findFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin){
-        LinkedList<LocalDateTime> fechas = new LinkedList<>();
+    public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin){
+        LinkedList<OffsetDateTime> fechas = new LinkedList<>();
         if(recurrencia.charAt(0) == 'H'){
-            LocalDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio);
-            LocalDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaFin);
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            OffsetDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
+            OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaFin).atOffset(fechaInicio.getOffset());
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fechaFin)) {
@@ -105,22 +105,20 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         return fechas;
     }
 
-    protected static LocalDateTime add(LocalDateTime fecha, int n, Character t){
-        LocalDateTime fechaFinal = LocalDateTime.from(fecha);
+    protected static OffsetDateTime add(OffsetDateTime fecha, int n, Character t){
+        OffsetDateTime fechaFinal;
         switch (t) {
             case 'A' : fechaFinal = fecha.plusYears(n); break;
             case 'M' : fechaFinal = fecha.plusMonths(n); break;
             case 'S' : fechaFinal = fecha.plusWeeks(n); break;
             case 'D' : fechaFinal = fecha.plusDays(n); break;
-            case 'H' : fechaFinal = fecha.plusHours(n); break;
-            default: fechaFinal = fecha.plusHours(0); break;
+            default : fechaFinal = fecha.plusHours(n); break;
         }
         return fechaFinal;
     }
 
-    public static LocalDateTime findSiguiente(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia) {
-        LocalDateTime fecha = LocalDateTime.now();
-        int periodo = 0;
+    public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia) {
+        OffsetDateTime fecha = OffsetDateTime.now();
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
@@ -129,13 +127,13 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 dia = (dia+1)%7;
                 fecha = fecha.plusDays(1);
             }
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             while (fechaI.isBefore(fecha) || fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             if (fechaI.isAfter(fecha)) return fechaI;
             return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto));
         } else {
-            LocalDateTime fechaI = fechaInicio;
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha)){
                 fechaI = add(fechaI,d,recurrencia.charAt(0));
@@ -144,18 +142,18 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         }
     }
 
-    public static LocalDateTime findSiguiente(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
+    public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
         if(recurrencia.charAt(0) == 'H'){
-            LocalDateTime fecha = LocalDateTime.now();
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
-            LocalDateTime franjaI;
-            LocalDateTime franjaF;
+            OffsetDateTime fecha = OffsetDateTime.now();
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
+            OffsetDateTime franjaI;
+            OffsetDateTime franjaF;
             if(fecha.compareTo(fechaInicio) < 0){
-                franjaI = fechaInicio.toLocalDate().atTime(franjaInicio);
-                franjaF = fechaInicio.toLocalDate().atTime(franjaFin);
+                franjaI = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
+                franjaF = fechaInicio.toLocalDate().atTime(franjaFin).atOffset(fechaInicio.getOffset());
             } else {
-                franjaI = LocalDate.now().atTime(franjaInicio);
-                franjaF = LocalDate.now().atTime(franjaInicio);
+                franjaI = LocalDate.now().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
+                franjaF = LocalDate.now().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
             }
             if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
@@ -172,9 +170,8 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         }
     }
 
-    public static LocalDateTime findAnterior(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia) {
-        LocalDateTime fecha = LocalDateTime.now();
-        int periodo = 0;
+    public static OffsetDateTime findAnterior(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia) {
+        OffsetDateTime fecha = OffsetDateTime.now();
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
@@ -186,17 +183,17 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 dia = (dia+6)%7;
                 fecha = fecha.minusDays(1);
             }
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             fechaI = fechaI.plusDays((long) fecha.getDayOfWeek().getValue()-fechaI.getDayOfWeek().getValue());
             if(fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(1);
             while (fechaI.isBefore(fecha)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
-            fecha = LocalDateTime.now();
+            fecha = OffsetDateTime.now();
             if(!fechaI.isBefore(fecha)) fechaI = fechaI.minusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
             if (fechaI.isBefore(fecha) && fechaI.isAfter(fechaInicio)) return fechaI;
             else if(fecha.isAfter(fechaInicio)) return fechaInicio;
             return null;
         } else {
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
 
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha)){
@@ -209,12 +206,12 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         }
     }
 
-    public static LocalDateTime findAnterior(LocalDateTime fechaInicio, LocalDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
+    public static OffsetDateTime findAnterior(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
         if(recurrencia.charAt(0) == 'H'){
-            LocalDateTime fecha = LocalDateTime.now();
-            LocalDateTime fechaI = LocalDateTime.from(fechaInicio);
-            LocalDateTime franjaI = LocalDate.now().atTime(franjaInicio);
-            LocalDateTime franjaF = LocalDate.now().atTime(franjaFin);
+            OffsetDateTime fecha = OffsetDateTime.now();
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
+            OffsetDateTime franjaI = LocalDate.now().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
+            OffsetDateTime franjaF = LocalDate.now().atTime(franjaFin).atOffset(fechaInicio.getOffset());
             if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
@@ -365,19 +362,19 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.franjaFin = franjaFin;
     }
 
-    public LocalDateTime getFechaInicio() {
+    public OffsetDateTime getFechaInicio() {
         return fechaInicio;
     }
 
-    public void setFechaInicio(LocalDateTime fechaInicio) {
+    public void setFechaInicio(OffsetDateTime fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
 
-    public LocalDateTime getFechaFin() {
+    public OffsetDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDateTime fechaFin) {
+    public void setFechaFin(OffsetDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

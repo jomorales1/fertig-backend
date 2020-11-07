@@ -24,8 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -102,13 +103,13 @@ class EventoControllerTests {
         evento.setDuracion(1);
         evento.setRecurrencia("D2");
         evento.setRecordatorio(1);
-        evento.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        evento.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        evento.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        evento.setFechaFin(OffsetDateTime.now().plusWeeks(2));
 
         return this.eventoService.save(evento);
     }
 
-    Evento setUpEvento(Usuario user, String recurrencia, LocalDateTime fechaInicio, LocalDateTime fechaFin){
+    Evento setUpEvento(Usuario user, String recurrencia, OffsetDateTime fechaInicio, OffsetDateTime fechaFin){
         if (usuarioService.findById(user.getUsuario()).isEmpty()) {
             this.usuarioService.save(user);
         }
@@ -167,7 +168,7 @@ class EventoControllerTests {
 
         Evento event;
         String recurrencia;
-        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2021,1,31,12,0);
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
         LocalTime franjaIncio = LocalTime.of(7,0);
         LocalTime franjaFin  = LocalTime.of(13,0);
         RecurrenteResponse obtainedEvent;
@@ -181,7 +182,7 @@ class EventoControllerTests {
 
         //RECURRENCIA CADA 12 HORAS
         recurrencia = "H12";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -195,13 +196,13 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA DIARIA
         recurrencia = "D2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -215,13 +216,13 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA CADA 2 SEMANAS
         recurrencia = "S2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -235,13 +236,13 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA MENSUAL
         recurrencia = "S2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -255,13 +256,13 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,1,12,0));
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA DOS SEMANAS
         recurrencia = "E5.S2";
-        fechaInicio = LocalDateTime.of(2021,1,1,12,0);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -275,7 +276,7 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), LocalDateTime.of(2021,1,11,12,0));
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
         this.eventoService.deleteById(event.getId());
 
@@ -290,10 +291,10 @@ class EventoControllerTests {
 
         Evento event;
         String recurrencia;
-        LocalDateTime fechaInicio, fechaFin = LocalDateTime.of(2020, 7, 1, 0, 0);
-        LinkedList<LocalDateTime> expectedDates = new LinkedList<>();
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2020, 7, 1, 0, 0,0,0, ZoneOffset.UTC);
+        LinkedList<OffsetDateTime> expectedDates = new LinkedList<>();
         EventoRepeticionesResponse obtainedEvent;
-        List<LocalDateTime> obtainedDates;
+        List<OffsetDateTime> obtainedDates;
 
         ResultActions resultActions;
         MvcResult mvcResult;
@@ -304,11 +305,11 @@ class EventoControllerTests {
 
         //RECURRENCIA DIARIA
         recurrencia = "D1";
-        fechaInicio = LocalDateTime.of(2020, 6, 25, 16, 0);
+        fechaInicio = OffsetDateTime.of(2020, 6, 25, 16, 0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 25; day <= 30; day++){
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -325,8 +326,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        assertEquals(expectedDates.size(), obtainedDates.size());
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -334,11 +335,11 @@ class EventoControllerTests {
 
         //RECURRENCIA SEMANAL
         recurrencia = "S1";
-        fechaInicio = LocalDateTime.of(2020, 6, 2, 16, 0);
+        fechaInicio = OffsetDateTime.of(2020, 6, 2, 16, 0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 2; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -355,8 +356,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        assertEquals(expectedDates.size(), obtainedDates.size());
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -364,11 +365,11 @@ class EventoControllerTests {
 
         //RECURRENCIA MENSUAL
         recurrencia = "M1";
-        fechaInicio = LocalDateTime.of(2020, 1, 28, 16, 0);
+        fechaInicio = OffsetDateTime.of(2020, 1, 28, 16, 0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int month = 1; month <= 6; month++){
-            expectedDates.add(LocalDateTime.of(2020, month, 28, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2020, month, 28, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -385,8 +386,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        assertEquals(expectedDates.size(), obtainedDates.size());
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -394,11 +395,11 @@ class EventoControllerTests {
 
         //RECURRENCIA ANUAL
         recurrencia = "A1";
-        fechaInicio = LocalDateTime.of(2016, 6, 30, 16, 0);
+        fechaInicio = OffsetDateTime.of(2016, 6, 30, 16, 0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int year = 2016; year <= 2020; year++){
-            expectedDates.add(LocalDateTime.of(year, 6, 30, 16, 0));
+            expectedDates.add(OffsetDateTime.of(year, 6, 30, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -415,8 +416,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        assertEquals(expectedDates.size(), obtainedDates.size());
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -424,15 +425,15 @@ class EventoControllerTests {
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA SEMANA
         recurrencia = "E5.S1";
-        fechaInicio = LocalDateTime.of(2020, 6, 1, 16, 0);
+        fechaInicio = OffsetDateTime.of(2020, 6, 1, 16, 0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         for(int day = 1; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         for(int day = 3; day <= 30; day+=7){
-            expectedDates.add(LocalDateTime.of(2020, 6, day, 16, 0));
+            expectedDates.add(OffsetDateTime.of(2020, 6, day, 16, 0,0,0, ZoneOffset.UTC));
         }
 
         // Valid request -> status 200 expected
@@ -449,8 +450,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
-        for(LocalDateTime date : expectedDates){
+        assertEquals(expectedDates.size(), obtainedDates.size());
+        for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
@@ -572,8 +573,8 @@ class EventoControllerTests {
         requestEvento.setDuracion(1);
         requestEvento.setRecurrencia("D2");
         requestEvento.setRecordatorio(1);
-        requestEvento.setFechaInicio(LocalDateTime.now().minusWeeks(3));
-        requestEvento.setFechaFin(LocalDateTime.now().plusWeeks(2));
+        requestEvento.setFechaInicio(OffsetDateTime.now().minusWeeks(3));
+        requestEvento.setFechaFin(OffsetDateTime.now().plusWeeks(2));
 
         this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestEvento)))

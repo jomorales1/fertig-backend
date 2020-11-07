@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -27,7 +27,6 @@ public class Tarea implements Serializable {
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_padre")
-    //@Column(name = "id_padre")
     private Tarea padre;
 
     @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -47,8 +46,8 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     protected Integer tiempoInvertido;
 
-    @Column(name="fecha_fin", columnDefinition="TIMESTAMP")
-    protected LocalDateTime fechaFin;
+    @Column(name="fecha_fin", columnDefinition="DATETIME")
+    protected OffsetDateTime fechaFin;
 
     private int nivel;
 
@@ -121,11 +120,11 @@ public class Tarea implements Serializable {
         this.estimacion = estimacion;
     }
 
-    public LocalDateTime getFechaFin() {
+    public OffsetDateTime getFechaFin() {
         return fechaFin;
     }
 
-    public void setFechaFin(LocalDateTime fechaFin) {
+    public void setFechaFin(OffsetDateTime fechaFin) {
         this.fechaFin = fechaFin;
     }
 

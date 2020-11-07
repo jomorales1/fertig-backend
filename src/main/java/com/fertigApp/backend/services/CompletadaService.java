@@ -5,7 +5,7 @@ import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @Service
@@ -33,15 +33,15 @@ public class CompletadaService {
         this.completadaRepository.deleteAllByRutinaC(rutina);
     }
 
-    public Iterable<LocalDateTime> findFechasCompletadasByRutina(Rutina rutina){
+    public Iterable<OffsetDateTime> findFechasCompletadasByRutina(Rutina rutina){
         return this.completadaRepository.findFechasCompletadasByRutina(rutina);
     }
 
-    public LocalDateTime findMaxAjustadaCompletadasByRutina(Rutina rutina){
+    public OffsetDateTime findMaxAjustadaCompletadasByRutina(Rutina rutina){
         return this.completadaRepository.findMaxAjustadaCompletadasByRutina(rutina);
     }
 
-    public LocalDateTime findFechaNoCompletadaByRutina(Rutina rutina){
+    public OffsetDateTime findFechaNoCompletadaByRutina(Rutina rutina){
         return this.completadaRepository.findFechaNoCompletadaByRutina(rutina);
     }
 

@@ -987,7 +987,7 @@ class TareaControllerTests {
                 .andExpect(status().isOk());
 
         task = this.tareaService.findById(task.getId()).get();
-        assertEquals(task.getTiempoInvertido(), 10);
+        assertEquals(10, task.getTiempoInvertido());
 
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
