@@ -85,10 +85,6 @@ public class EventoController {
 
         Optional<Evento> optEvento = this.eventoService.findById(id);
         if (optEvento.isPresent()){
-            if (!optEvento.get().getUsuario().getUsuario().equals(user)) {
-                LOGGER.info("Wrong user");
-                return null;
-            }
             return optEvento.get();
         }
         LOGGER.info("Event not found");

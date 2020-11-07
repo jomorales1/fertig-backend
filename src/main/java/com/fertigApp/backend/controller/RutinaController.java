@@ -119,10 +119,6 @@ public class RutinaController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Rutina rutina = this.rutinaService.findById(id).get();
-        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info("La rutina no pertenece al usuario");
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(rutina);
     }
 

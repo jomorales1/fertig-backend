@@ -71,10 +71,6 @@ public class TareaController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Tarea tarea = this.tareaService.findById(id).get();
-        if (!this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isPresent()) {
-            LOGGER.info("La tarea no pertenece al usuario");
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(tarea);
     }
 
