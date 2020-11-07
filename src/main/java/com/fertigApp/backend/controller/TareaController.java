@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -67,26 +65,18 @@ public class TareaController {
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
     @GetMapping(path="/tasks/getTask/{id}")
     public ResponseEntity<Tarea> getTarea(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
             LOGGER.info(TAR_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(null);
         }
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
         Tarea tarea = optionalTarea.get();
-        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea).isEmpty()) {
-            LOGGER.info(TAR_NO_PERTENECE);
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(tarea);
     }
 
     @PutMapping(path="/tasks/updateTask/{id}")
     public ResponseEntity<Tarea> replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -138,7 +128,6 @@ public class TareaController {
     @PostMapping(path="/tasks/addTask")
     public @ResponseBody ResponseEntity<MessageResponse> addNewTarea(@RequestBody RequestTarea requestTarea) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);

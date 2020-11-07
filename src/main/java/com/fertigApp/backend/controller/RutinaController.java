@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -113,19 +112,12 @@ public class RutinaController {
     // Método GET para obtener una rutina específica por medio de su ID.
     @GetMapping(path="/routines/getRoutine/{id}")
     public ResponseEntity<Rutina> getRutina(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
             LOGGER.info("La rutina no existe");
             return ResponseEntity.badRequest().body(null);
         }
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(new Usuario());
         Rutina rutina = optionalRutina.get();
-        if (!rutina.getUsuario().getUsuario().equals(usuario.getUsuario())) {
-            LOGGER.info(RUT_NO_PERTENECE);
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(rutina);
     }
 
@@ -133,7 +125,6 @@ public class RutinaController {
     @PutMapping(path="/routines/updateRoutine/{id}")
     public ResponseEntity<Rutina> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
@@ -168,9 +159,7 @@ public class RutinaController {
     public @ResponseBody ResponseEntity<MessageResponse> addNewRutina(@RequestBody RequestRutina requestRutina) {
         Rutina rutina = new Rutina();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
-
         Optional<Usuario> optUsuario =usuarioService.findById(userDetails.getUsername());
         rutina.setUsuario(optUsuario.orElse(null));
         rutina.setNombre(requestRutina.getNombre());
@@ -331,7 +320,6 @@ public class RutinaController {
     @PatchMapping(path="/routines/checkRoutine/{id}")
     public ResponseEntity<MessageResponse> checkRoutine(@PathVariable Integer id){
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
@@ -376,7 +364,6 @@ public class RutinaController {
     @PatchMapping(path="/routines/uncheckRoutine/{id}")
     public ResponseEntity<MessageResponse> uncheckRoutine(@PathVariable Integer id){
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
 
         Optional<Rutina> optionalRutina = rutinaService.findById(id);

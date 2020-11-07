@@ -79,18 +79,12 @@ public class EventoController {
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
     @GetMapping(path="/events/getEvent/{id}")
     public ResponseEntity<Evento> getEvento(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Evento> optionalEvento = this.eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
             LOGGER.info(EV_NO_ENCONTRADO);
             return ResponseEntity.badRequest().body(null);
         }
         Evento evento = optionalEvento.get();
-        String username = userDetails.getUsername();
-        if (!evento.getUsuario().getUsuario().equals(username)) {
-            LOGGER.info(EV_NO_PERTENECE);
-            return ResponseEntity.badRequest().body(null);
-        }
         return ResponseEntity.ok(evento);
     }
 
@@ -98,7 +92,6 @@ public class EventoController {
     @PutMapping(path="/events/updateEvent/{id}")
     public ResponseEntity<Evento> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
         UserDetails userDetails = (UserDetails) principal;
         Optional<Evento> optionalEvento = eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
