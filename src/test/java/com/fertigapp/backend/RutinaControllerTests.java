@@ -406,22 +406,8 @@ class RutinaControllerTests {
         this.mockMvc.perform(get(uri + "/" + (rutina.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        Usuario newUser = new Usuario();
-        newUser.setUsuario("newUser");
-        newUser.setCorreo("new_user@test.com");
-        newUser.setNombre("New User");
-        newUser.setPassword(passwordEncoder.encode("testing"));
-        this.usuarioService.save(newUser);
-        Rutina newRutina = setUpRutina(newUser);
-
-        this.mockMvc.perform(get(uri + "/" + newRutina.getId()).header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadRequest());
-
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
-        this.completadaService.deleteAllByRutina(newRutina);
-        this.rutinaService.deleteById(newRutina.getId());
-        this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 

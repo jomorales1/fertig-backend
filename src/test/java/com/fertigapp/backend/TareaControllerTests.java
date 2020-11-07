@@ -185,39 +185,8 @@ class TareaControllerTests {
         this.mockMvc.perform(get(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        Usuario usuario = new Usuario();
-        usuario.setUsuario("usuario");
-        usuario.setCorreo("correo@test.com");
-        usuario.setNombre("Usuario de prueba");
-        usuario.setPassword(passwordEncoder.encode("testing"));
-        this.usuarioService.save(usuario);
-
-        Tarea tarea = new Tarea();
-        tarea.setNombre("Test Task");
-        tarea.setDescripcion("Test description");
-        tarea.setPrioridad(1);
-        tarea.setEtiqueta("Test label");
-        tarea.setEstimacion(4);
-        tarea.setNivel(2);
-        tarea.setHecha(false);
-        tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
-        tarea = this.tareaService.save(tarea);
-
-        TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
-        tareaDeUsuario.setUsuario(usuario);
-        tareaDeUsuario.setTarea(tarea);
-        tareaDeUsuario.setAdmin(true);
-        this.tareaDeUsuarioService.save(tareaDeUsuario);
-
-        this.mockMvc.perform(get(uri + tarea.getId()).header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadRequest());
-
-        this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(tarea.getId());
         this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
