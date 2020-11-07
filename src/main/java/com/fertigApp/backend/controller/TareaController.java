@@ -322,6 +322,32 @@ public class TareaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea creada"));
     }
 
+    @PutMapping(path = "/tasks/checkSubtask/{id}")
+    public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
+        }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Tarea subtask = optionalTarea.get();
+        Tarea parent;
+        Usuario usuario = optionalUsuario.orElse(null);
+        if (subtask.getNivel() == 2) {
+            parent = subtask.getPadre();
+        } else {
+            parent = subtask.getPadre().getPadre();
+        }
+        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
+            LOGGER.info(TAR_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
+        }
+        subtask.setHecha(!subtask.getHecha());
+        this.tareaService.save(subtask);
+        return ResponseEntity.ok(new MessageResponse("Subtarea chequeada"));
+    }
+
     @PutMapping(path = "/tasks/updateSubtask/{id}")
     public ResponseEntity<MessageResponse> updateSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -344,52 +370,26 @@ public class TareaController {
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
         }
         subtask.setNombre(requestTarea.getNombre());
-        subtask.setDescripcion(requestTarea.getDescripcion());
         subtask.setPrioridad(requestTarea.getPrioridad());
+        subtask.setDescripcion(requestTarea.getDescripcion());
+        subtask.setFechaFin(requestTarea.getFechaFin());
         subtask.setEtiqueta(requestTarea.getEtiqueta());
         subtask.setEstimacion(requestTarea.getEstimacion());
-        subtask.setFechaFin(requestTarea.getFechaFin());
+        subtask.setTiempoInvertido(requestTarea.getTiempoInvertido());
         subtask.setHecha(requestTarea.getHecha());
         subtask.setRecordatorio(requestTarea.getRecordatorio());
-        subtask.setTiempoInvertido(requestTarea.getTiempoInvertido());
         this.tareaService.save(subtask);
         return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
     }
 
-    @PutMapping(path = "/tasks/checkSubtask/{id}")
-    public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
-        if (optionalTarea.isEmpty()) {
-            LOGGER.info(TAR_NO_ENCONTRADA);
-            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
-        }
-        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Tarea subtask = optionalTarea.get();
-        Tarea parent;
-        if (subtask.getNivel() == 2) {
-            parent = subtask.getPadre();
-        } else {
-            parent = subtask.getPadre().getPadre();
-        }
-        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
-            LOGGER.info(TAR_NO_PERTENECE);
-            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
-        }
-        subtask.setHecha(!subtask.getHecha());
-        this.tareaService.save(subtask);
-        return ResponseEntity.ok(new MessageResponse("Subtarea chequeada"));
-    }
-
     @DeleteMapping(path = "/tasks/deleteSubtask/{id}")
     public ResponseEntity<MessageResponse> deleteSubtask(@PathVariable Integer id) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
             LOGGER.info(TAR_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(null);
         Tarea subtask = optionalTarea.get();
