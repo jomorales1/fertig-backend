@@ -20,10 +20,6 @@ public class TareaService {
         return tareaRepository.findAll();
     }
 
-    public Iterable<Tarea> findAllByPadre(Tarea tarea) {
-        return tareaRepository.findAllByPadre(tarea);
-    }
-
     public Optional<Tarea> findById(Integer id){
         return tareaRepository.findById(id);
     }
