@@ -7,6 +7,7 @@ import com.fertigApp.backend.model.Preferido;
 import com.fertigApp.backend.model.Sonido;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.SonidoResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestSonido;
 import com.fertigApp.backend.services.PreferidoService;
@@ -101,7 +102,7 @@ class SonidoControllerTests {
         Preferido preferido = new Preferido();
         preferido.setUsuario(usuario);
         preferido.setSonido(sonido);
-        this.preferidoService.add(preferido);
+        this.preferidoService.save(preferido);
         return sonido;
     }
 
@@ -111,32 +112,66 @@ class SonidoControllerTests {
     }
 
     @Test
-    void addSound() throws Exception {
-       String uri = "/sounds/addSound";
+    void getAllSounds() throws Exception {
+        String uri = "/sounds/getAllSounds";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
+        Sonido sonido = setUpSonido(user);
+        Sonido sonido1 = new Sonido();
+        sonido1.setId("testSound2");
+        this.sonidoService.save(sonido1);
 
-       RequestSonido requestSonido = new RequestSonido();
-       requestSonido.setIdSonido("testSound");
+        ResultActions resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        MvcResult mvcResult = resultActions.andReturn();
+        String response = mvcResult.getResponse().getContentAsString();
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, SonidoResponse.class);
+        List<SonidoResponse> sonidoResponses = objectMapper.readValue(response, javaList);
+        assertNotNull(sonidoResponses);
+        assertEquals(sonidoResponses.size(), 2);
 
-        this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
-                .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestSonido)))
-                .andExpect(status().isCreated());
-        List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
-        for(Sonido s: sonidos){
-            this.preferidoService.deleteAllByUsuarioAndSonido(user, s);
-            this.sonidoService.deleteById(s.getId());
+        for (SonidoResponse sonidoResponse : sonidoResponses) {
+            if (sonidoResponse.getSonido().equals(sonido.getId())) {
+                assertTrue(sonidoResponse.isFavorite());
+            } else {
+                assertFalse(sonidoResponse.isFavorite());
+            }
         }
-        this.usuarioService.deleteById(user.getUsuario());
 
+        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+        this.sonidoService.deleteById(sonido1.getId());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    void getAllSoundsByUser() throws Exception {
-        String uri = "/sounds/getSounds";
+    void addFavorite() throws Exception {
+        String uri = "/sounds/addFavorite/";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = createUser();
+        else user = this.usuarioService.findById("test_user").get();
+        String token = getToken(user);
+        Sonido sonido = new Sonido();
+        sonido.setId("testSound2");
+        this.sonidoService.save(sonido);
+
+        this.mockMvc.perform(post(uri + sonido.getId() + "a").header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri + sonido.getId()).header("Authorization", "Bearer " + token))
+                .andExpect(status().isCreated());
+
+        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+        this.sonidoService.deleteById(sonido.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
+    void getAllFavoritesByUser() throws Exception {
+        String uri = "/sounds/getFavorites";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -154,12 +189,13 @@ class SonidoControllerTests {
         assertEquals(sonidos.get(0).getId(), sonido.getId());
 
         this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+        this.sonidoService.deleteById(sonido.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
-    void deleteSound() throws Exception {
-        String uri = "/sounds/deleteSound/";
+    void deleteFavorite() throws Exception {
+        String uri = "/sounds/deleteFavorite/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -173,27 +209,11 @@ class SonidoControllerTests {
         this.mockMvc.perform(delete(uri + sonido.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        Usuario usuario = new Usuario();
-        usuario.setUsuario("newUser");
-        usuario.setCorreo("new_user@test.com");
-        usuario.setNombre("New User");
-        usuario.setPassword(passwordEncoder.encode("testing"));
-        this.usuarioService.save(usuario);
-
-        Sonido sound = new Sonido();
-        sound.setId("testSound");
-        sound.addUsuario(usuario);
-        sound = this.sonidoService.save(sound);
-        Preferido preferido = new Preferido();
-        preferido.setUsuario(usuario);
-        preferido.setSonido(sound);
-
-        this.mockMvc.perform(delete(uri + sound.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri + sonido.getId() + "a").header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sound);
-        this.sonidoService.deleteById(sound.getId());
-        this.usuarioService.deleteById(usuario.getUsuario());
+        this.preferidoService.deleteAllByUsuarioAndSonido(user, sonido);
+        this.sonidoService.deleteById(sonido.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 

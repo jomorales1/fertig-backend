@@ -21,7 +21,7 @@ public class PreferidoService {
         return this.preferidoRepository.findById(id);
     }
 
-    public Preferido add(Preferido preferido){
+    public Preferido save(Preferido preferido){
         return  this.preferidoRepository.save(preferido);
     }
 
@@ -29,7 +29,7 @@ public class PreferidoService {
         this.preferidoRepository.deleteById(id);
     }
 
-    public Iterable<Preferido> getByUsuario(Usuario usuario){
+    public Iterable<Preferido> findByUsuario(Usuario usuario){
          return this.preferidoRepository.findPreferidoByUsuario(usuario);
     }
 

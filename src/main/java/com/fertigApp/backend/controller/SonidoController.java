@@ -3,6 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.Preferido;
 import com.fertigApp.backend.model.Sonido;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.SonidoResponse;
 import com.fertigApp.backend.requestModels.RequestSonido;
 import com.fertigApp.backend.services.PreferidoService;
 import com.fertigApp.backend.services.SonidoService;
@@ -33,37 +34,55 @@ public class SonidoController {
         this.preferidoService = preferidoService;
     }
 
-    @PostMapping(path = "/sounds/addSound")
-    public @ResponseBody ResponseEntity<Void> addSound(@RequestBody RequestSonido requestSonido){
+    @GetMapping(path = "/sounds/getAllSounds")
+    public ResponseEntity<List<SonidoResponse>> getAllSounds() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
+        List<SonidoResponse> sonidoResponses = new ArrayList<>();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        Sonido sonido = new Sonido();
-        sonido.setId(requestSonido.getIdSonido());
-        sonido.addUsuario(usuario);
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        for (Sonido sonido : sonidos) {
+            SonidoResponse sonidoResponse = new SonidoResponse();
+            sonidoResponse.setSonido(sonido.getId());
+            sonidoResponse.setFavorite(this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isPresent());
+            sonidoResponses.add(sonidoResponse);
+        }
+        return ResponseEntity.ok(sonidoResponses);
+    }
+
+    @PostMapping(path = "/sounds/addFavorite/{id}")
+    public @ResponseBody ResponseEntity<Void> addFavorite(@PathVariable String id){
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Sonido> optionalSonido = this.sonidoService.findById(id);
+        if (optionalSonido.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Sonido sonido = optionalSonido.get();
         Preferido preferido = new Preferido();
         preferido.setUsuario(usuario);
-        preferido.setSonido(this.sonidoService.save(sonido));
-        this.preferidoService.add(preferido);
+        preferido.setSonido(sonido);
+        this.preferidoService.save(preferido);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/sounds/getSounds")
-    public List<Sonido> getAllSoundsByUser() {
+    @GetMapping(path = "/sounds/getFavorites")
+    public ResponseEntity<List<Sonido>> getAllFavoritesByUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
-        Usuario usuario = optionalUsuario.orElse(null);
-        List<Preferido> preferidos = (List<Preferido>) this.preferidoService.getByUsuario(usuario);
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        List<Preferido> preferidos = (List<Preferido>) this.preferidoService.findByUsuario(usuario);
         List<Sonido> sonidos = new ArrayList<>();
         for (Preferido p: preferidos) {
             Optional<Sonido> optionalSonido = this.sonidoService.findById(p.getSonido().getId());
             sonidos.add(optionalSonido.orElse(new Sonido()));
         }
-        return sonidos;
+        return ResponseEntity.ok(sonidos);
     }
 
-    @DeleteMapping(path = "/sounds/deleteSound/{id}")
-    public ResponseEntity<Void> deleteSound(@PathVariable String id) {
+    @DeleteMapping(path = "/sounds/deleteFavorite/{id}")
+    public ResponseEntity<Void> deleteFavorite(@PathVariable String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Sonido> optionalSonido = this.sonidoService.findById(id);
         if (optionalSonido.isEmpty())
@@ -74,7 +93,6 @@ public class SonidoController {
         if (this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isEmpty())
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.preferidoService.deleteAllByUsuarioAndSonido(usuario, sonido);
-        this.sonidoService.deleteById(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
