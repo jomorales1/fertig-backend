@@ -10,7 +10,7 @@ public class  Preferido implements Serializable{
     private IdPreferido id = new IdPreferido();
 
     @ManyToOne
-    @MapsId("id_sonido")
+    @MapsId("idSonido")
     @JoinColumn(name = "id_sonido")
     private Sonido sonido;
 

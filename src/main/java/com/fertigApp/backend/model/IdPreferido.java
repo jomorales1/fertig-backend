@@ -9,24 +9,24 @@ import java.util.Objects;
 public class IdPreferido implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String id_sonido;
+    private String idSonido;
     private String usuario;
 
     public IdPreferido() {
 
     }
 
-    public IdPreferido(String id_sonido, String usuario) {
-        this.id_sonido = id_sonido;
+    public IdPreferido(String idSonido, String usuario) {
+        this.idSonido = idSonido;
         this.usuario = usuario;
     }
 
-    public String getId_sonido() {
-        return id_sonido;
+    public String getIdSonido() {
+        return idSonido;
     }
 
-    public void setId_sonido(String id_sonido) {
-        this.id_sonido = id_sonido;
+    public void setIdSonido(String id_sonido) {
+        this.idSonido = id_sonido;
     }
 
     public String getUsuario() {
@@ -42,7 +42,7 @@ public class IdPreferido implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((usuario == null) ? 0 : usuario.hashCode());
-        result = prime * result + ((id_sonido == null) ? 0 : id_sonido.hashCode());
+        result = prime * result + ((idSonido == null) ? 0 : idSonido.hashCode());
         return result;
     }
 
@@ -52,6 +52,6 @@ public class IdPreferido implements Serializable {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         IdPreferido other = (IdPreferido)obj;
-        return Objects.equals(getUsuario(), other.getUsuario()) && Objects.equals(getId_sonido(), other.getId_sonido());
+        return Objects.equals(getUsuario(), other.getUsuario()) && Objects.equals(getIdSonido(), other.getIdSonido());
     }
 }
