@@ -17,10 +17,6 @@ public class PreferidoService {
         this.preferidoRepository = preferidoRepository;
     }
 
-    public Iterable<Preferido> findAll(){
-        return this.preferidoRepository.findAll();
-    }
-
     public Optional<Preferido> findById(String id){
         return this.preferidoRepository.findById(id);
     }

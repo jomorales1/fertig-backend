@@ -17,10 +17,6 @@ public class CompletadaService {
         this.completadaRepository = completadaRepository;
     }
 
-    public Optional<Completada> findById(Integer id){
-        return completadaRepository.findById(id);
-    }
-
     public Completada save(Completada completada){
         return completadaRepository.save(completada);
     }
