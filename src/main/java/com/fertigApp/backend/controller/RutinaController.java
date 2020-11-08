@@ -335,7 +335,7 @@ public class RutinaController {
         }
         ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
         Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
-        if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
+        //if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
         OffsetDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
                 rutina.getFechaFin(),
                 rutina.getRecurrencia(),
@@ -368,7 +368,12 @@ public class RutinaController {
 
         Optional<Rutina> optionalRutina = rutinaService.findById(id);
         Optional<Usuario> optionalUsuario = usuarioService.findByUsuario(userDetails.getUsername());
-        if(optionalRutina.isPresent() && optionalUsuario.isPresent()){
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+
+        if(optionalRutina.isPresent()){
+            if(!optionalRutina.get().getUsuario().getUsuario().equals(usuario.getUsuario())){
+                return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
+            }
             ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
             if (!completadas.isEmpty()) completadaService.deleteById(completadas.get(0).getId());
             Completada completada = completadaService.findMaxCompletada(optionalRutina.get());

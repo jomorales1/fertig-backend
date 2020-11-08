@@ -983,6 +983,14 @@ class RutinaControllerTests {
     void checkRoutine() throws Exception {
         String uri = "/routines/checkRoutine/";
 
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("Juan");
+        usuario.setPassword(passwordEncoder.encode("12345"));
+        usuario.setNombre("Juan");
+        usuario.setCorreo("prueba@prueba.edu.co");
+        usuarioService.save(usuario);
+        Rutina rutinaUsuario = setUpRutina(usuario);
+
         Usuario user = setUpUsuario();
         String token = getToken(user);
         Rutina rutina = setUpRutina(user);
@@ -992,18 +1000,26 @@ class RutinaControllerTests {
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Invalid request -> status 400 expected
+        // Rutina no encontrada
         this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
+        // Invalid request -> status 400 expected
+        // Rutina no pertenece
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaUsuario.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
         this.completadaService.deleteAllByRutina(rutina);
+        this.completadaService.deleteAllByRutina(rutinaUsuario);
         this.rutinaService.deleteById(rutina.getId());
+        this.rutinaService.deleteById(rutinaUsuario.getId());
         this.usuarioService.deleteById(user.getUsuario());
+        this.usuarioService.deleteById(usuario.getUsuario());
     }
 
     @Test
     void uncheckRoutine() throws Exception {
         String uri = "/routines/uncheckRoutine/";
-
 
         Usuario usuario = new Usuario();
         usuario.setUsuario("Juan");
@@ -1011,10 +1027,11 @@ class RutinaControllerTests {
         usuario.setNombre("Juan");
         usuario.setCorreo("prueba@prueba.edu.co");
         usuarioService.save(usuario);
-        Rutina rutina2 = setUpRutina(usuario);
+        Rutina rutinaUsuario = setUpRutina(usuario);
 
         Usuario user = setUpUsuario();
         String token = getToken(user);
+        Rutina rutinaNDC = setUpRutina(user);
         Rutina rutina = setUpRutina(user);
 
         this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutina.getId()))
@@ -1025,18 +1042,26 @@ class RutinaControllerTests {
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Invalid request -> status 400 expected
+        // Rutina no existe
         this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         // Invalid request -> status 400 expected
-        this.mockMvc.perform(patch(uri + String.valueOf(rutina2.getId()))
+        // Rutina no pertenece al usuario
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaUsuario.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.completadaService.deleteAllByRutina(rutina2);
-        this.rutinaService.deleteById(rutina2.getId());
+        // Invalid request -> status 400 expected
+        // Rutina que no se puede deschekear
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaNDC.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
+        this.completadaService.deleteAllByRutina(rutinaUsuario);
+        this.rutinaService.deleteById(rutinaUsuario.getId());
         this.usuarioService.deleteById(usuario.getUsuario());
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.rutinaService.deleteById(rutinaNDC.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
