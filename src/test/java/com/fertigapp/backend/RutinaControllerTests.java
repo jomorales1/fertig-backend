@@ -411,6 +411,24 @@ class RutinaControllerTests {
     }
 
     @Test
+    void getAllCheckeadas() throws Exception {
+        String uri = "/routines/getCheckedRoutines";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+        String token = getToken(user);
+
+        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        this.completadaService.deleteAllByRutina(rutina);
+        this.rutinaService.deleteById(rutina.getId());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
+    @Test
     void getAllRutinasRepeticionesByUsuario() throws Exception {
         String uri = "/routines/getRoutinesAndRepetitions";
         Usuario user = setUpUsuario();

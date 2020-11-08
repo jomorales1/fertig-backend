@@ -82,16 +82,16 @@ public class RutinaController {
 
     @GetMapping(path="/routines/getCheckedRoutines")
     public ResponseEntity<List<RecurrenteResponse>> getAllCheckeadas(){
-            UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
-            Usuario usuario = optionalUsuario.orElse(new Usuario());
-            List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuario);
-            List<RecurrenteResponse> rutinaResponses = new ArrayList<>();
-            for(Rutina rutina : rutinas) {
-                RecurrenteResponse response = new RecurrenteResponse(rutina, completadaService.findMaxAjustadaCompletadasByRutina(rutina));
-                rutinaResponses.add(response);
-            }
-            return ResponseEntity.ok().body(rutinaResponses);
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuario);
+        List<RecurrenteResponse> rutinaResponses = new ArrayList<>();
+        for(Rutina rutina : rutinas) {
+            RecurrenteResponse response = new RecurrenteResponse(rutina, completadaService.findMaxAjustadaCompletadasByRutina(rutina));
+            rutinaResponses.add(response);
+        }
+        return ResponseEntity.ok().body(rutinaResponses);
     }
 
     @GetMapping(path="/routines/getRoutinesAndRepetitions")
