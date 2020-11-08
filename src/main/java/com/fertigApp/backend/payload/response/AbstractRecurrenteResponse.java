@@ -87,7 +87,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
         if(recurrencia.charAt(0) == 'H'){
             OffsetDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
-            OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaFin).atOffset(fechaInicio.getOffset());
+            OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));

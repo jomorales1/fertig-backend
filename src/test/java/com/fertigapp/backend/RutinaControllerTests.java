@@ -1011,10 +1011,33 @@ class RutinaControllerTests {
 
         Usuario user = setUpUsuario();
         String token = getToken(user);
+
+        Rutina rutinaF;
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
+        LocalTime franjaIncio = LocalTime.of(7,0);
+        LocalTime franjaFin  = LocalTime.of(13,0);
+
+        //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
+
+        fechaInicio = OffsetDateTime.of(2020,1,1,14,0,0,0, ZoneOffset.UTC);
+        rutinaF = setUpRutina(user, "H13", fechaInicio, fechaFin, franjaIncio, franjaFin);
+
+        Rutina rutinaE = setUpRutina(user, "E5.S1");
         Rutina rutina = setUpRutina(user);
 
         // Valid request -> status 200 expected
+        // Recurrencia normal
         this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        // Valid request -> status 200 expected
+        // Recurrencia E
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaE.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        // Valid request -> status 200 expected
+        // Recurrencia F
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaF.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Invalid request -> status 400 expected
@@ -1027,12 +1050,18 @@ class RutinaControllerTests {
         this.mockMvc.perform(patch(uri + String.valueOf(rutinaUsuario.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.completadaService.deleteAllByRutina(rutina);
         this.completadaService.deleteAllByRutina(rutinaUsuario);
-        this.rutinaService.deleteById(rutina.getId());
+        this.completadaService.deleteAllByRutina(rutinaE);
+        this.completadaService.deleteAllByRutina(rutinaF);
+        this.completadaService.deleteAllByRutina(rutina);
+
         this.rutinaService.deleteById(rutinaUsuario.getId());
-        this.usuarioService.deleteById(user.getUsuario());
+        this.rutinaService.deleteById(rutinaE.getId());
+        this.rutinaService.deleteById(rutinaF.getId());
+        this.rutinaService.deleteById(rutina.getId());
+
         this.usuarioService.deleteById(usuario.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
@@ -1050,13 +1079,42 @@ class RutinaControllerTests {
         Usuario user = setUpUsuario();
         String token = getToken(user);
         Rutina rutinaNDC = setUpRutina(user);
+
+        Rutina rutinaF;
+        OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
+        LocalTime franjaIncio = LocalTime.of(7,0);
+        LocalTime franjaFin  = LocalTime.of(13,0);
+
+        //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
+
+        fechaInicio = OffsetDateTime.of(2020,1,1,14,0,0,0, ZoneOffset.UTC);
+        rutinaF = setUpRutina(user, "H13", fechaInicio, fechaFin, franjaIncio, franjaFin);
+
+        Rutina rutinaE = setUpRutina(user, "E5.S1");
         Rutina rutina = setUpRutina(user);
 
         this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutina.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
+        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutinaF.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutinaE.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
         // Valid request -> status 200 expected
+        // recurrencia normal
         this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        // Valid request -> status 200 expected
+        // Recurrencia E
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaE.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        // Valid request -> status 200 expected
+        // Recurrencia F
+        this.mockMvc.perform(patch(uri + String.valueOf(rutinaF.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Invalid request -> status 400 expected
@@ -1075,11 +1133,18 @@ class RutinaControllerTests {
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         this.completadaService.deleteAllByRutina(rutinaUsuario);
-        this.rutinaService.deleteById(rutinaUsuario.getId());
-        this.usuarioService.deleteById(usuario.getUsuario());
+        this.completadaService.deleteAllByRutina(rutinaNDC);
+        this.completadaService.deleteAllByRutina(rutinaF);
+        this.completadaService.deleteAllByRutina(rutinaE);
         this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
+
+        this.rutinaService.deleteById(rutinaUsuario.getId());
         this.rutinaService.deleteById(rutinaNDC.getId());
+        this.rutinaService.deleteById(rutinaF.getId());
+        this.rutinaService.deleteById(rutinaE.getId());
+        this.rutinaService.deleteById(rutina.getId());
+
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
 
