@@ -334,7 +334,7 @@ public class RutinaController {
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
         ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
-        Completada completada = (completadas.isEmpty()) ? null : completadas.get(0);
+        Completada completada = (completadas.isEmpty()) ? new Completada() : completadas.get(0);
         //if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
         OffsetDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
                 rutina.getFechaFin(),
