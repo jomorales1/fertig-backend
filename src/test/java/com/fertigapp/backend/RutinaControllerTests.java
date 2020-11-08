@@ -987,25 +987,13 @@ class RutinaControllerTests {
         String token = getToken(user);
         Rutina rutina = setUpRutina(user);
 
-        ResultActions resultActions;
-        MvcResult mvcResult;
-        String response;
-
         // Valid request -> status 200 expected
-        resultActions = this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
+        this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
-        mvcResult = resultActions.andReturn();
-        response = mvcResult.getResponse().getContentAsString();
-
-        assertEquals("{\"message\":\"Routine repetition checked\"}", response);
 
         // Invalid request -> status 400 expected
-        resultActions = this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
+        this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
-        mvcResult = resultActions.andReturn();
-        response = mvcResult.getResponse().getContentAsString();
-
-        assertEquals("{\"message\":\"Rutina no encontrada\"}", response );
 
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -1016,43 +1004,37 @@ class RutinaControllerTests {
     void uncheckRoutine() throws Exception {
         String uri = "/routines/uncheckRoutine/";
 
+
+        Usuario usuario = new Usuario();
+        usuario.setUsuario("Juan");
+        usuario.setPassword(passwordEncoder.encode("12345"));
+        usuario.setNombre("Juan");
+        usuario.setCorreo("prueba@prueba.edu.co");
+        usuarioService.save(usuario);
+        Rutina rutina2 = setUpRutina(usuario);
+
         Usuario user = setUpUsuario();
         String token = getToken(user);
         Rutina rutina = setUpRutina(user);
 
-//        Completada newCompletada = new Completada();
-//        newCompletada.setRutina(rutina);
-//        newCompletada.setFecha(
-//                AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
-//                        rutina.getFechaFin(),
-//                        rutina.getRecurrencia(),
-//                        rutina.getDuracion(),
-//                        rutina.getFranjaInicio(),
-//                        rutina.getFranjaFin())
-//        );
-//        newCompletada.setHecha(true);
-//        this.completadaService.save(newCompletada);
+        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutina.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        ResultActions resultActions;
-        MvcResult mvcResult;
-        String response;
-
-//        // Valid request -> status 200 expected
-//        resultActions = this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
-//                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
-//        mvcResult = resultActions.andReturn();
-//        response = mvcResult.getResponse().getContentAsString();
-//
-//        assertEquals("{\"message\":\"Routine repetition unchecked\"}", response );
+        // Valid request -> status 200 expected
+        this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Invalid request -> status 400 expected
-        resultActions = this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
+        this.mockMvc.perform(patch(uri + String.valueOf(rutina.getId() + 1))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
-        mvcResult = resultActions.andReturn();
-        response = mvcResult.getResponse().getContentAsString();
 
-        assertEquals("{\"message\":\"Routine not found\"}", response );
+        // Invalid request -> status 400 expected
+        this.mockMvc.perform(patch(uri + String.valueOf(rutina2.getId()))
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
+        this.completadaService.deleteAllByRutina(rutina2);
+        this.rutinaService.deleteById(rutina2.getId());
+        this.usuarioService.deleteById(usuario.getUsuario());
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
