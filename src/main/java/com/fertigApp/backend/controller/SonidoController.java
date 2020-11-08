@@ -4,7 +4,6 @@ import com.fertigApp.backend.model.Preferido;
 import com.fertigApp.backend.model.Sonido;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.SonidoResponse;
-import com.fertigApp.backend.requestModels.RequestSonido;
 import com.fertigApp.backend.services.PreferidoService;
 import com.fertigApp.backend.services.SonidoService;
 import com.fertigApp.backend.services.UsuarioService;
