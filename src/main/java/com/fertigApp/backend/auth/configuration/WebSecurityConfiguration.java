@@ -46,8 +46,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             {
                     "/oauth/token",
                     "/oauth/authorize**",
-                    "/users/addUser",
-                    "/signin",
+                    "/user/add",
+                    "/sign-in",
                     "/login/oauth2/code/google",
                     "/login/oauth2/code/facebook"
             };

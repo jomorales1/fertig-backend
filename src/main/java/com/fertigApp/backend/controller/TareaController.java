@@ -48,12 +48,12 @@ public class TareaController {
     }
 
     // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
-    @GetMapping(path="/tasks")
+    @GetMapping(path="/task")
     public @ResponseBody Iterable<Tarea> getAllTareas() {
         return this.tareaService.findAll();
     }
 
-    @GetMapping(path="/tasks/getTasks")
+    @GetMapping(path="/task/tasks")
     public ResponseEntity<List<Tarea>> getAllTareasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -63,7 +63,7 @@ public class TareaController {
     }
 
     // Método GET para obtener una entidad de tipo "tarea" por medio de su ID.
-    @GetMapping(path="/tasks/getTask/{id}")
+    @GetMapping(path="/task/{id}")
     public ResponseEntity<Tarea> getTarea(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -74,7 +74,7 @@ public class TareaController {
         return ResponseEntity.ok(tarea);
     }
 
-    @PutMapping(path="/tasks/updateTask/{id}")
+    @PutMapping(path="/task/update/{id}")
     public ResponseEntity<Tarea> replaceTarea(@PathVariable Integer id, @RequestBody RequestTarea task) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -104,7 +104,7 @@ public class TareaController {
         return ResponseEntity.ok().body(tarea);
     }
 
-    @PatchMapping(path="/tasks/checkTask/{id}")
+    @PatchMapping(path="/task/check/{id}")
     public ResponseEntity<MessageResponse> checkTarea(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -125,7 +125,7 @@ public class TareaController {
     }
 
     // Método POST para agregar un registro en la tabla "tarea" de la DB.
-    @PostMapping(path="/tasks/addTask")
+    @PostMapping(path="/task/add")
     public @ResponseBody ResponseEntity<MessageResponse> addNewTarea(@RequestBody RequestTarea requestTarea) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -151,7 +151,7 @@ public class TareaController {
     }
 
     // Método DELETE para borrar un registro de la tabla "tarea" en la DB.
-    @DeleteMapping(path="/tasks/deleteTask/{id}")
+    @DeleteMapping(path="/task/delete/{id}")
     public ResponseEntity<MessageResponse> deleteTarea(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -177,7 +177,7 @@ public class TareaController {
     }
 
     // Método GET para obtener todos los colaboradores de una tarea
-    @GetMapping(path = "/tasks/getOwners/{id}")
+    @GetMapping(path = "/task/{id}/owners")
     public ResponseEntity<List<Usuario>> getTaskOwners(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -201,7 +201,7 @@ public class TareaController {
     }
 
     // Método POST para añadir un administrador
-    @PostMapping(path = "/tasks/addAdmin/{id}/{username}")
+    @PostMapping(path = "/task/{id}/add-admin/{username}")
     public ResponseEntity<MessageResponse> addTaskAdmin(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -239,7 +239,7 @@ public class TareaController {
     }
 
     // Método POST para añadir un colaborador a una tarea
-    @PostMapping(path = "/tasks/addOwner/{id}/{username}")
+    @PostMapping(path = "/task/{id}/add-owner/{username}")
     public ResponseEntity<MessageResponse> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optional = this.usuarioService.findById(username);
@@ -273,7 +273,7 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Dueño agregado"));
     }
 
-    @PostMapping(path = "/tasks/addSubtask/{id}")
+    @PostMapping(path = "/task/{id}/add-subtask")
     public ResponseEntity<MessageResponse> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -322,7 +322,7 @@ public class TareaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea creada"));
     }
 
-    @PutMapping(path = "/tasks/checkSubtask/{id}")
+    @PutMapping(path = "/task/{id}/check-subtask")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -348,7 +348,7 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Subtarea chequeada"));
     }
 
-    @PutMapping(path = "/tasks/updateSubtask/{id}")
+    @PutMapping(path = "/task/{id}/update-subtask")
     public ResponseEntity<MessageResponse> updateSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -382,7 +382,7 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
     }
 
-    @DeleteMapping(path = "/tasks/deleteSubtask/{id}")
+    @DeleteMapping(path = "/task/{id}/delete-subtask")
     public ResponseEntity<MessageResponse> deleteSubtask(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -411,7 +411,7 @@ public class TareaController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Subtarea eliminada"));
     }
 
-    @PutMapping(path = "/tasks/increaseTime/{id}/{time}")
+    @PutMapping(path = "/task/{id}/increase-time/{time}")
     public ResponseEntity<MessageResponse> increaseInvestedTime(@PathVariable Integer id, @PathVariable Integer time) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -438,7 +438,7 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Tiempo agregado"));
     }
 
-    @PostMapping(path = "/tasks/copyTask/{id}")
+    @PostMapping(path = "/task/{id}/copy")
     public ResponseEntity<MessageResponse> copyTask(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);

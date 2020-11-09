@@ -51,7 +51,7 @@ public class UsuarioController {
     }
 
     //Metodo POST para iniciar sesión
-    @PostMapping("/signin")
+    @PostMapping("/sign-in")
     public ResponseEntity<JwtResponse> authenticateUser(@RequestBody LoginRequest loginRequest) {
         //se llama al administrador de autenticación para que
         Authentication authentication = authenticationManager.authenticate(
@@ -73,20 +73,20 @@ public class UsuarioController {
     }
 
     // Método GET para obtener todas las entidades de tipo "usuario" de la DB.
-    @GetMapping(path="/users/getAllUsers")
+    @GetMapping(path="/user/all-users")
     public @ResponseBody Iterable<Usuario> getAllUsuarios() {
         // This returns a JSON or XML with the usuarios
         return usuarioService.findAll();
     }
     // Método GET para obtener todas las entidades de tipo "usuario" cuyo usuario corresponde con la cadena dada
-    @GetMapping(path="/users/search/{usuario}")
+    @GetMapping(path="/user/search/{usuario}")
     public @ResponseBody Iterable<Usuario> getAllUsuarios(@PathVariable String usuario) {
         // This returns a JSON or XML with the usuarios
         return usuarioService.findAllByUsuario(usuario);
     }
 
     // Método GET para obtener la información del usuario hace la request.
-    @GetMapping(path="/users/get")
+    @GetMapping(path="/user/get")
     public Usuario getUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> usuario = usuarioService.findById(userDetails.getUsername());
@@ -94,7 +94,7 @@ public class UsuarioController {
     }
 
     // Método PUT para modificar la información de un usuario en la DB.
-    @PutMapping(path="/users/update")
+    @PutMapping(path="/user/update")
     public ResponseEntity<Usuario> replaceUsuario(@RequestBody RequestUsuario requestUsuario) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
@@ -114,7 +114,7 @@ public class UsuarioController {
     }
 
     // Método POST para añadir un registro de tipo "usuario" en la DB.
-    @PostMapping(path="/users/addUser") // Map ONLY POST Requests
+    @PostMapping(path="/user/add") // Map ONLY POST Requests
     public @ResponseBody ResponseEntity<MessageResponse> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
         if (usuarioService.existsById(requestUsuario.getUsuario()))
             return ResponseEntity
@@ -134,14 +134,14 @@ public class UsuarioController {
     }
 
     // Método DELETE para eliminar un registro de tipo "usuario" en la DB.
-    @DeleteMapping(path="/users/delete")
+    @DeleteMapping(path="/user/delete")
     public ResponseEntity<Void> deleteUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         usuarioService.deleteById(userDetails.getUsername());
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @GetMapping(path = "/users/getFriends")
+    @GetMapping(path = "/user/friends")
     public ResponseEntity<List<Usuario>> getFriends() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -149,7 +149,7 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario.getAgregados());
     }
 
-    @PutMapping(path = "/users/addFriend/{username}")
+    @PutMapping(path = "/user/add-friend/{username}")
     public ResponseEntity<Void> addFriend(@PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -163,7 +163,7 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/users/deleteFriend/{username}")
+    @DeleteMapping(path = "/user/delete-friend/{username}")
     public ResponseEntity<Void> deleteFriend(@PathVariable String username) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());

@@ -60,14 +60,14 @@ public class RutinaController {
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
-    @GetMapping(path="/routines")
+    @GetMapping(path="/routine")
     public @ResponseBody ResponseEntity<List<Rutina>> getAllRutinas() {
         List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findAll();
         return ResponseEntity.ok(rutinas);
     }
 
     // Método GET para obtener todas las rutinas de un usuario específico.
-    @GetMapping(path="/routines/getRoutines")
+    @GetMapping(path="/routine/routines")
     public ResponseEntity<List<RecurrenteResponse>> getAllRutinasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
@@ -80,7 +80,7 @@ public class RutinaController {
         return ResponseEntity.ok().body(rutinaResponses);
     }
 
-    @GetMapping(path="/routines/getCheckedRoutines")
+    @GetMapping(path="/routine/checked-routines")
     public ResponseEntity<List<RecurrenteResponse>> getAllCheckeadas(){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
@@ -94,7 +94,7 @@ public class RutinaController {
         return ResponseEntity.ok().body(rutinaResponses);
     }
 
-    @GetMapping(path="/routines/getRoutinesAndRepetitions")
+    @GetMapping(path="/routine/routines-and-repetitions")
     public ResponseEntity<List<RutinaRepeticionesResponse>> getAllRutinasRepeticionesByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
@@ -110,7 +110,7 @@ public class RutinaController {
     }
 
     // Método GET para obtener una rutina específica por medio de su ID.
-    @GetMapping(path="/routines/getRoutine/{id}")
+    @GetMapping(path="/routine/{id}")
     public ResponseEntity<Rutina> getRutina(@PathVariable Integer id) {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
@@ -122,7 +122,7 @@ public class RutinaController {
     }
 
     // Método PUT para modificar un registro en la base de datos.
-    @PutMapping(path="/routines/updateRoutine/{id}")
+    @PutMapping(path="/routine/update/{id}")
     public ResponseEntity<Rutina> replaceRutina(@PathVariable Integer id, @RequestBody RequestRutina routine) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -155,7 +155,7 @@ public class RutinaController {
     }
 
     // Método POST para añadir un registro en la tabla "rutina" de la DB.
-    @PostMapping(path="/routines/addRoutine")
+    @PostMapping(path="/routine/add")
     public @ResponseBody ResponseEntity<MessageResponse> addNewRutina(@RequestBody RequestRutina requestRutina) {
         Rutina rutina = new Rutina();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();

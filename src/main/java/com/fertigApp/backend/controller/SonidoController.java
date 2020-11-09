@@ -33,7 +33,7 @@ public class SonidoController {
         this.preferidoService = preferidoService;
     }
 
-    @GetMapping(path = "/sounds/getAllSounds")
+    @GetMapping(path = "/sound")
     public ResponseEntity<List<SonidoResponse>> getAllSounds() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();
@@ -49,7 +49,7 @@ public class SonidoController {
         return ResponseEntity.ok(sonidoResponses);
     }
 
-    @PostMapping(path = "/sounds/addFavorite/{id}")
+    @PostMapping(path = "/sound/add-favorite/{id}")
     public @ResponseBody ResponseEntity<Void> addFavorite(@PathVariable String id){
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Sonido> optionalSonido = this.sonidoService.findById(id);
@@ -66,7 +66,7 @@ public class SonidoController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @GetMapping(path = "/sounds/getFavorites")
+    @GetMapping(path = "/sound/favorites")
     public ResponseEntity<List<Sonido>> getAllFavoritesByUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -80,7 +80,7 @@ public class SonidoController {
         return ResponseEntity.ok(sonidos);
     }
 
-    @DeleteMapping(path = "/sounds/deleteFavorite/{id}")
+    @DeleteMapping(path = "/sound/delete-favorite/{id}")
     public ResponseEntity<Void> deleteFavorite(@PathVariable String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Sonido> optionalSonido = this.sonidoService.findById(id);
