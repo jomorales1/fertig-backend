@@ -273,8 +273,8 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Dueño agregado"));
     }
 
-    @PostMapping(path = "/tasks/addSubTask/{id}")
-    public ResponseEntity<MessageResponse> addSubTask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
+    @PostMapping(path = "/tasks/addSubtask/{id}")
+    public ResponseEntity<MessageResponse> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea subTask) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
