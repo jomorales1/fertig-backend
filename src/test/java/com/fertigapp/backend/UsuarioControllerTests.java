@@ -64,7 +64,7 @@ class UsuarioControllerTests {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
-            String uri = "/signin";
+            String uri = "/sign-in";
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(user.getUsuario());
@@ -92,20 +92,19 @@ class UsuarioControllerTests {
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
-        String uri = "/signin";
+        String uri = "/sign-in";
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUsername(user.getUsuario());
         loginRequest.setPassword("testing");
         this.mockMvc.perform(post(uri).contentType(MediaType.APPLICATION_JSON_VALUE)
         .content(objectMapper.writeValueAsString(loginRequest)).accept(MediaType.ALL)).andExpect(status().isOk());
-        //assertThat(resultActions.andExpect(status().isOk()));
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
     @WithMockUser(value = "ADMIN")
     void getAllUsuarios() throws Exception {
-        String uri = "/users/getAllUsers";
+        String uri = "/user/all-users";
         ResultActions resultActions = this.mockMvc.perform(get(uri)).andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
@@ -116,7 +115,7 @@ class UsuarioControllerTests {
 
     @Test
     void getAllUsuariosByPrefix() throws Exception {
-        String uri = "/users/search/";
+        String uri = "/user/search/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -138,7 +137,7 @@ class UsuarioControllerTests {
 
     @Test
     void getUsuario() throws Exception {
-        String uri = "/users/get";
+        String uri = "/user/get";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -167,8 +166,8 @@ class UsuarioControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        String uri = "/users/update";
-        String searchUri = "/users/get";
+        String uri = "/user/update";
+        String searchUri = "/user/get";
 
         // Valid request -> status 200 expected
         RequestUsuario requestUsuario = new RequestUsuario();
@@ -214,7 +213,7 @@ class UsuarioControllerTests {
 
     @Test
     void addNewUser() throws Exception {
-        String uri = "/users/addUser";
+        String uri = "/user/add";
         RequestUsuario requestUsuario = new RequestUsuario("add_user@test.com", "Test Add User", "addUser", "add_user_password");
 
         // Valid request -> status 201 expected
@@ -243,7 +242,7 @@ class UsuarioControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        String uri = "/users/delete";
+        String uri = "/user/delete";
 
         this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
@@ -251,7 +250,7 @@ class UsuarioControllerTests {
 
     @Test
     void getFriends() throws Exception {
-        String uri = "/users/getFriends";
+        String uri = "/user/friends";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -286,7 +285,7 @@ class UsuarioControllerTests {
 
     @Test
     void addFriend() throws Exception {
-        String uri = "/users/addFriend/";
+        String uri = "/user/add-friend/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -316,7 +315,7 @@ class UsuarioControllerTests {
 
     @Test
     void deleteFriend() throws Exception {
-        String uri = "/users/deleteFriend/";
+        String uri = "/user/delete-friend/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();

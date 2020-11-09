@@ -48,7 +48,7 @@ public class TareaController {
     }
 
     // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
-    @GetMapping(path="/task")
+    @GetMapping(path="/tasks")
     public @ResponseBody Iterable<Tarea> getAllTareas() {
         return this.tareaService.findAll();
     }
@@ -322,7 +322,7 @@ public class TareaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea creada"));
     }
 
-    @PutMapping(path = "/task/{id}/check-subtask")
+    @PatchMapping(path = "/task/{id}/check-subtask")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {

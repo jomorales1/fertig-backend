@@ -203,7 +203,7 @@ class RutinaControllerTests {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
-            String uri = "/signin";
+            String uri = "/sign-in";
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(user.getUsuario());
@@ -252,7 +252,7 @@ class RutinaControllerTests {
 
     @Test
     void getAllRutinasByUsuario() throws Exception {
-        String uri = "/routines/getRoutines";
+        String uri = "/routine/routines";
         Usuario user = setUpUsuario();
         String token = getToken(user);
 
@@ -379,7 +379,7 @@ class RutinaControllerTests {
 
     @Test
     void getRutina() throws Exception {
-        String uri = "/routines/getRoutine";
+        String uri = "/routine";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -412,7 +412,7 @@ class RutinaControllerTests {
 
     @Test
     void getAllCheckeadas() throws Exception {
-        String uri = "/routines/getCheckedRoutines";
+        String uri = "/routine/checked-routines";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -430,7 +430,7 @@ class RutinaControllerTests {
 
     @Test
     void getAllRutinasRepeticionesByUsuario() throws Exception {
-        String uri = "/routines/getRoutinesAndRepetitions";
+        String uri = "/routine/routines-and-repetitions";
         Usuario user = setUpUsuario();
         String token = getToken(user);
 
@@ -612,7 +612,7 @@ class RutinaControllerTests {
 
     @Test
     void replaceRutina() throws Exception {
-        String uri = "/routines/updateRoutine/";
+        String uri = "/routine/update/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -670,7 +670,7 @@ class RutinaControllerTests {
 
     @Test
     void addNewRutina() throws Exception {
-        String uri = "/routines/addRoutine";
+        String uri = "/routine/add";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -709,13 +709,14 @@ class RutinaControllerTests {
 
     @Test
     void addSubtask() throws Exception {
-        String uri = "/routines/addSubtask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
         else user = this.usuarioService.findById("test_user").get();
         Rutina rutina = setUpRutina(user);
         String token = getToken(user);
+        String uri1 = "/routine/";
+        String uri2 = "/add-subtask";
 
         RequestTarea requestTarea = new RequestTarea();
         requestTarea.setNombre("Test Task");
@@ -727,7 +728,7 @@ class RutinaControllerTests {
         requestTarea.setRecordatorio(2);
         requestTarea.setTiempoInvertido(0);
 
-        this.mockMvc.perform(post(uri + (rutina.getId() + 1)).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + (rutina.getId() + 1) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
@@ -751,11 +752,11 @@ class RutinaControllerTests {
         routine.setRecordatorio(60);
         routine = this.rutinaService.save(routine);
 
-        this.mockMvc.perform(post(uri + routine.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + routine.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + rutina.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + rutina.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isCreated());
 
@@ -769,7 +770,8 @@ class RutinaControllerTests {
 
     @Test
     void updateSubtask() throws Exception {
-        String uri = "/routines/updateSubtask/";
+        String uri1 = "/routine/";
+        String uri2 = "/update-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -815,7 +817,7 @@ class RutinaControllerTests {
         requestTarea.setRecordatorio(subtarea.getRecordatorio());
         requestTarea.setTiempoInvertido(subtarea.getTiempoInvertido());
 
-        this.mockMvc.perform(put(uri + (subtarea.getId() + 2)).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + (subtarea.getId() + 2) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
@@ -841,11 +843,11 @@ class RutinaControllerTests {
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
 
-        this.mockMvc.perform(put(uri + newSubtarea.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + newSubtarea.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + subtarea.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + subtarea.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isOk());
 
@@ -861,7 +863,8 @@ class RutinaControllerTests {
 
     @Test
     void checkSubtask() throws Exception {
-        String uri = "/routines/checkSubtask/";
+        String uri1 = "/routine/";
+        String uri2 = "/check-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -883,7 +886,7 @@ class RutinaControllerTests {
         subtarea = this.tareaService.save(subtarea);
         this.rutinaService.save(rutina);
 
-        this.mockMvc.perform(put(uri + (subtarea.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + (subtarea.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Usuario newUser = new Usuario();
@@ -908,16 +911,16 @@ class RutinaControllerTests {
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
 
-        this.mockMvc.perform(put(uri + newSubtarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + newSubtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + subtarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + subtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         subtarea = this.tareaService.findById(subtarea.getId()).get();
         assertTrue(subtarea.getHecha());
 
-        this.mockMvc.perform(put(uri + subtarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + subtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         subtarea = this.tareaService.findById(subtarea.getId()).get();
@@ -935,7 +938,8 @@ class RutinaControllerTests {
 
     @Test
     void deleteSubtask() throws Exception {
-        String uri = "/routines/deleteSubtask/";
+        String uri1 = "/routine/";
+        String uri2 = "/delete-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -957,7 +961,7 @@ class RutinaControllerTests {
         subtarea = this.tareaService.save(subtarea);
         this.rutinaService.save(rutina);
 
-        this.mockMvc.perform(delete(uri + (subtarea.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + (subtarea.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Usuario newUser = new Usuario();
@@ -982,10 +986,10 @@ class RutinaControllerTests {
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
 
-        this.mockMvc.perform(delete(uri + newSubtarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + newSubtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(delete(uri + subtarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + subtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         this.tareaService.deleteById(newSubtarea.getId());
@@ -999,7 +1003,7 @@ class RutinaControllerTests {
 
     @Test
     void checkRoutine() throws Exception {
-        String uri = "/routines/checkRoutine/";
+        String uri = "/routine/check/";
 
         Usuario usuario = new Usuario();
         usuario.setUsuario("Juan");
@@ -1066,7 +1070,7 @@ class RutinaControllerTests {
 
     @Test
     void uncheckRoutine() throws Exception {
-        String uri = "/routines/uncheckRoutine/";
+        String uri = "/routine/uncheck/";
 
         Usuario usuario = new Usuario();
         usuario.setUsuario("Juan");
@@ -1093,13 +1097,13 @@ class RutinaControllerTests {
         Rutina rutinaE = setUpRutina(user, "E5.S1");
         Rutina rutina = setUpRutina(user);
 
-        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutina.getId()))
+        this.mockMvc.perform(patch("/routine/check/" + String.valueOf(rutina.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutinaF.getId()))
+        this.mockMvc.perform(patch("/routine/check/" + String.valueOf(rutinaF.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
-        this.mockMvc.perform(patch("/routines/checkRoutine/" + String.valueOf(rutinaE.getId()))
+        this.mockMvc.perform(patch("/routine/check/" + String.valueOf(rutinaE.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         // Valid request -> status 200 expected
@@ -1150,7 +1154,7 @@ class RutinaControllerTests {
 
     @Test
     void deleteRutina() throws Exception {
-        String uri = "/routines/deleteRoutine/";
+        String uri = "/routine/delete/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();

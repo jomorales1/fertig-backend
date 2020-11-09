@@ -73,7 +73,7 @@ class TareaControllerTests {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
-            String uri = "/signin";
+            String uri = "/sign-in";
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(user.getUsuario());
@@ -144,7 +144,7 @@ class TareaControllerTests {
 
     @Test
     void getAllTareasByUsuario() throws Exception {
-        String uri = "/tasks/getTasks";
+        String uri = "/task/tasks";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -167,7 +167,7 @@ class TareaControllerTests {
 
     @Test
     void getTarea() throws Exception {
-        String uri = "/tasks/getTask/";
+        String uri = "/task/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -192,7 +192,7 @@ class TareaControllerTests {
 
     @Test
     void replaceTarea() throws Exception {
-        String uri = "/tasks/updateTask/";
+        String uri = "/task/update/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -265,7 +265,7 @@ class TareaControllerTests {
 
     @Test
     void checkTarea() throws Exception {
-        String uri = "/tasks/checkTask/";
+        String uri = "/task/check/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -324,7 +324,7 @@ class TareaControllerTests {
 
     @Test
     void addNewTarea() throws Exception {
-        String uri = "/tasks/addTask";
+        String uri = "/task/add";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -355,7 +355,7 @@ class TareaControllerTests {
 
     @Test
     void deleteTarea() throws Exception {
-        String uri = "/tasks/deleteTask/";
+        String uri = "/task/delete/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -414,15 +414,16 @@ class TareaControllerTests {
 
     @Test
     void getTaskOwners() throws Exception {
-        String uri = "/tasks/getOwners/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
         Tarea task = setUp(user);
+        String uri1 = "/task/";
+        String uri2 = "/owners";
 
-        ResultActions resultActions = this.mockMvc.perform(get(uri + task.getId()).header("Authorization", "Bearer " + token))
+        ResultActions resultActions = this.mockMvc.perform(get(uri1 + task.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
@@ -431,7 +432,7 @@ class TareaControllerTests {
         assertNotNull(owners);
         assertEquals(owners.get(0).getUsuario(), user.getUsuario());
 
-        this.mockMvc.perform(get(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(get(uri1 + (task.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Usuario usuario = new Usuario();
@@ -459,7 +460,7 @@ class TareaControllerTests {
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
-        this.mockMvc.perform(get(uri + tarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(get(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
@@ -472,13 +473,14 @@ class TareaControllerTests {
 
     @Test
     void addTaskAdmin() throws Exception {
-        String uri = "/tasks/addAdmin/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
         Tarea task = setUp(user);
+        String uri1 = "/task/";
+        String uri2 = "/add-admin/";
 
         Usuario newAdmin = new Usuario();
         newAdmin.setUsuario("newAdmin");
@@ -487,13 +489,13 @@ class TareaControllerTests {
         newAdmin.setPassword(passwordEncoder.encode("testing"));
         this.usuarioService.save(newAdmin);
 
-        this.mockMvc.perform(post(uri + (task.getId() + 1) + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + (task.getId() + 1) + uri2 + newAdmin.getUsuario())
             .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId() + "/" + newAdmin.getUsuario() + "a")
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newAdmin.getUsuario() + "a")
             .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId() + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         Tarea tarea = new Tarea();
@@ -508,7 +510,7 @@ class TareaControllerTests {
         tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
-        this.mockMvc.perform(post(uri + tarea.getId() + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         TareaDeUsuario relation = new TareaDeUsuario();
@@ -523,7 +525,7 @@ class TareaControllerTests {
         relation1.setAdmin(false);
         this.tareaDeUsuarioService.save(relation1);
 
-        this.mockMvc.perform(post(uri + tarea.getId() + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -532,10 +534,10 @@ class TareaControllerTests {
         tareaDeUsuario.setAdmin(false);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
-        this.mockMvc.perform(post(uri + tarea.getId() + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId() + "/" + newAdmin.getUsuario())
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         Optional<TareaDeUsuario> optionalTareaDeUsuario =  this.tareaDeUsuarioService.findByUsuarioAndTarea(newAdmin, task);
@@ -552,13 +554,14 @@ class TareaControllerTests {
 
     @Test
     void addTaskOwner() throws Exception {
-        String uri = "/tasks/addOwner/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
         Tarea task = setUp(user);
+        String uri1 = "/task/";
+        String uri2 = "/add-owner/";
 
         Usuario newOwner = new Usuario();
         newOwner.setUsuario("newAdmin");
@@ -567,10 +570,10 @@ class TareaControllerTests {
         newOwner.setPassword(passwordEncoder.encode("testing"));
         this.usuarioService.save(newOwner);
 
-        this.mockMvc.perform(post(uri + (task.getId() + 1) + "/" + newOwner.getUsuario())
+        this.mockMvc.perform(post(uri1 + (task.getId() + 1) + uri2 + newOwner.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId() + "/" + newOwner.getUsuario() + "a")
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newOwner.getUsuario() + "a")
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         Tarea tarea = new Tarea();
@@ -585,7 +588,7 @@ class TareaControllerTests {
         tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
-        this.mockMvc.perform(post(uri + tarea.getId() + "/" + newOwner.getUsuario())
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newOwner.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -594,10 +597,10 @@ class TareaControllerTests {
         tareaDeUsuario.setAdmin(false);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
-        this.mockMvc.perform(post(uri + tarea.getId() + "/" + newOwner.getUsuario())
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newOwner.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId() + "/" + newOwner.getUsuario())
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newOwner.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
         this.tareaDeUsuarioService.deleteAllByTarea(task);
@@ -610,7 +613,8 @@ class TareaControllerTests {
 
     @Test
     void addSubTask() throws Exception {
-        String uri = "/tasks/addSubtask/";
+        String uri1 = "/task/";
+        String uri2 = "/add-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -628,7 +632,7 @@ class TareaControllerTests {
         requestTarea.setRecordatorio(2);
         requestTarea.setTiempoInvertido(0);
 
-        this.mockMvc.perform(post(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + (task.getId() + 1) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
@@ -644,7 +648,7 @@ class TareaControllerTests {
         tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
-        this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
@@ -667,11 +671,11 @@ class TareaControllerTests {
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
-        this.mockMvc.perform(post(uri + tarea2.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + tarea2.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId()).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isCreated());
 
@@ -684,7 +688,8 @@ class TareaControllerTests {
 
     @Test
     void updateSubtask() throws Exception {
-        String uri = "/tasks/updateSubtask/";
+        String uri1 = "/task/";
+        String uri2 = "/update-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -716,7 +721,7 @@ class TareaControllerTests {
         requestTarea.setRecordatorio(subtarea.getRecordatorio());
         requestTarea.setTiempoInvertido(subtarea.getTiempoInvertido());
 
-        this.mockMvc.perform(put(uri + (task.getId() + 2)).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + (task.getId() + 2) + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
@@ -753,13 +758,13 @@ class TareaControllerTests {
 
         assertEquals(4, tareas.size());
 
-        this.mockMvc.perform(put(uri + indexB).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + indexB + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
         assertEquals(newSubtarea.getNombre(), this.tareaService.findById(indexB).get().getNombre());
 
-        this.mockMvc.perform(put(uri + indexA).header("Authorization", "Bearer " + token)
+        this.mockMvc.perform(put(uri1 + indexA + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isOk());
 
@@ -773,7 +778,8 @@ class TareaControllerTests {
 
     @Test
     void checkSubtask() throws Exception {
-        String uri = "/tasks/checkSubtask/";
+        String uri1 = "/task/";
+        String uri2 = "/check-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -795,7 +801,7 @@ class TareaControllerTests {
         task.addSubtarea(subtarea);
         this.tareaService.save(task);
 
-        this.mockMvc.perform(put(uri + (task.getId() + 2)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + (task.getId() + 2) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Usuario newUser = new Usuario();
@@ -829,16 +835,16 @@ class TareaControllerTests {
                 indexB = tarea.getId();
         }
 
-        this.mockMvc.perform(put(uri + indexB).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + indexB + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + indexA).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + indexA + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         subtarea = this.tareaService.findById(indexA).get();
         assertTrue(subtarea.getHecha());
 
-        this.mockMvc.perform(put(uri + (indexA)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(patch(uri1 + (indexA) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         subtarea = this.tareaService.findById(indexA).get();
@@ -854,7 +860,8 @@ class TareaControllerTests {
 
     @Test
     void deleteSubtask() throws Exception {
-        String uri = "/tasks/deleteSubtask/";
+        String uri1 = "/task/";
+        String uri2 = "/delete-subtask";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -876,7 +883,7 @@ class TareaControllerTests {
         task.addSubtarea(subtarea);
         this.tareaService.save(task);
 
-        this.mockMvc.perform(delete(uri + (task.getId() + 2)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + (task.getId() + 2) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Usuario newUser = new Usuario();
@@ -910,10 +917,10 @@ class TareaControllerTests {
                 indexB = tarea.getId();
         }
 
-        this.mockMvc.perform(delete(uri + indexB).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + indexB + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(delete(uri + indexA).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(delete(uri1 + indexA + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
 
         this.tareaDeUsuarioService.deleteAllByTarea(newTarea);
@@ -926,7 +933,8 @@ class TareaControllerTests {
 
     @Test
     void increaseInvestedTime() throws Exception {
-        String uri = "/tasks/increaseTime/";
+        String uri1 = "/task/";
+        String uri2 = "/increase-time/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -934,7 +942,7 @@ class TareaControllerTests {
         String token = getToken(user);
         Tarea task = setUp(user);
 
-        this.mockMvc.perform(put(uri + (task.getId() + 1) + "/" + "10").header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri1 + (task.getId() + 1) + uri2 + "10").header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
         Tarea tarea = new Tarea();
@@ -949,10 +957,10 @@ class TareaControllerTests {
         tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
-        this.mockMvc.perform(put(uri + tarea.getId() + "/" + "10").header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri1 + tarea.getId() + uri2 + "10").header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(put(uri + task.getId() + "/" + "10").header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(put(uri1 + task.getId() + uri2 + "10").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         task = this.tareaService.findById(task.getId()).get();
@@ -966,7 +974,8 @@ class TareaControllerTests {
 
     @Test
     void copyTask() throws Exception {
-        String uri = "/tasks/copyTask/";
+        String uri1 = "/task/";
+        String uri2 = "/copy";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -1027,16 +1036,16 @@ class TareaControllerTests {
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
-        this.mockMvc.perform(post(uri + (tarea.getId() + 1)).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(post(uri1 + (tarea.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + subtask1.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(post(uri1 + subtask1.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + task.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(post(uri1 + task.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(post(uri + tarea.getId()).header("Authorization", "Bearer " + token))
+        this.mockMvc.perform(post(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
         this.tareaDeUsuarioService.deleteAllByUsuario(user);

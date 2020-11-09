@@ -60,7 +60,7 @@ public class RutinaController {
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
-    @GetMapping(path="/routine")
+    @GetMapping(path="/routines")
     public @ResponseBody ResponseEntity<List<Rutina>> getAllRutinas() {
         List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findAll();
         return ResponseEntity.ok(rutinas);
@@ -253,7 +253,7 @@ public class RutinaController {
         return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
     }
 
-    @PutMapping(path = "/routine/{id}/check-subtask")
+    @PatchMapping(path = "/routine/{id}/check-subtask")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {

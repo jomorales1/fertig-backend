@@ -72,7 +72,7 @@ class EventoControllerTests {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
-            String uri = "/signin";
+            String uri = "/sign-in";
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(user.getUsuario());
@@ -159,7 +159,7 @@ class EventoControllerTests {
 
     @Test
     void getAllEventosByUsuario() throws Exception {
-        String uri = "/events/getEvents";
+        String uri = "/event/events";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -285,7 +285,7 @@ class EventoControllerTests {
 
     @Test
     void getEventsRepetitions() throws  Exception {
-        String uri = "/events/getEventsAndRepetitions";
+        String uri = "/event/events-and-repetitions";
         Usuario user = setUpUsuario();
         String token = getToken(user);
 
@@ -493,7 +493,7 @@ class EventoControllerTests {
 
     @Test
     void getEvento() throws Exception {
-        String uri = "/events/getEvent/";
+        String uri = "/event/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -518,7 +518,7 @@ class EventoControllerTests {
 
     @Test
     void replaceEvento() throws Exception {
-        String uri = "/events/updateEvent/";
+        String uri = "/event/update/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -575,7 +575,7 @@ class EventoControllerTests {
 
     @Test
     void addNewEvento() throws Exception {
-        String uri = "/events/addEvent";
+        String uri = "/event/add";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();
@@ -610,7 +610,7 @@ class EventoControllerTests {
 
     @Test
     void deleteEvento() throws Exception {
-        String uri = "/events/deleteEvent/";
+        String uri = "/event/delete/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = setUpUsuario();

@@ -72,7 +72,7 @@ class SonidoControllerTests {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
-            String uri = "/signin";
+            String uri = "/sign-in";
 
             LoginRequest loginRequest = new LoginRequest();
             loginRequest.setUsername(user.getUsuario());
@@ -110,7 +110,7 @@ class SonidoControllerTests {
 
     @Test
     void getAllSounds() throws Exception {
-        String uri = "/sounds/getAllSounds";
+        String uri = "/sounds";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -145,7 +145,7 @@ class SonidoControllerTests {
 
     @Test
     void addFavorite() throws Exception {
-        String uri = "/sounds/addFavorite/";
+        String uri = "/sound/add-favorite/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -168,7 +168,7 @@ class SonidoControllerTests {
 
     @Test
     void getAllFavoritesByUser() throws Exception {
-        String uri = "/sounds/getFavorites";
+        String uri = "/sound/favorites";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -192,7 +192,7 @@ class SonidoControllerTests {
 
     @Test
     void deleteFavorite() throws Exception {
-        String uri = "/sounds/deleteFavorite/";
+        String uri = "/sound/delete-favorite/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();

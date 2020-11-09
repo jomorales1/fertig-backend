@@ -46,7 +46,7 @@ public class EventoController {
 
     // Método GET para obtener del servidor una lista de todos los eventos
     // en la DB.
-    @GetMapping(path="/event")
+    @GetMapping(path="/events")
     public @ResponseBody Iterable<Evento> getAllEventos() {
         return this.eventoService.findAll();
     }
