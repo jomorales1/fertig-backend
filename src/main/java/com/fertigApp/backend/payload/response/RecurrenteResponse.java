@@ -38,4 +38,13 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
     public void setFecha(OffsetDateTime fecha) {
         this.fecha = fecha;
     }
+
+    public Set<Tarea> getSubtareas() {
+        return subtareas;
+    }
+
+    public void setSubtareas(Set<Tarea> subtareas) {
+        this.subtareas = subtareas;
+    }
+
 }
