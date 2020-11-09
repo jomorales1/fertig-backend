@@ -59,6 +59,9 @@ public class SonidoController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         Sonido sonido = optionalSonido.get();
+        if (this.preferidoService.findByUsuarioAndSonido(usuario, sonido).isPresent()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
         Preferido preferido = new Preferido();
         preferido.setUsuario(usuario);
         preferido.setSonido(sonido);
