@@ -33,7 +33,7 @@ public class SonidoController {
         this.preferidoService = preferidoService;
     }
 
-    @GetMapping(path = "/sound")
+    @GetMapping(path = "/sounds")
     public ResponseEntity<List<SonidoResponse>> getAllSounds() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         List<Sonido> sonidos = (List<Sonido>) this.sonidoService.findAll();

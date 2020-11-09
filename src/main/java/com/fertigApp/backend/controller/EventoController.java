@@ -46,13 +46,13 @@ public class EventoController {
 
     // Método GET para obtener del servidor una lista de todos los eventos
     // en la DB.
-    @GetMapping(path="/events")
+    @GetMapping(path="/event")
     public @ResponseBody Iterable<Evento> getAllEventos() {
         return this.eventoService.findAll();
     }
 
     // Método GET para obtener la lista de eventos de un usuario determinado.
-    @GetMapping(path="/events/getEvents")
+    @GetMapping(path="/event/events")
     public ResponseEntity<Iterable<RecurrenteResponse>> getAllEventosByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -64,7 +64,7 @@ public class EventoController {
         return ResponseEntity.ok().body(eventos);
     }
 
-    @GetMapping(path="/events/getEventsAndRepetitions")
+    @GetMapping(path="/event/events-and-repetitions")
     public ResponseEntity<Iterable<EventoRepeticionesResponse>> getAllEventosRepeticionesByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
@@ -77,7 +77,7 @@ public class EventoController {
     }
 
     // Método GET para obtener un evento específico de un usuario por medio de su ID.
-    @GetMapping(path="/events/getEvent/{id}")
+    @GetMapping(path="/event/{id}")
     public ResponseEntity<Evento> getEvento(@PathVariable Integer id) {
         Optional<Evento> optionalEvento = this.eventoService.findById(id);
         if (optionalEvento.isEmpty()) {
@@ -89,7 +89,7 @@ public class EventoController {
     }
 
     // Método PUT para actualizar un evento específico.
-    @PutMapping(path="/events/updateEvent/{id}")
+    @PutMapping(path="/event/update/{id}")
     public ResponseEntity<Evento> replaceEvento(@PathVariable Integer id, @RequestBody RequestEvento event) {
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -119,7 +119,7 @@ public class EventoController {
     }
 
     // Método POST para agregar un evento a la DB.
-    @PostMapping(path="/events/addEvent")
+    @PostMapping(path="/event/add")
     public @ResponseBody ResponseEntity<Void> addNewEvento(@RequestBody RequestEvento requestEvento) {
         Evento evento = new Evento();
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -144,7 +144,7 @@ public class EventoController {
     }
 
     // Método DELETE para borrar un registro de la tabla "evento" en la DB.
-    @DeleteMapping(path="/events/deleteEvent/{id}")
+    @DeleteMapping(path="/event/delete/{id}")
     public ResponseEntity<Void> deleteEvento(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Evento> optionalEvento = this.eventoService.findById(id);

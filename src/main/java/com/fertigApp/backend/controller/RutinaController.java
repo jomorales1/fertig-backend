@@ -187,7 +187,7 @@ public class RutinaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Rutina creada"));
     }
 
-    @PostMapping(path = "/routines/addSubtask/{id}")
+    @PostMapping(path = "/routine/{id}/add-subtask")
     public ResponseEntity<MessageResponse> addSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         if (optionalRutina.isEmpty()) {
@@ -219,7 +219,7 @@ public class RutinaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Subtarea de rutina creada"));
     }
 
-    @PutMapping(path = "/routines/updateSubtask/{id}")
+    @PutMapping(path = "/routine/{id}/update-subtask")
     public ResponseEntity<MessageResponse> updateSubtask(@PathVariable Integer id, @RequestBody RequestTarea requestTarea) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -253,7 +253,7 @@ public class RutinaController {
         return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
     }
 
-    @PutMapping(path = "/routines/checkSubtask/{id}")
+    @PutMapping(path = "/routine/{id}/check-subtask")
     public ResponseEntity<MessageResponse> checkSubtask(@PathVariable Integer id) {
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -279,7 +279,7 @@ public class RutinaController {
         return ResponseEntity.ok(new MessageResponse("Subtarea checkeada"));
     }
 
-    @DeleteMapping(path = "/routines/deleteSubtask/{id}")
+    @DeleteMapping(path = "/routine/{id}/delete-subtask")
     public ResponseEntity<MessageResponse> deleteSubtask(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
@@ -317,7 +317,7 @@ public class RutinaController {
     }
 
     //@PutMapping
-    @PatchMapping(path="/routines/checkRoutine/{id}")
+    @PatchMapping(path="/routine/check/{id}")
     public ResponseEntity<MessageResponse> checkRoutine(@PathVariable Integer id){
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -361,7 +361,7 @@ public class RutinaController {
         return ResponseEntity.ok().body(new MessageResponse("Routine repetition checked"));
     }
 
-    @PatchMapping(path="/routines/uncheckRoutine/{id}")
+    @PatchMapping(path="/routine/uncheck/{id}")
     public ResponseEntity<MessageResponse> uncheckRoutine(@PathVariable Integer id){
         Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
@@ -390,7 +390,7 @@ public class RutinaController {
     }
 
     // Método DELETE para borrar un registro en la tabla "rutina" de la DB.
-    @DeleteMapping(path="/routines/deleteRoutine/{id}")
+    @DeleteMapping(path="/routine/delete/{id}")
     public ResponseEntity<MessageResponse> deleteRutina(@PathVariable Integer id) {
         Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
