@@ -1,5 +1,6 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
@@ -12,6 +13,7 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
 
     private OffsetDateTime fecha;
 
+    @JsonInclude
     private Set<Tarea> subtareas;
 
     public RecurrenteResponse(){

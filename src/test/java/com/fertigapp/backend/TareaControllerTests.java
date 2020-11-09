@@ -610,7 +610,7 @@ class TareaControllerTests {
 
     @Test
     void addSubTask() throws Exception {
-        String uri = "/tasks/addSubTask/";
+        String uri = "/tasks/addSubtask/";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
