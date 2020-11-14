@@ -6,6 +6,7 @@ import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.OwnerResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.TareaDeUsuarioService;
@@ -427,10 +428,12 @@ class TareaControllerTests {
                 .andExpect(status().isOk());
         MvcResult mvcResult = resultActions.andReturn();
         String response = mvcResult.getResponse().getContentAsString();
-        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Usuario.class);
-        List<Usuario> owners = objectMapper.readValue(response, javaList);
+        CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, OwnerResponse.class);
+        List<OwnerResponse> owners = objectMapper.readValue(response, javaList);
         assertNotNull(owners);
-        assertEquals(owners.get(0).getUsuario(), user.getUsuario());
+        assertEquals(owners.get(0).getUsername(), user.getUsuario());
+        assertEquals(owners.get(0).getName(), user.getNombre());
+        assertTrue(owners.get(0).isAdmin());
 
         this.mockMvc.perform(get(uri1 + (task.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());

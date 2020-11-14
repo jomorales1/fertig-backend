@@ -4,6 +4,7 @@ import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
+import com.fertigApp.backend.payload.response.OwnerResponse;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.TareaDeUsuarioService;
 import com.fertigApp.backend.services.TareaService;
@@ -178,7 +179,7 @@ public class TareaController {
 
     // Método GET para obtener todos los colaboradores de una tarea
     @GetMapping(path = "/task/{id}/owners")
-    public ResponseEntity<List<Usuario>> getTaskOwners(@PathVariable Integer id) {
+    public ResponseEntity<List<OwnerResponse>> getTaskOwners(@PathVariable Integer id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -193,9 +194,13 @@ public class TareaController {
             return ResponseEntity.badRequest().body(null);
         }
         ArrayList<TareaDeUsuario> tareaDeUsuarios = (ArrayList<TareaDeUsuario>) this.tareaDeUsuarioService.findAllByTarea(tarea);
-        ArrayList<Usuario> owners = new ArrayList<>();
+        ArrayList<OwnerResponse> owners = new ArrayList<>();
         for (TareaDeUsuario tareaDeUsuario : tareaDeUsuarios) {
-            owners.add(tareaDeUsuario.getUsuario());
+            OwnerResponse ownerResponse = new OwnerResponse();
+            ownerResponse.setUsername(tareaDeUsuario.getUsuario().getUsuario());
+            ownerResponse.setName(tareaDeUsuario.getUsuario().getNombre());
+            ownerResponse.setAdmin(tareaDeUsuario.isAdmin());
+            owners.add(ownerResponse);
         }
         return ResponseEntity.ok(owners);
     }
