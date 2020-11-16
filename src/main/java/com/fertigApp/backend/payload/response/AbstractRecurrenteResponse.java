@@ -63,7 +63,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia){
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
         Character c = recurrencia.charAt(0);
-        if(recurrencia.charAt(0) == 'E'){
+        if(recurrencia == null) {
+            fechas.add(OffsetDateTime.from(fechaFin));
+        } else if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".");
             int dias = Integer.parseInt(recurrencia.substring(1, punto));
             for(long i = 1; i<8;  i++) {
@@ -85,7 +87,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin){
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
-        if(recurrencia.charAt(0) == 'H'){
+        if(recurrencia == null) {
+            fechas.add(OffsetDateTime.from(fechaFin));
+        } else if(recurrencia.charAt(0) == 'H'){
             OffsetDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
             OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
@@ -119,7 +123,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia) {
         OffsetDateTime fecha = OffsetDateTime.now();
-        if(recurrencia.charAt(0) == 'E'){
+        if(recurrencia == null) {
+            return OffsetDateTime.from(fechaFin);
+        } else if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
             int dia = fecha.getDayOfWeek().getValue() - 1;
@@ -143,7 +149,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     }
 
     public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
-        if(recurrencia.charAt(0) == 'H'){
+        if(recurrencia == null) {
+            return OffsetDateTime.from(fechaFin);
+        } else if(recurrencia.charAt(0) == 'H'){
             OffsetDateTime fecha = OffsetDateTime.now();
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             OffsetDateTime franjaI;
@@ -172,7 +180,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public static OffsetDateTime findAnterior(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia) {
         OffsetDateTime fecha = OffsetDateTime.now();
-        if(recurrencia.charAt(0) == 'E'){
+        if(recurrencia == null) {
+            return OffsetDateTime.from(fechaFin);
+        } else if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
             int dia = fecha.getDayOfWeek().getValue() - 1;
@@ -207,7 +217,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     }
 
     public static OffsetDateTime findAnterior(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, LocalTime franjaInicio, LocalTime franjaFin) {
-        if(recurrencia.charAt(0) == 'H'){
+        if(recurrencia == null) {
+            return OffsetDateTime.from(fechaFin);
+        } else if(recurrencia.charAt(0) == 'H'){
             OffsetDateTime fecha = OffsetDateTime.now();
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             OffsetDateTime franjaI = LocalDate.now().atTime(franjaInicio).atOffset(fechaInicio.getOffset());
@@ -239,7 +251,9 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public static String getMensajeRecurrencia(String recurrencia) {
         String mensajeRecurrencia;
-        if(recurrencia.charAt(0) == 'E'){
+        if(recurrencia == null){
+            mensajeRecurrencia = "Sin repetición";
+        } else if(recurrencia.charAt(0) == 'E'){
             int point = recurrencia.indexOf(".");
             int codDias = Integer.parseInt(recurrencia.substring(1,point));
             LinkedList<String> dias = new LinkedList<>();
