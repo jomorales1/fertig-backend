@@ -1,5 +1,6 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
@@ -39,9 +40,12 @@ public class EventoController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    public EventoController(EventoService eventoService, UsuarioService usuarioService) {
+    private final NotificationSystem notificationSystem;
+
+    public EventoController(EventoService eventoService, UsuarioService usuarioService, NotificationSystem notificationSystem) {
         this.eventoService = eventoService;
         this.usuarioService = usuarioService;
+        this.notificationSystem = notificationSystem;
     }
 
     // Método GET para obtener del servidor una lista de todos los eventos
@@ -132,14 +136,15 @@ public class EventoController {
         evento.setDescripcion(requestEvento.getDescripcion());
         evento.setPrioridad(requestEvento.getPrioridad());
         evento.setEtiqueta(requestEvento.getEtiqueta());
-        if (requestEvento.getDuracion() != null)
-            evento.setDuracion(requestEvento.getDuracion());
+        evento.setDuracion(requestEvento.getDuracion());
         evento.setFechaInicio(requestEvento.getFechaInicio());
         evento.setFechaFin(requestEvento.getFechaFin());
         evento.setRecurrencia(requestEvento.getRecurrencia());
-        if (requestEvento.getRecordatorio() != null)
-            evento.setRecordatorio(requestEvento.getRecordatorio());
-        this.eventoService.save(evento);
+        evento.setRecordatorio(requestEvento.getRecordatorio());
+        Evento savedEvent = this.eventoService.save(evento);
+        if (savedEvent.getRecordatorio() != null) {
+            this.notificationSystem.scheduleEventNotification(userDetails.getUsername(), savedEvent);
+        }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -159,6 +164,7 @@ public class EventoController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         this.eventoService.deleteById(id);
+        this.notificationSystem.cancelScheduledEventNotification(id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 }

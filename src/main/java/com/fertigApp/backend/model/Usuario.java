@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Entity// This tells Hibernate to make a table out of this class
 @Table(name = "usuario")
@@ -59,6 +60,10 @@ public class Usuario implements Serializable {
 			inverseJoinColumns = {@JoinColumn(name = "agregado")}
 	)
 	private List<Usuario> agregados;
+
+    @JsonIgnore
+	@OneToMany(mappedBy = "usuarioF")
+    private Set<FirebaseNotificationToken> notificationTokens;
 
 	public Usuario() { }
 
