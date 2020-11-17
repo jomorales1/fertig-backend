@@ -25,12 +25,9 @@ public class NotificationController {
 
     private final UsuarioService usuarioService;
 
-    private final PushNotificationService notificationService;
-
-    public NotificationController(FirebaseNTService firebaseNTService, UsuarioService usuarioService, PushNotificationService notificationService) {
+    public NotificationController(FirebaseNTService firebaseNTService, UsuarioService usuarioService) {
         this.firebaseNTService = firebaseNTService;
         this.usuarioService = usuarioService;
-        this.notificationService = notificationService;
     }
 
     @GetMapping(path = "/notification/tokens")
@@ -71,17 +68,6 @@ public class NotificationController {
         }
         this.firebaseNTService.deleteById(notificationToken.getToken());
         return ResponseEntity.ok(new MessageResponse("El token fue eliminado"));
-    }
-
-    @PostMapping(path = "/send")
-    public String sendTestNotification() {
-        PushNotificationRequest notificationRequest = new PushNotificationRequest();
-        notificationRequest.setTitle("Mensaje de prueba");
-        notificationRequest.setMessage("Holaaaaaa");
-        notificationRequest.setTopic("Firebase");
-        notificationRequest.setToken("d5N2-wun-Zpj6VQdoyEBU3:APA91bEy--ffiJi9rIjM9gSPHt0shp4aLzhpL1u_nEcsKgfgs0FZgxN_8CO4RVqF3L9OPAfQrBLL8mcTmz9ossMosV2XSHbnn6Ma0oCeD6kIeKuI5M1Jm4qGmmPj1B4ZNhiIhgLObuOi");
-        this.notificationService.sendPushNotificationToToken(notificationRequest);
-        return "Mensaje enviado";
     }
 
 }

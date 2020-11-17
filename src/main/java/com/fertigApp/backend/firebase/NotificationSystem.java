@@ -24,7 +24,7 @@ public class NotificationSystem {
 
     private final FirebaseNTService firebaseNTService;
 
-    private final HashMap<Integer, NotificationEvent> scheduledTasks;
+    private final HashMap<Integer, List<NotificationEvent>> scheduledTasks;
     private final HashMap<Integer, NotificationEvent> scheduledRoutines;
     private final HashMap<Integer, NotificationEvent> scheduledEvents;
 
@@ -38,37 +38,37 @@ public class NotificationSystem {
         this.scheduledEvents = new HashMap<>();
     }
 
-    private Calendar nextDate(OffsetDateTime fechaFin, Integer recordatorio) {
-        Calendar now = Calendar.getInstance();
-        now.set(Calendar.SECOND, fechaFin.getSecond());
-        now.set(Calendar.MINUTE, fechaFin.getMinute());
-        now.set(Calendar.HOUR_OF_DAY, fechaFin.getHour());
-        now.set(Calendar.DAY_OF_MONTH, fechaFin.getDayOfMonth());
-        now.set(Calendar.MONTH, fechaFin.getMonth().getValue());
-        now.set(Calendar.YEAR, fechaFin.getYear());
-        now.add(Calendar.MINUTE, - recordatorio);
-        return now;
+    private Date nextDate(OffsetDateTime fechaFin, Integer recordatorio) {
+        Calendar date = new GregorianCalendar(fechaFin.getYear(), fechaFin.getMonthValue() - 1, fechaFin.getDayOfMonth(),
+            fechaFin.getHour(), fechaFin.getMinute());
+        date.add(Calendar.MINUTE, - recordatorio);
+        return date.getTime();
     }
 
     public void scheduleTaskNotification(String username, Tarea tarea) {
-        Calendar date = nextDate(tarea.getFechaFin(), tarea.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(this.taskScheduler.schedule(new TaskNotification(username, tarea), date.getTime()));
+        Date date = nextDate(tarea.getFechaFin(), tarea.getRecordatorio());
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new TaskNotification(username, tarea), date));
         if (!this.scheduledTasks.containsKey(tarea.getId()))
-            this.scheduledTasks.put(tarea.getId(), event);
-        else this.scheduledTasks.replace(tarea.getId(), event);
+            this.scheduledTasks.put(tarea.getId(), new ArrayList<>());
+        this.scheduledTasks.get(tarea.getId()).add(event);
     }
 
-    public void cancelScheduledTaskNotification(Integer id) {
+    public void cancelScheduledTaskNotification(String username, Integer id) {
         if (!this.scheduledTasks.containsKey(id)) return;
-        this.scheduledTasks.remove(id);
+        for (NotificationEvent event : this.scheduledTasks.get(id)) {
+            if (event.getUsername().equals(username)) {
+                event.getScheduled().cancel(false);
+                break;
+            }
+        }
     }
 
     public void scheduleRoutineNotification(String username, Rutina rutina) {
         OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                 rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
                 rutina.getFranjaInicio(), rutina.getFranjaFin());
-        Calendar date = nextDate(next, rutina.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(this.taskScheduler.schedule(new RoutineNotification(username, rutina), date.getTime()));
+        Date date = nextDate(next, rutina.getRecordatorio());
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new RoutineNotification(username, rutina), date));
         if (!this.scheduledRoutines.containsKey(rutina.getId()))
             this.scheduledRoutines.put(rutina.getId(), event);
         else this.scheduledRoutines.replace(rutina.getId(), event);
@@ -76,13 +76,14 @@ public class NotificationSystem {
 
     public void cancelScheduledRoutineNotification(Integer id) {
         if (!this.scheduledRoutines.containsKey(id)) return;
+        this.scheduledRoutines.get(id).getScheduled().cancel(true);
         this.scheduledRoutines.remove(id);
     }
 
     public void scheduleEventNotification(String username, Evento evento) {
         OffsetDateTime next = evento.getFechaInicio();
-        Calendar date = nextDate(next, evento.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(this.taskScheduler.schedule(new EventNotification(username, evento), date.getTime()));
+        Date date = nextDate(next, evento.getRecordatorio());
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new EventNotification(username, evento), date));
         if (!this.scheduledEvents.containsKey(evento.getId()))
             this.scheduledEvents.put(evento.getId(), event);
         else this.scheduledEvents.replace(evento.getId(), event);
@@ -90,15 +91,23 @@ public class NotificationSystem {
 
     public void cancelScheduledEventNotification(Integer id) {
         if (!this.scheduledEvents.containsKey(id)) return;
+        this.scheduledEvents.get(id).getScheduled().cancel(true);
         this.scheduledEvents.remove(id);
     }
 
     static class NotificationEvent {
 
+        private final String username;
+
         private final ScheduledFuture<?> scheduled;
 
-        NotificationEvent(ScheduledFuture<?> scheduled) {
+        NotificationEvent(String username, ScheduledFuture<?> scheduled) {
+            this.username = username;
             this.scheduled = scheduled;
+        }
+
+        public String getUsername() {
+            return username;
         }
 
         public ScheduledFuture<?> getScheduled() {
@@ -125,7 +134,7 @@ public class NotificationSystem {
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de tarea");
-                notificationRequest.setMessage("Tu tarea " + "[" + this.tarea.getNombre() + "]" + " vence en la siguiente fecha " + this.tarea.getFechaFin().toString() + ", no lo olvides!");
+                notificationRequest.setMessage("Tu tarea " + '"' + this.tarea.getNombre() + '"' + " vence en " + this.tarea.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
@@ -148,19 +157,19 @@ public class NotificationSystem {
             OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(this.rutina.getFechaInicio(),
                     this.rutina.getFechaFin(), this.rutina.getRecurrencia(), this.rutina.getDuracion(),
                     this.rutina.getFranjaInicio(), this.rutina.getFranjaFin());
-            Calendar date = nextDate(next, this.rutina.getRecordatorio());
+            Date date = nextDate(next, this.rutina.getRecordatorio());
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de rutina");
-                notificationRequest.setMessage("Tu rutina " + "[" + rutina + "]" + " empieza en la siguiente fecha " + date.toString() + ", no lo olvides!");
+                notificationRequest.setMessage("Tu rutina " + '"' + this.rutina.getNombre() + '"' + " empieza en " + this.rutina.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
-            NotificationEvent event = new NotificationEvent(taskScheduler.schedule(new RoutineNotification(this.username, this.rutina), date.getTime()));
+            NotificationEvent event = new NotificationEvent(this.username, taskScheduler.schedule(new RoutineNotification(this.username, this.rutina), date));
             scheduledRoutines.replace(this.rutina.getId(), event);
         }
     }
@@ -183,7 +192,7 @@ public class NotificationSystem {
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de evento");
-                notificationRequest.setMessage("Tu evento " + "[" + this.evento.getNombre() + "]" + " inicia en la siguiente fecha " + this.evento.getFechaInicio().toString() + ", no lo olvides!");
+                notificationRequest.setMessage("Tu evento " + '"' + this.evento.getNombre() + '"' + " inicia en " + this.evento.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);

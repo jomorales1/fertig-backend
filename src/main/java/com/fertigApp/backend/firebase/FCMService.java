@@ -52,7 +52,8 @@ public class FCMService {
         WebpushConfig webpushConfig = getWebpushConfig();
         return Message.builder()
                 .setApnsConfig(apnsConfig).setAndroidConfig(androidConfig).setWebpushConfig(webpushConfig)
-                    .setNotification(new Notification(request.getTitle(), request.getMessage()));
+                    .setNotification(new Notification(request.getTitle(), request.getMessage()))
+                        .putData("icon", "https://www.flaticon.es/svg/static/icons/svg/1069/1069867.svg");
     }
 
 }

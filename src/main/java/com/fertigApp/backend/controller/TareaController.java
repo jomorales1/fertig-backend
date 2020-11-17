@@ -124,7 +124,7 @@ public class TareaController {
         }
         tarea.setHecha(!tarea.getHecha());
         this.tareaService.save(tarea);
-        this.notificationSystem.cancelScheduledTaskNotification(id);
+        this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), id);
         return ResponseEntity.ok().body(new MessageResponse("Tarea chequeada"));
     }
 
@@ -181,7 +181,7 @@ public class TareaController {
         }
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaService.deleteById(tarea.getId());
-        this.notificationSystem.cancelScheduledTaskNotification(id);
+        this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), id);
         return ResponseEntity.ok(new MessageResponse("Tarea eliminada"));
     }
 
