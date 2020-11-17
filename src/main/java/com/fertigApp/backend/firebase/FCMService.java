@@ -41,7 +41,7 @@ public class FCMService {
 
     private WebpushConfig getWebpushConfig(String title, String body) {
         return WebpushConfig.builder().setNotification(
-                WebpushNotification.builder().setTitle(title).setBody(body).setImage(IMAGE_URL).build()).build();
+                WebpushNotification.builder().setTitle(title).setBody(body).setIcon(IMAGE_URL).build()).build();
     }
 
     private Message getPreconfiguredMessageToToken(PushNotificationRequest request) {
