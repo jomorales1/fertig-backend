@@ -183,7 +183,7 @@ public class RutinaController {
         completada.setHecha(false);
         this.completadaService.save(completada);
         if (rutina.getRecordatorio() != null) {
-            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), savedRutina);
+            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), savedRutina.getId());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Rutina creada"));
     }
@@ -359,7 +359,7 @@ public class RutinaController {
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
             this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());
-            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), rutina);
+            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), rutina.getId());
         }
         LOGGER.info("Routine repetition checked");
         this.completadaService.save(newCompletada);

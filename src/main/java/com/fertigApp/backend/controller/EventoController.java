@@ -143,7 +143,7 @@ public class EventoController {
         evento.setRecordatorio(requestEvento.getRecordatorio());
         Evento savedEvent = this.eventoService.save(evento);
         if (savedEvent.getRecordatorio() != null) {
-            this.notificationSystem.scheduleEventNotification(userDetails.getUsername(), savedEvent);
+            this.notificationSystem.scheduleEventNotification(userDetails.getUsername(), savedEvent.getId());
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

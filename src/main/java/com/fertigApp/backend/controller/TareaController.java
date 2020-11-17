@@ -153,7 +153,7 @@ public class TareaController {
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         if (tarea.getRecordatorio() != null && tarea.getFechaFin() != null) {
-            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask);
+            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask.getId());
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Tarea creada"));
     }
@@ -522,7 +522,7 @@ public class TareaController {
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         if (savedTask.getRecordatorio() != null && savedTask.getFechaFin() != null) {
-            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask);
+            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask.getId());
         }
         return ResponseEntity.ok(new MessageResponse("Tarea copiada"));
     }

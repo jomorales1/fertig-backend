@@ -3,9 +3,7 @@ package com.fertigApp.backend.firebase;
 import com.fertigApp.backend.model.*;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.requestModels.PushNotificationRequest;
-import com.fertigApp.backend.services.FirebaseNTService;
-import com.fertigApp.backend.services.PushNotificationService;
-import com.fertigApp.backend.services.UsuarioService;
+import com.fertigApp.backend.services.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +20,25 @@ public class NotificationSystem {
 
     private final UsuarioService usuarioService;
 
+    private final TareaService tareaService;
+
+    private final RutinaService rutinaService;
+
+    private final EventoService eventoService;
+
     private final FirebaseNTService firebaseNTService;
 
     private final HashMap<Integer, List<NotificationEvent>> scheduledTasks;
     private final HashMap<Integer, NotificationEvent> scheduledRoutines;
     private final HashMap<Integer, NotificationEvent> scheduledEvents;
 
-    public NotificationSystem(PushNotificationService notificationService, ThreadPoolTaskScheduler taskScheduler, UsuarioService usuarioService, FirebaseNTService firebaseNTService) {
+    public NotificationSystem(PushNotificationService notificationService, ThreadPoolTaskScheduler taskScheduler, UsuarioService usuarioService, TareaService tareaService, RutinaService rutinaService, EventoService eventoService, FirebaseNTService firebaseNTService) {
         this.pushNotificationService = notificationService;
         this.taskScheduler = taskScheduler;
         this.usuarioService = usuarioService;
+        this.tareaService = tareaService;
+        this.rutinaService = rutinaService;
+        this.eventoService = eventoService;
         this.firebaseNTService = firebaseNTService;
         this.scheduledTasks = new HashMap<>();
         this.scheduledRoutines = new HashMap<>();
@@ -45,9 +52,11 @@ public class NotificationSystem {
         return date.getTime();
     }
 
-    public void scheduleTaskNotification(String username, Tarea tarea) {
+    public void scheduleTaskNotification(String username, Integer idTarea) {
+        Optional<Tarea> optionalTarea = this.tareaService.findById(idTarea);
+        Tarea tarea = optionalTarea.orElse(new Tarea());
         Date date = nextDate(tarea.getFechaFin(), tarea.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new TaskNotification(username, tarea), date));
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new TaskNotification(username, idTarea), date));
         if (!this.scheduledTasks.containsKey(tarea.getId()))
             this.scheduledTasks.put(tarea.getId(), new ArrayList<>());
         this.scheduledTasks.get(tarea.getId()).add(event);
@@ -63,12 +72,14 @@ public class NotificationSystem {
         }
     }
 
-    public void scheduleRoutineNotification(String username, Rutina rutina) {
+    public void scheduleRoutineNotification(String username, Integer idRutina) {
+        Optional<Rutina> optionalRutina = rutinaService.findById(idRutina);
+        Rutina rutina = optionalRutina.orElse(new Rutina());
         OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                 rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
                 rutina.getFranjaInicio(), rutina.getFranjaFin());
         Date date = nextDate(next, rutina.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new RoutineNotification(username, rutina), date));
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new RoutineNotification(username, idRutina), date));
         if (!this.scheduledRoutines.containsKey(rutina.getId()))
             this.scheduledRoutines.put(rutina.getId(), event);
         else this.scheduledRoutines.replace(rutina.getId(), event);
@@ -80,10 +91,12 @@ public class NotificationSystem {
         this.scheduledRoutines.remove(id);
     }
 
-    public void scheduleEventNotification(String username, Evento evento) {
+    public void scheduleEventNotification(String username, Integer idEvento) {
+        Optional<Evento> optionalEvento = this.eventoService.findById(idEvento);
+        Evento evento = optionalEvento.orElse(new Evento());
         OffsetDateTime next = evento.getFechaInicio();
         Date date = nextDate(next, evento.getRecordatorio());
-        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new EventNotification(username, evento), date));
+        NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new EventNotification(username, idEvento), date));
         if (!this.scheduledEvents.containsKey(evento.getId()))
             this.scheduledEvents.put(evento.getId(), event);
         else this.scheduledEvents.replace(evento.getId(), event);
@@ -119,22 +132,24 @@ public class NotificationSystem {
     class TaskNotification implements Runnable {
 
         private final String username;
-        private final Tarea tarea;
+        private final Integer idTarea;
 
-        TaskNotification(String username, Tarea tarea) {
+        TaskNotification(String username, Integer idTarea) {
             this.username = username;
-            this.tarea = tarea;
+            this.idTarea = idTarea;
         }
 
         @Override
         public void run() {
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
+            Optional<Tarea> optionalTarea = tareaService.findById(this.idTarea);
+            Tarea tarea = optionalTarea.orElse(new Tarea());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de tarea");
-                notificationRequest.setMessage("Tu tarea " + '"' + this.tarea.getNombre() + '"' + " vence en " + this.tarea.getRecordatorio() + " minutos, no lo olvides!");
+                notificationRequest.setMessage("Tu tarea " + '"' + tarea.getNombre() + '"' + " vence en " + tarea.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
@@ -145,54 +160,58 @@ public class NotificationSystem {
     class RoutineNotification implements Runnable {
 
         private final String username;
-        private final Rutina rutina;
+        private final Integer idRutina;
 
-        RoutineNotification(String username, Rutina rutina) {
+        RoutineNotification(String username, Integer idRutina) {
             this.username = username;
-            this.rutina = rutina;
+            this.idRutina = idRutina;
         }
 
         @Override
         public void run() {
-            OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(this.rutina.getFechaInicio(),
-                    this.rutina.getFechaFin(), this.rutina.getRecurrencia(), this.rutina.getDuracion(),
-                    this.rutina.getFranjaInicio(), this.rutina.getFranjaFin());
-            Date date = nextDate(next, this.rutina.getRecordatorio());
+            Optional<Rutina> optionalRutina = rutinaService.findById(this.idRutina);
+            Rutina rutina = optionalRutina.orElse(new Rutina());
+            OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
+                    rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
+                    rutina.getFranjaInicio(), rutina.getFranjaFin());
+            Date date = nextDate(next, rutina.getRecordatorio());
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de rutina");
-                notificationRequest.setMessage("Tu rutina " + '"' + this.rutina.getNombre() + '"' + " empieza en " + this.rutina.getRecordatorio() + " minutos, no lo olvides!");
+                notificationRequest.setMessage("Tu rutina " + '"' + rutina.getNombre() + '"' + " empieza en " + rutina.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
-            NotificationEvent event = new NotificationEvent(this.username, taskScheduler.schedule(new RoutineNotification(this.username, this.rutina), date));
-            scheduledRoutines.replace(this.rutina.getId(), event);
+            NotificationEvent event = new NotificationEvent(this.username, taskScheduler.schedule(new RoutineNotification(this.username, this.idRutina), date));
+            scheduledRoutines.replace(rutina.getId(), event);
         }
     }
 
     class EventNotification implements Runnable {
 
         private final String username;
-        private final Evento evento;
+        private final Integer idEvento;
 
-        EventNotification(String username, Evento evento) {
+        EventNotification(String username, Integer idEvento) {
             this.username = username;
-            this.evento = evento;
+            this.idEvento = idEvento;
         }
 
         @Override
         public void run() {
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
+            Optional<Evento> optionalEvento = eventoService.findById(this.idEvento);
+            Evento evento = optionalEvento.orElse(new Evento());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de evento");
-                notificationRequest.setMessage("Tu evento " + '"' + this.evento.getNombre() + '"' + " inicia en " + this.evento.getRecordatorio() + " minutos, no lo olvides!");
+                notificationRequest.setMessage("Tu evento " + '"' + evento.getNombre() + '"' + " inicia en " + evento.getRecordatorio() + " minutos, no lo olvides!");
                 notificationRequest.setTopic("Recordatorio");
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
