@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
 public interface CompletadaRepository extends CrudRepository<Completada, Integer> {
     Iterable<Completada> findByRutinaC(Rutina rutina);
 
-    Iterable<Completada> findByRutinaCAndHecha(Rutina rutina, Boolean hecha);
+    Completada findTopByRutinaCAndHecha(Rutina rutina, Boolean hecha);
 
     @Query("select c.fecha from Completada c where c.rutinaC = :rutina and c.hecha = true")
     Iterable<OffsetDateTime> findFechasCompletadasByRutina(@Param("rutina") Rutina rutina);
@@ -22,14 +22,14 @@ public interface CompletadaRepository extends CrudRepository<Completada, Integer
     @Query("select max(c.fecha) from Completada c where c.rutinaC = :rutina and c.hecha = false")
     OffsetDateTime findFechaNoCompletadaByRutina(@Param("rutina") Rutina rutina);
 
-    @Query("select max(c.fechaAjustada) from Completada c where c.rutinaC = :rutina and c.hecha = true")
-    OffsetDateTime findMaxAjustadaCompletadasByRutina(@Param("rutina") Rutina rutina);
+    @Query("select max(c.fecha) from Completada c where c.rutinaC = :rutina and c.hecha = true")
+    OffsetDateTime findMaxFechaCompletadaByRutina(@Param("rutina") Rutina rutina);
 
     @Transactional
     void deleteAllByRutinaC(Rutina rutinaC);
 
     void deleteById(Integer id);
 
-    @Query("select c from Completada c where c.rutinaC = :rutina and c.fechaAjustada = (select max(cc.fechaAjustada) from Completada cc where cc.rutinaC = :rutina and cc.hecha = true) and c.hecha = true")
+    @Query("select c from Completada c where c.rutinaC = :rutina and c.fecha = (select max(cc.fecha) from Completada cc where cc.rutinaC = :rutina and cc.hecha = true) and c.hecha = true")
     Completada findMaxCompletada(@Param("rutina") Rutina rutina);
 }

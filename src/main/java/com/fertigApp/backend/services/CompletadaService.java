@@ -6,7 +6,6 @@ import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 @Service
 public class CompletadaService {
@@ -21,8 +20,8 @@ public class CompletadaService {
         return completadaRepository.save(completada);
     }
 
-    public  Iterable<Completada> findHechaByRutina(Rutina rutina){
-        return completadaRepository.findByRutinaCAndHecha(rutina, false);
+    public Completada findTopHechaByRutinaAndHecha(Rutina rutina, boolean hecha){
+        return completadaRepository.findTopByRutinaCAndHecha(rutina, hecha);
     }
 
     public void deleteAllByRutina(Rutina rutina){
@@ -33,8 +32,8 @@ public class CompletadaService {
         return this.completadaRepository.findFechasCompletadasByRutina(rutina);
     }
 
-    public OffsetDateTime findMaxAjustadaCompletadasByRutina(Rutina rutina){
-        return this.completadaRepository.findMaxAjustadaCompletadasByRutina(rutina);
+    public OffsetDateTime findMaxFechaCompletadaByRutina(Rutina rutina){
+        return this.completadaRepository.findMaxFechaCompletadaByRutina(rutina);
     }
 
     public OffsetDateTime findFechaNoCompletadaByRutina(Rutina rutina){
