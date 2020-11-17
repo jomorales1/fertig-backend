@@ -62,7 +62,6 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia){
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
-        Character c = recurrencia.charAt(0);
         if(recurrencia == null) {
             fechas.add(OffsetDateTime.from(fechaFin));
         } else if(recurrencia.charAt(0) == 'E'){
@@ -77,6 +76,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                 dias = dias >> 1;
             }
         } else{
+            Character c = recurrencia.charAt(0);
             int n = Integer.parseInt(recurrencia.substring(1));
             for(OffsetDateTime current = OffsetDateTime.from(fechaInicio); current.isBefore(fechaFin); current = add(current,n,c)) {
                 fechas.add(current);
