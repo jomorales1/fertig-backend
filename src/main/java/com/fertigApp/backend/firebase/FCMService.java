@@ -13,6 +13,8 @@ public class FCMService {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FCMService.class);
 
+    private static final String IMAGE_URL = "https://www.flaticon.es/svg/static/icons/svg/1069/1069867.svg";
+
     public void sendMessageToToken(PushNotificationRequest request)
             throws InterruptedException, ExecutionException {
         Message message = getPreconfiguredMessageToToken(request);
@@ -37,8 +39,9 @@ public class FCMService {
                 .setAps(Aps.builder().setCategory(topic).setThreadId(topic).build()).build();
     }
 
-    private WebpushConfig getWebpushConfig() {
-        return WebpushConfig.builder().build();
+    private WebpushConfig getWebpushConfig(String title, String body) {
+        return WebpushConfig.builder().setNotification(
+                WebpushNotification.builder().setTitle(title).setBody(body).setImage(IMAGE_URL).build()).build();
     }
 
     private Message getPreconfiguredMessageToToken(PushNotificationRequest request) {
@@ -49,11 +52,9 @@ public class FCMService {
     private Message.Builder getPreconfiguredMessageBuilder(PushNotificationRequest request) {
         AndroidConfig androidConfig = getAndroidConfig(request.getTopic());
         ApnsConfig apnsConfig = getApnsConfig(request.getTopic());
-        WebpushConfig webpushConfig = getWebpushConfig();
+        WebpushConfig webpushConfig = getWebpushConfig(request.getTitle(), request.getMessage());
         return Message.builder()
-                .setApnsConfig(apnsConfig).setAndroidConfig(androidConfig).setWebpushConfig(webpushConfig)
-                    .setNotification(new Notification(request.getTitle(), request.getMessage()))
-                        .putData("icon", "https://www.flaticon.es/svg/static/icons/svg/1069/1069867.svg");
+                .setApnsConfig(apnsConfig).setAndroidConfig(androidConfig).setWebpushConfig(webpushConfig);
     }
 
 }
