@@ -1,14 +1,13 @@
 package com.fertigApp.backend.controller;
 
+import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.payload.response.OwnerResponse;
 import com.fertigApp.backend.requestModels.RequestTarea;
-import com.fertigApp.backend.services.TareaDeUsuarioService;
-import com.fertigApp.backend.services.TareaService;
-import com.fertigApp.backend.services.UsuarioService;
+import com.fertigApp.backend.services.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,10 +41,13 @@ public class TareaController {
 
     private final TareaDeUsuarioService tareaDeUsuarioService;
 
-    public TareaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService) {
+    private final NotificationSystem notificationSystem;
+
+    public TareaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, NotificationSystem notificationSystem) {
         this.tareaService = tareaService;
         this.usuarioService = usuarioService;
         this.tareaDeUsuarioService = tareaDeUsuarioService;
+        this.notificationSystem = notificationSystem;
     }
 
     // Método GET para obtener todas las entidades de tipo "Tarea" almacenadas en la DB.
@@ -122,6 +124,7 @@ public class TareaController {
         }
         tarea.setHecha(!tarea.getHecha());
         this.tareaService.save(tarea);
+        this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), id);
         return ResponseEntity.ok().body(new MessageResponse("Tarea chequeada"));
     }
 
@@ -145,9 +148,13 @@ public class TareaController {
         tarea.setTiempoInvertido(0);
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);
-        tareaDeUsuario.setTarea(this.tareaService.save(tarea));
+        Tarea savedTask = this.tareaService.save(tarea);
+        tareaDeUsuario.setTarea(savedTask);
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
+        if (tarea.getRecordatorio() != null && tarea.getFechaFin() != null) {
+            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask.getId());
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Tarea creada"));
     }
 
@@ -174,6 +181,7 @@ public class TareaController {
         }
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaService.deleteById(tarea.getId());
+        this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), id);
         return ResponseEntity.ok(new MessageResponse("Tarea eliminada"));
     }
 
@@ -509,9 +517,13 @@ public class TareaController {
         }
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);
-        tareaDeUsuario.setTarea(this.tareaService.save(copy));
+        Tarea savedTask = this.tareaService.save(copy);
+        tareaDeUsuario.setTarea(savedTask);
         tareaDeUsuario.setAdmin(true);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
+        if (savedTask.getRecordatorio() != null && savedTask.getFechaFin() != null) {
+            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), savedTask.getId());
+        }
         return ResponseEntity.ok(new MessageResponse("Tarea copiada"));
     }
 

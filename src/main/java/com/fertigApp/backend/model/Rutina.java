@@ -44,7 +44,7 @@ public class Rutina implements Serializable {
 
     protected String recurrencia;
 
-    protected int recordatorio;
+    protected Integer recordatorio;
 
     @Column(name="franja_inicio",columnDefinition = "TIME")
     protected LocalTime franjaInicio;
@@ -133,11 +133,11 @@ public class Rutina implements Serializable {
         return recurrencia;
     }
 
-    public int getRecordatorio() {
+    public Integer getRecordatorio() {
         return recordatorio;
     }
 
-    public void setRecordatorio(int recordatorio) {
+    public void setRecordatorio(Integer recordatorio) {
         this.recordatorio = recordatorio;
     }
 

@@ -1,19 +1,14 @@
 package com.fertigApp.backend.controller;
 
-import com.fertigApp.backend.model.Completada;
-import com.fertigApp.backend.model.Rutina;
-import com.fertigApp.backend.model.Tarea;
-import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.firebase.NotificationSystem;
+import com.fertigApp.backend.model.*;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
 import com.fertigApp.backend.requestModels.RequestRutina;
 import com.fertigApp.backend.requestModels.RequestTarea;
-import com.fertigApp.backend.services.CompletadaService;
-import com.fertigApp.backend.services.RutinaService;
-import com.fertigApp.backend.services.TareaService;
-import com.fertigApp.backend.services.UsuarioService;
+import com.fertigApp.backend.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -52,11 +47,14 @@ public class RutinaController {
 
     private final CompletadaService completadaService;
 
-    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, TareaService tareaService, CompletadaService completadaService) {
+    private final NotificationSystem notificationSystem;
+
+    public RutinaController(RutinaService rutinaService, UsuarioService usuarioService, TareaService tareaService, CompletadaService completadaService, NotificationSystem notificationSystem) {
         this.rutinaService = rutinaService;
         this.usuarioService = usuarioService;
         this.tareaService = tareaService;
         this.completadaService = completadaService;
+        this.notificationSystem = notificationSystem;
     }
 
     // Método GET para obtener todas las entidades de tipo "Rutina" almacenadas en la DB.
@@ -173,7 +171,7 @@ public class RutinaController {
         rutina.setFechaFin(requestRutina.getFechaFin());
         rutina.setFranjaInicio(requestRutina.getFranjaInicio());
         rutina.setFranjaFin(requestRutina.getFranjaFin());
-        this.rutinaService.save(rutina);
+        Rutina savedRutina =  this.rutinaService.save(rutina);
 
         Completada completada = new Completada();
         completada.setRutinaC(rutina);
@@ -184,6 +182,9 @@ public class RutinaController {
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
+        if (rutina.getRecordatorio() != null) {
+            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), savedRutina.getId());
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(new MessageResponse("Rutina creada"));
     }
 
@@ -356,6 +357,10 @@ public class RutinaController {
                         rutina.getFranjaFin())
         );
         newCompletada.setHecha(false);
+        if (rutina.getRecordatorio() != null) {
+            this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());
+            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), rutina.getId());
+        }
         LOGGER.info("Routine repetition checked");
         this.completadaService.save(newCompletada);
         return ResponseEntity.ok().body(new MessageResponse("Routine repetition checked"));
@@ -407,6 +412,7 @@ public class RutinaController {
         }
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Rutina eliminada"));
     }
 
