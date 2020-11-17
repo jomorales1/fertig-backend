@@ -20,7 +20,7 @@ public class PushNotificationService {
     public void sendPushNotificationToToken(PushNotificationRequest request) {
         try {
             this.fcmService.sendMessageToToken(request);
-        } catch (InterruptedException | ExecutionException e) {
+        } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
     }
