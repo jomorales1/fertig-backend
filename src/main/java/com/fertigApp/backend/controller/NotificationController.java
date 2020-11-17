@@ -55,7 +55,7 @@ public class NotificationController {
         return ResponseEntity.ok(new MessageResponse("Firebase token registrado con éxito"));
     }
 
-    @DeleteMapping(path = "/notification/delete/{id}")
+    @DeleteMapping(path = "/notification/delete-token/{id}")
     public ResponseEntity<MessageResponse> deleteFirebaseToken(@PathVariable String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<FirebaseNotificationToken> tokenOptional = this.firebaseNTService.findById(id);
