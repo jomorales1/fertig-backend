@@ -251,6 +251,47 @@ public class TareaController {
         return ResponseEntity.ok(new MessageResponse("Administrador agregado"));
     }
 
+    @PatchMapping(path = "/task/{id}/remove-admin/{username}")
+    public ResponseEntity<MessageResponse> removeTaskAdmin(@PathVariable Integer id, @PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalAdmin = this.usuarioService.findById(userDetails.getUsername());
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(username);
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalUsuario.isEmpty()) {
+            LOGGER.info("El usuario no existe");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario especificado no existe"));
+        }
+        if (optionalTarea.isEmpty()) {
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
+        }
+        Usuario admin = optionalAdmin.orElse(new Usuario());
+        Usuario usuario = optionalUsuario.get();
+        Tarea tarea = optionalTarea.get();
+        Optional<TareaDeUsuario> optionalTareaAdmin = this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea);
+        Optional<TareaDeUsuario> optionalTareaUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
+        if (optionalTareaAdmin.isEmpty()) {
+            LOGGER.info(TAR_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
+        }
+        if (optionalTareaUsuario.isEmpty()) {
+            LOGGER.info("El usuario no es un colaborador");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
+        }
+        if (!optionalTareaAdmin.get().isAdmin()) {
+            LOGGER.info(US_NO_ADMIN);
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ADMIN));
+        }
+        if (!optionalTareaUsuario.get().isAdmin()) {
+            LOGGER.info("El usuario especificado no es administrador");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario especificado no es administrador"));
+        }
+        TareaDeUsuario tareaDeUsuario = optionalTareaUsuario.get();
+        tareaDeUsuario.setAdmin(false);
+        this.tareaDeUsuarioService.save(tareaDeUsuario);
+        return ResponseEntity.ok(new MessageResponse("El usuario ya no es un administrador"));
+    }
+
     // Método POST para añadir un colaborador a una tarea
     @PostMapping(path = "/task/{id}/add-owner/{username}")
     public ResponseEntity<MessageResponse> addTaskOwner(@PathVariable Integer id, @PathVariable String username) {
@@ -284,6 +325,42 @@ public class TareaController {
         tareaDeUsuario.setAdmin(false);
         this.tareaDeUsuarioService.save(tareaDeUsuario);
         return ResponseEntity.ok(new MessageResponse("Dueño agregado"));
+    }
+
+    @DeleteMapping(path = "/task/{id}/delete-owner/{username}")
+    public ResponseEntity<MessageResponse> deleteTaskOwner(@PathVariable Integer id, @PathVariable String username) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(username);
+        Optional<Tarea> optionalTarea = this.tareaService.findById(id);
+        if (optionalTarea.isEmpty()) {
+            LOGGER.info(TAR_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
+        }
+        if (optionalUsuario.isEmpty()) {
+            LOGGER.info("Usuario no encontrado");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
+        }
+        Optional<Usuario> optionalAdmin = this.usuarioService.findById(userDetails.getUsername());
+        Usuario admin = optionalAdmin.orElse(new Usuario());
+        Usuario usuario = optionalUsuario.get();
+        Tarea tarea = optionalTarea.get();
+        Optional<TareaDeUsuario> optionalTareaAdmin = this.tareaDeUsuarioService.findByUsuarioAndTarea(admin, tarea);
+        if (optionalTareaAdmin.isEmpty()) {
+            LOGGER.info(TAR_NO_PERTENECE);
+            return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
+        }
+        if (!optionalTareaAdmin.get().isAdmin()) {
+            LOGGER.info(US_NO_ADMIN);
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ADMIN));
+        }
+        Optional<TareaDeUsuario> optionalTareaUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
+        if (optionalTareaUsuario.isEmpty()) {
+            LOGGER.info("El usuario no es un colaborador");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
+        }
+        TareaDeUsuario tareaDeUsuario = optionalTareaUsuario.get();
+        this.tareaDeUsuarioService.deleteById(tareaDeUsuario.getId());
+        return ResponseEntity.ok(new MessageResponse("Dueño eliminado"));
     }
 
     @PostMapping(path = "/task/{id}/add-subtask")
