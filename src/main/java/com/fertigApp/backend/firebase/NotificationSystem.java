@@ -77,7 +77,7 @@ public class NotificationSystem {
         Rutina rutina = optionalRutina.orElse(new Rutina());
         OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                 rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
-                rutina.getFranjaInicio(), rutina.getFranjaFin());
+                rutina.getFranjaInicio(), rutina.getFranjaFin(), OffsetDateTime.now());
         Date date = nextDate(next, rutina.getRecordatorio());
         NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new RoutineNotification(username, idRutina), date));
         if (!this.scheduledRoutines.containsKey(rutina.getId()))
@@ -173,7 +173,7 @@ public class NotificationSystem {
             Rutina rutina = optionalRutina.orElse(new Rutina());
             OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
                     rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
-                    rutina.getFranjaInicio(), rutina.getFranjaFin());
+                    rutina.getFranjaInicio(), rutina.getFranjaFin(), OffsetDateTime.now());
             Date date = nextDate(next, rutina.getRecordatorio());
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -208,7 +208,7 @@ public class NotificationSystem {
             Optional<Evento> optionalEvento = eventoService.findById(this.idEvento);
             Evento evento = optionalEvento.orElse(new Evento());
             OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(evento.getFechaInicio(),
-                    evento.getFechaFin(), evento.getRecurrencia());
+                    evento.getFechaFin(), evento.getRecurrencia(), OffsetDateTime.now());
             Date date = nextDate(next, evento.getRecordatorio());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
