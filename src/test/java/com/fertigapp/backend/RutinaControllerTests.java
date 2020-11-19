@@ -371,7 +371,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,13,12,0,0,0, ZoneOffset.UTC));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
