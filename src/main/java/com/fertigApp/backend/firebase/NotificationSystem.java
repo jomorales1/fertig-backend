@@ -207,6 +207,9 @@ public class NotificationSystem {
             Usuario usuario = optionalUsuario.orElse(new Usuario());
             Optional<Evento> optionalEvento = eventoService.findById(this.idEvento);
             Evento evento = optionalEvento.orElse(new Evento());
+            OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(evento.getFechaInicio(),
+                    evento.getFechaFin(), evento.getRecurrencia());
+            Date date = nextDate(next, evento.getRecordatorio());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
@@ -216,6 +219,8 @@ public class NotificationSystem {
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
+            NotificationEvent notificationEvent = new NotificationEvent(this.username, taskScheduler.schedule(new EventNotification(this.username, this.idEvento), date));
+            scheduledEvents.replace(evento.getId(), notificationEvent);
         }
     }
 
