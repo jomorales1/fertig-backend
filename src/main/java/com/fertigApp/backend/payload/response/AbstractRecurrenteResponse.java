@@ -116,8 +116,13 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     }
 
     public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, OffsetDateTime fecha) {
-        fecha = (OffsetDateTime.now().isAfter(fecha) ? OffsetDateTime.now() : fecha.plusMinutes(10));
-        if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
+        if (OffsetDateTime.now().isAfter(fecha)){
+            fecha = OffsetDateTime.now();
+            if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
+        } else {
+            if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
+            fecha = fecha.plusMinutes(10);
+        }
         if(recurrencia.charAt(0) == 'E'){
             int punto = recurrencia.indexOf(".") ;
             int d = Integer.parseInt(recurrencia.substring(1, punto));
