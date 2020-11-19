@@ -65,6 +65,10 @@ public class Usuario implements Serializable {
 	@OneToMany(mappedBy = "usuarioF")
     private Set<FirebaseNotificationToken> notificationTokens;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "usuarioFL")
+	private Set<FranjaLibre> franjasLibres;
+
 	public Usuario() { }
 
 	public Usuario(String usuario, String correo, String password, String nombre) {
@@ -193,5 +197,13 @@ public class Usuario implements Serializable {
 
 	public void setAgregados(List<Usuario> agregados) {
 		this.agregados = agregados;
+	}
+
+	public Set<FranjaLibre> getFranjasLibres() {
+		return franjasLibres;
+	}
+
+	public void setFranjasLibres(Set<FranjaLibre> franjasLibres) {
+		this.franjasLibres = franjasLibres;
 	}
 }
