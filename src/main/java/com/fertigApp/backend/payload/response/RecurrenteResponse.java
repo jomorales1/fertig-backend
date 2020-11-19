@@ -22,7 +22,7 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
 
     public RecurrenteResponse(Evento evento) {
         super(evento);
-        this.fecha = findSiguiente(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia());
+        this.fecha = findSiguiente(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia(), OffsetDateTime.now());
     }
 
     public RecurrenteResponse(Rutina rutina, OffsetDateTime fecha) {

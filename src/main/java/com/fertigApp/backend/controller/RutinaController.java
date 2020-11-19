@@ -86,7 +86,7 @@ public class RutinaController {
         List<Rutina> rutinas = (List<Rutina>) rutinaService.findByUsuario(usuario);
         List<RecurrenteResponse> rutinaResponses = new ArrayList<>();
         for(Rutina rutina : rutinas) {
-            RecurrenteResponse response = new RecurrenteResponse(rutina, completadaService.findMaxAjustadaCompletadasByRutina(rutina));
+            RecurrenteResponse response = new RecurrenteResponse(rutina, completadaService.findMaxFechaCompletadaByRutina(rutina));
             rutinaResponses.add(response);
         }
         return ResponseEntity.ok().body(rutinaResponses);
@@ -102,7 +102,7 @@ public class RutinaController {
         for(Rutina rutina : rutinas){
             response.add(new RutinaRepeticionesResponse(rutina,
                     (List<OffsetDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
-                    completadaService.findMaxAjustadaCompletadasByRutina(rutina)));
+                    completadaService.findMaxFechaCompletadaByRutina(rutina)));
         }
         return ResponseEntity.ok().body(response);
     }
@@ -175,10 +175,15 @@ public class RutinaController {
 
         Completada completada = new Completada();
         completada.setRutinaC(rutina);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
-                        rutina.getFechaFin(),
-                        rutina.getRecurrencia()));
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                rutina.getFechaInicio(),
+                rutina.getFechaFin(),
+                rutina.getRecurrencia(),
+                rutina.getDuracion(),
+                rutina.getFranjaInicio(),
+                rutina.getFranjaFin(),
+                OffsetDateTime.now())
+        );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -334,27 +339,27 @@ public class RutinaController {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
-        ArrayList<Completada> completadas = (ArrayList<Completada>) this.completadaService.findHechaByRutina(rutina);
-        Completada completada = (completadas.isEmpty()) ? new Completada() : completadas.get(0);
-        //if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
+        Completada completada = this.completadaService.findTopHechaByRutinaAndHecha(rutina,false);
+        if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
         OffsetDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
                 rutina.getFechaFin(),
                 rutina.getRecurrencia(),
                 rutina.getDuracion(),
                 rutina.getFranjaInicio(),
                 rutina.getFranjaFin());
-        completada.setFechaAjustada((anterior.compareTo(completada.getFecha()) > 1) ? anterior : completada.getFecha());
+        if(anterior != null && anterior.isAfter(completada.getFecha())) completada.setFecha(anterior);
         completada.setHecha(true);
         this.completadaService.save(completada);
         Completada newCompletada = new Completada();
         newCompletada.setRutinaC(rutina);
-        newCompletada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
-                        rutina.getFechaFin(),
-                        rutina.getRecurrencia(),
-                        rutina.getDuracion(),
-                        rutina.getFranjaInicio(),
-                        rutina.getFranjaFin())
+        newCompletada.setFecha( AbstractRecurrenteResponse.findSiguiente(
+                rutina.getFechaInicio(),
+                rutina.getFechaFin(),
+                rutina.getRecurrencia(),
+                rutina.getDuracion(),
+                rutina.getFranjaInicio(),
+                rutina.getFranjaFin(),
+                completada.getFecha())
         );
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
@@ -379,11 +384,10 @@ public class RutinaController {
             if(!optionalRutina.get().getUsuario().getUsuario().equals(usuario.getUsuario())){
                 return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
             }
-            ArrayList<Completada>  completadas =  (ArrayList<Completada>) completadaService.findHechaByRutina(optionalRutina.get());
-            if (!completadas.isEmpty()) completadaService.deleteById(completadas.get(0).getId());
-            Completada completada = completadaService.findMaxCompletada(optionalRutina.get());
+            Completada completada = this.completadaService.findTopHechaByRutinaAndHecha(optionalRutina.get(), false);
+            completadaService.deleteById(completada.getId());
+            completada = completadaService.findMaxCompletada(optionalRutina.get());
             if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede descheckear"));
-            completada.setFechaAjustada(null);
             completada.setHecha(false);
             this.completadaService.save(completada);
             LOGGER.info("Routine repetition unchecked");

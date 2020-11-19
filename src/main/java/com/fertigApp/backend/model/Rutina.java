@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,10 +47,10 @@ public class Rutina implements Serializable {
     protected Integer recordatorio;
 
     @Column(name="franja_inicio",columnDefinition = "TIME")
-    protected LocalTime franjaInicio;
+    protected OffsetTime franjaInicio;
 
     @Column(name="franja_fin",columnDefinition = "TIME")
-    protected LocalTime franjaFin;
+    protected OffsetTime franjaFin;
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
@@ -141,19 +141,19 @@ public class Rutina implements Serializable {
         this.recordatorio = recordatorio;
     }
 
-    public LocalTime getFranjaInicio() {
+    public OffsetTime getFranjaInicio() {
         return franjaInicio;
     }
 
-    public void setFranjaInicio(LocalTime franjaInicio) {
+    public void setFranjaInicio(OffsetTime franjaInicio) {
         this.franjaInicio = franjaInicio;
     }
 
-    public LocalTime getFranjaFin() {
+    public OffsetTime getFranjaFin() {
         return franjaFin;
     }
 
-    public void setFranjaFin(LocalTime franjaFin) {
+    public void setFranjaFin(OffsetTime franjaFin) {
         this.franjaFin = franjaFin;
     }
 

@@ -3,9 +3,11 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
-import com.fertigApp.backend.model.*;
+import com.fertigApp.backend.model.Completada;
+import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Tarea;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
-import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
@@ -15,7 +17,6 @@ import com.fertigApp.backend.services.CompletadaService;
 import com.fertigApp.backend.services.RutinaService;
 import com.fertigApp.backend.services.TareaService;
 import com.fertigApp.backend.services.UsuarioService;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -29,16 +30,19 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalDateTime;
+import java.time.OffsetTime;
 import java.time.OffsetDateTime;
-import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
@@ -101,7 +105,8 @@ class RutinaControllerTests {
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
-                        routine.getRecurrencia()));
+                        routine.getRecurrencia(),
+                        OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         Rutina saved = this.rutinaService.save(routine);
@@ -129,7 +134,8 @@ class RutinaControllerTests {
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
-                        routine.getRecurrencia()));
+                        routine.getRecurrencia(),
+                        OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         Rutina saved = this.rutinaService.save(routine);
@@ -157,7 +163,8 @@ class RutinaControllerTests {
         completada.setFecha(
                 AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
                         routine.getFechaFin(),
-                        routine.getRecurrencia()));
+                        routine.getRecurrencia(),
+                        OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         Rutina saved = this.rutinaService.save(routine);
@@ -166,7 +173,7 @@ class RutinaControllerTests {
         return saved;
     }
 
-    Rutina setUpRutina(Usuario user, String recurrencia, OffsetDateTime fechaInicio, OffsetDateTime fechaFin, LocalTime franjaI, LocalTime franjaF) {
+    Rutina setUpRutina(Usuario user, String recurrencia, OffsetDateTime fechaInicio, OffsetDateTime fechaFin, OffsetTime franjaI, OffsetTime franjaF) {
         Rutina routine = new Rutina();
 
         routine.setUsuario(user);
@@ -190,7 +197,8 @@ class RutinaControllerTests {
                         routine.getRecurrencia(),
                         routine.getDuracion(),
                         routine.getFranjaInicio(),
-                        routine.getFranjaFin()));
+                        routine.getFranjaFin(),
+                        OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         Rutina saved = this.rutinaService.save(routine);
@@ -259,8 +267,8 @@ class RutinaControllerTests {
         Rutina routine;
         String recurrencia;
         OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
-        LocalTime franjaIncio = LocalTime.of(7,0);
-        LocalTime franjaFin  = LocalTime.of(13,0);
+        OffsetTime franjaIncio = OffsetTime.of(7,0,0,0,ZoneOffset.UTC);
+        OffsetTime franjaFin  = OffsetTime.of(13,0,0,0,ZoneOffset.UTC);
         RecurrenteResponse obtainedRoutine;
 
         ResultActions resultActions;
@@ -1018,11 +1026,10 @@ class RutinaControllerTests {
 
         Rutina rutinaF;
         OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
-        LocalTime franjaIncio = LocalTime.of(7,0);
-        LocalTime franjaFin  = LocalTime.of(13,0);
+        OffsetTime franjaIncio = OffsetTime.of(7,0,0,0,ZoneOffset.UTC);
+        OffsetTime franjaFin  = OffsetTime.of(13,0,0,0,ZoneOffset.UTC);
 
         //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
-
         fechaInicio = OffsetDateTime.of(2020,1,1,14,0,0,0, ZoneOffset.UTC);
         rutinaF = setUpRutina(user, "H13", fechaInicio, fechaFin, franjaIncio, franjaFin);
 
@@ -1086,8 +1093,8 @@ class RutinaControllerTests {
 
         Rutina rutinaF;
         OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
-        LocalTime franjaIncio = LocalTime.of(7,0);
-        LocalTime franjaFin  = LocalTime.of(13,0);
+        OffsetTime franjaIncio = OffsetTime.of(7,0,0,0,ZoneOffset.UTC);
+        OffsetTime franjaFin  = OffsetTime.of(13,0,0,0,ZoneOffset.UTC);
 
         //RECURRENCIA HORARIA CADA 13 HORAS ENTRE 7AM Y 13AM
 
@@ -1184,4 +1191,47 @@ class RutinaControllerTests {
         this.usuarioService.deleteById(newUser.getUsuario());
         this.usuarioService.deleteById(user.getUsuario());
     }
+
+//    @Test
+//    void rutinaHoraria() throws Exception {
+//        String uri1 = "/routine/check/";
+//        String uri2 = "/routine/routines";
+//        Usuario user;
+//        if (this.usuarioService.findById("test_user").isEmpty())
+//            user = setUpUsuario();
+//        else user = this.usuarioService.findById("test_user").get();
+//        String token = getToken(user);
+//        Rutina routine = setUpRutina(
+//                user,
+//                "H13",
+//                OffsetDateTime.of(2020,11,18,12,0,0,0,ZoneOffset.UTC),
+//                OffsetDateTime.of(2020,12,31,0,0,0,0,ZoneOffset.UTC),
+//                OffsetTime.of(10,10),
+//                OffsetTime.of(15,0));
+//
+//        ResultActions resultActions;
+//        MvcResult mvcResult;
+//        String response;
+//
+//        this.mockMvc.perform(patch(uri1 + String.valueOf(routine.getId()))
+//                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+//
+//        resultActions = this.mockMvc.perform(get(uri2).header("Authorization", "Bearer " + token))
+//                .andExpect(status().isOk());
+//        mvcResult = resultActions.andReturn();
+//        response = mvcResult.getResponse().getContentAsString();
+//        CollectionType javaList =  objectMapper.getTypeFactory().constructCollectionType(List.class, RecurrenteResponse.class);
+//        List<RecurrenteResponse> routines = objectMapper.readValue(response, javaList);
+//
+//        RecurrenteResponse obtainedRoutine = routines.get(0);
+//
+//        assertNotNull(obtainedRoutine);
+//        assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
+//        assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
+//        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2020,11,19,14,0,0,0,ZoneOffset.UTC));
+//
+//        this.completadaService.deleteAllByRutina(routine);
+//        this.rutinaService.deleteById(routine.getId());
+//        this.usuarioService.deleteById(user.getUsuario());
+//    }
 }
