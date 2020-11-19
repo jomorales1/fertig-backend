@@ -585,6 +585,9 @@ class TareaControllerTests {
         this.mockMvc.perform(patch(uri1 + (task.getId() + 1) + uri2 + newAdmin.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
+        this.mockMvc.perform(patch(uri1 + task.getId() + uri2 + user.getUsuario())
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
         Tarea tarea = new Tarea();
         tarea.setNombre("Test Task");
         tarea.setDescripcion("Test description");
@@ -725,6 +728,9 @@ class TareaControllerTests {
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         this.mockMvc.perform(delete(uri1 + task.getId() + uri2 + newAdmin.getUsuario() + "a")
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(delete(uri1 + task.getId() + uri2 + user.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
         Tarea tarea = new Tarea();

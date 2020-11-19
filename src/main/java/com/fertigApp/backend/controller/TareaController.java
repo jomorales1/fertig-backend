@@ -265,6 +265,10 @@ public class TareaController {
             LOGGER.info(TAR_NO_ENCONTRADA);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
+        if (username.equals(userDetails.getUsername())) {
+            LOGGER.info("Un usuario no puede quitarse asi mismo privilegios de administrador");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: un usuario no puede quitarse asi mismo privilegios de administrador"));
+        }
         Usuario admin = optionalAdmin.orElse(new Usuario());
         Usuario usuario = optionalUsuario.get();
         Tarea tarea = optionalTarea.get();
@@ -339,6 +343,10 @@ public class TareaController {
         if (optionalUsuario.isEmpty()) {
             LOGGER.info("Usuario no encontrado");
             return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
+        }
+        if (username.equals(userDetails.getUsername())) {
+            LOGGER.info("Un usuario no puede eliminarse asi mismo");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: un usuario no puede eliminarse asi mismo"));
         }
         Optional<Usuario> optionalAdmin = this.usuarioService.findById(userDetails.getUsername());
         Usuario admin = optionalAdmin.orElse(new Usuario());
