@@ -6,9 +6,9 @@ plugins {
 	id "jacoco"
 }
 
-group = 'com.FertigApp'
+group = 'com.fertigApp'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '14'
+sourceCompatibility = '11'
 
 repositories {
     mavenCentral()

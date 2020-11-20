@@ -269,13 +269,13 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             for(int i = 1; i<=7; i++) {
                 if((codDias & 1) == 1){
                     switch (i){
-                        case 1 -> dias.add("Lunes");
-                        case 2 -> dias.add("Martes");
-                        case 3 -> dias.add("Miercoles");
-                        case 4 -> dias.add("Jueves");
-                        case 5 -> dias.add("Viernes");
-                        case 6 -> dias.add("Sabados");
-                        default -> dias.add("Domingos");
+                        case 1 : dias.add("Lunes"); break;
+                        case 2 : dias.add("Martes"); break;
+                        case 3 : dias.add("Miercoles"); break;
+                        case 4 : dias.add("Jueves"); break;
+                        case 5 : dias.add("Viernes"); break;
+                        case 6 : dias.add("Sabados"); break;
+                        default : dias.add("Domingos"); break;
                     }
                 }
                 codDias = codDias >> 1;
@@ -293,20 +293,20 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             int n = Integer.parseInt(recurrencia.substring(1));
             if(n == 1) {
                 switch (recurrencia.charAt(0)) {
-                    case 'A' -> mensajeRecurrencia += "año";
-                    case 'M' -> mensajeRecurrencia += "mes";
-                    case 'S' -> mensajeRecurrencia += "semana";
-                    case 'D' -> mensajeRecurrencia += "dia";
-                    default -> mensajeRecurrencia += "hora";
+                    case 'A' : mensajeRecurrencia += "año"; break;
+                    case 'M' : mensajeRecurrencia += "mes"; break;
+                    case 'S' : mensajeRecurrencia += "semana"; break;
+                    case 'D' : mensajeRecurrencia += "dia"; break;
+                    default : mensajeRecurrencia += "hora"; break;
                 }
             } else {
                 mensajeRecurrencia += recurrencia.substring(1) + " ";
                 switch (recurrencia.charAt(0)) {
-                    case 'A' -> mensajeRecurrencia += "años";
-                    case 'M' -> mensajeRecurrencia += "meses";
-                    case 'S' -> mensajeRecurrencia += "semanas";
-                    case 'D' -> mensajeRecurrencia += "dias";
-                    default -> mensajeRecurrencia += "horas";
+                    case 'A' : mensajeRecurrencia += "años"; break;
+                    case 'M' : mensajeRecurrencia += "meses"; break;
+                    case 'S' : mensajeRecurrencia += "semanas"; break;
+                    case 'D' : mensajeRecurrencia += "dias"; break;
+                    default : mensajeRecurrencia += "horas"; break;
                 }
             }
         }
