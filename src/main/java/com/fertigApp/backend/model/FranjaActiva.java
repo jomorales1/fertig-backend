@@ -8,7 +8,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name="franja_libre")
-public class FranjaLibre implements Serializable {
+public class FranjaActiva implements Serializable {
 
     @Id
     @SequenceGenerator(name = "id_fl_generator",
@@ -30,7 +30,7 @@ public class FranjaLibre implements Serializable {
     @JoinColumn(name = "usuario")
     protected Usuario usuarioFL;
 
-    public FranjaLibre() {
+    public FranjaActiva() {
 
     }
 

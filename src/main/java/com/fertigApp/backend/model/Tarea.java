@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -195,5 +196,4 @@ public class Tarea implements Serializable {
     public void setTiempoInvertido(Integer tiempoInvertido) {
         this.tiempoInvertido = tiempoInvertido;
     }
-
 }

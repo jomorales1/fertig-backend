@@ -67,7 +67,7 @@ public class Usuario implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioFL")
-	private Set<FranjaLibre> franjasLibres;
+	private Set<FranjaActiva> franjasActivas;
 
 	public Usuario() { }
 
@@ -199,11 +199,11 @@ public class Usuario implements Serializable {
 		this.agregados = agregados;
 	}
 
-	public Set<FranjaLibre> getFranjasLibres() {
-		return franjasLibres;
+	public Set<FranjaActiva> getFranjasLibres() {
+		return franjasActivas;
 	}
 
-	public void setFranjasLibres(Set<FranjaLibre> franjasLibres) {
-		this.franjasLibres = franjasLibres;
+	public void setFranjasLibres(Set<FranjaActiva> franjasActivas) {
+		this.franjasActivas = franjasActivas;
 	}
 }
