@@ -42,6 +42,9 @@ class NotificationSystemTests {
     private UsuarioService usuarioService;
 
     @Autowired
+    private FirebaseNTService firebaseNTService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public Usuario createUser() {
@@ -83,6 +86,13 @@ class NotificationSystemTests {
         this.tareaDeUsuarioService.save(tareaDeUsuario);
 
         return task;
+    }
+
+    public void setUpToken(Usuario user) {
+        FirebaseNotificationToken notificationToken = new FirebaseNotificationToken();
+        notificationToken.setToken("token");
+        notificationToken.setUsuarioF(user);
+        this.firebaseNTService.save(notificationToken);
     }
 
     Rutina setUpRutina(Usuario user) {
@@ -146,6 +156,7 @@ class NotificationSystemTests {
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         Tarea task = setUpTarea(user);
+        setUpToken(user);
 
         this.notificationSystem.scheduleTaskNotification(user.getUsuario(), task.getId());
         TimeUnit.SECONDS.sleep(20);
@@ -153,6 +164,7 @@ class NotificationSystemTests {
 
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(task.getId());
+        this.firebaseNTService.deleteById("token");
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -163,6 +175,7 @@ class NotificationSystemTests {
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         Rutina rutina = setUpRutina(user);
+        setUpToken(user);
 
         this.notificationSystem.scheduleRoutineNotification(user.getUsuario(), rutina.getId());
         TimeUnit.SECONDS.sleep(40);
@@ -170,6 +183,7 @@ class NotificationSystemTests {
 
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
+        this.firebaseNTService.deleteById("token");
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -180,12 +194,14 @@ class NotificationSystemTests {
             user = createUser();
         else user = this.usuarioService.findById("test_user").get();
         Evento event = setUpEvento(user);
+        setUpToken(user);
 
         this.notificationSystem.scheduleEventNotification(user.getUsuario(), event.getId());
         TimeUnit.SECONDS.sleep(40);
         this.notificationSystem.cancelScheduledEventNotification(event.getId());
 
         this.eventoService.deleteById(event.getId());
+        this.firebaseNTService.deleteById("token");
         this.usuarioService.deleteById(user.getUsuario());
     }
 
