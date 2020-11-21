@@ -3,10 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.model.FirebaseNotificationToken;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
-import com.fertigApp.backend.requestModels.PushNotificationRequest;
-import com.fertigApp.backend.requestModels.RequestFirebaseToken;
 import com.fertigApp.backend.services.FirebaseNTService;
-import com.fertigApp.backend.services.PushNotificationService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -44,19 +41,19 @@ public class NotificationController {
     }
 
     @PostMapping(path = "/notification/add-token")
-    public ResponseEntity<MessageResponse> addFirebaseToken(@RequestBody RequestFirebaseToken firebaseToken) {
+    public ResponseEntity<MessageResponse> addFirebaseToken(@RequestParam(value = "token") String token) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
         FirebaseNotificationToken notificationToken = new FirebaseNotificationToken();
         notificationToken.setUsuarioF(usuario);
-        notificationToken.setToken(firebaseToken.getToken());
+        notificationToken.setToken(token);
         this.firebaseNTService.save(notificationToken);
         return ResponseEntity.ok(new MessageResponse("Firebase token registrado con éxito"));
     }
 
-    @DeleteMapping(path = "/notification/delete-token/{id}")
-    public ResponseEntity<MessageResponse> deleteFirebaseToken(@PathVariable String id) {
+    @DeleteMapping(path = "/notification/delete-token")
+    public ResponseEntity<MessageResponse> deleteFirebaseToken(@RequestParam(value = "id") String id) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<FirebaseNotificationToken> tokenOptional = this.firebaseNTService.findById(id);
         if (tokenOptional.isEmpty()) {

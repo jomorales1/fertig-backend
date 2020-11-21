@@ -6,7 +6,6 @@ import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.FirebaseNotificationToken;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.requestModels.LoginRequest;
-import com.fertigApp.backend.requestModels.RequestFirebaseToken;
 import com.fertigApp.backend.services.FirebaseNTService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.junit.jupiter.api.Test;
@@ -135,21 +134,18 @@ class NotificationControllerTests {
         else user = this.usuarioService.findById("test_user").get();
         String token = getToken(user);
 
-        RequestFirebaseToken requestFirebaseToken = new RequestFirebaseToken();
-        requestFirebaseToken.setUsername(user.getUsuario());
-        requestFirebaseToken.setToken("token");
+        String firebaseToken = "token";
 
         this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
-            .contentType(MediaType.APPLICATION_JSON_VALUE).content(this.objectMapper.writeValueAsString(requestFirebaseToken)))
-                .andExpect(status().isOk());
+            .param("token", firebaseToken)).andExpect(status().isOk());
 
-        this.firebaseNTService.deleteById(requestFirebaseToken.getToken());
+        this.firebaseNTService.deleteById(firebaseToken);
         this.usuarioService.deleteById(user.getUsuario());
     }
 
     @Test
     void deleteFirebaseToken() throws Exception {
-        String uri = "/notification/delete-token/";
+        String uri = "/notification/delete-token";
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -157,8 +153,8 @@ class NotificationControllerTests {
         String token = getToken(user);
         FirebaseNotificationToken notificationToken = setUpToken(user);
 
-        this.mockMvc.perform(delete(uri + "a").header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadRequest());
+        this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token)
+            .param("id", notificationToken.getToken() + "a")).andExpect(status().isBadRequest());
 
         Usuario usuario = new Usuario();
         usuario.setUsuario("usuario");
@@ -172,11 +168,11 @@ class NotificationControllerTests {
         newToken.setToken("new_token");
         this.firebaseNTService.save(newToken);
 
-        this.mockMvc.perform(delete(uri + newToken.getToken()).header("Authorization", "Bearer " + token))
-                .andExpect(status().isBadRequest());
+        this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token)
+                .param("id", newToken.getToken())).andExpect(status().isBadRequest());
 
-        this.mockMvc.perform(delete(uri + notificationToken.getToken()).header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
+        this.mockMvc.perform(delete(uri).header("Authorization", "Bearer " + token)
+                .param("id", notificationToken.getToken())).andExpect(status().isOk());
 
         this.firebaseNTService.deleteById(newToken.getToken());
         this.usuarioService.deleteById(usuario.getUsuario());
