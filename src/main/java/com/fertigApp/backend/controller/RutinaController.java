@@ -420,4 +420,55 @@ public class RutinaController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new MessageResponse("Rutina eliminada"));
     }
 
+    @PostMapping(path = "/routine/{id}/copy")
+    public ResponseEntity<MessageResponse> copyRoutine(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Rutina> optionalRutina = this.rutinaService.findById(id);
+        if (optionalRutina.isEmpty()) {
+            LOGGER.info(RUT_NO_ENCONTRADA);
+            return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_ENCONTRADA));
+        }
+        Rutina rutina = optionalRutina.get();
+        if (rutina.getUsuario().getUsuario().equals(userDetails.getUsername())) {
+            LOGGER.info("La rutina ya pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: la rutina ya pertenece al usuario"));
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+
+        Rutina copy = new Rutina();
+        copy.setNombre(rutina.getNombre());
+        copy.setUsuario(usuario);
+        copy.setPrioridad(rutina.getPrioridad());
+        copy.setDuracion(rutina.getDuracion());
+        copy.setRecurrencia(rutina.getRecurrencia());
+        copy.setRecordatorio(rutina.getRecordatorio());
+        copy.setDescripcion(rutina.getDescripcion());
+        copy.setFechaInicio(rutina.getFechaInicio());
+        copy.setFechaFin(rutina.getFechaFin());
+        copy.setFranjaInicio(rutina.getFranjaInicio());
+        copy.setEtiqueta(rutina.getEtiqueta());
+        copy.setFranjaFin(rutina.getFranjaFin());
+        Rutina savedRutina =  this.rutinaService.save(copy);
+
+        Completada completada = new Completada();
+        completada.setRutinaC(copy);
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                copy.getFechaInicio(),
+                copy.getFechaFin(),
+                copy.getRecurrencia(),
+                copy.getDuracion(),
+                copy.getFranjaInicio(),
+                copy.getFranjaFin(),
+                OffsetDateTime.now())
+        );
+        completada.setFechaAjustada(null);
+        completada.setHecha(false);
+        this.completadaService.save(completada);
+        if (copy.getRecordatorio() != null) {
+            this.notificationSystem.scheduleRoutineNotification(userDetails.getUsername(), savedRutina.getId());
+        }
+        return ResponseEntity.ok(new MessageResponse("Rutina creada"));
+    }
+
 }

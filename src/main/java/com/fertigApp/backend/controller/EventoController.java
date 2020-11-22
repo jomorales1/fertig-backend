@@ -4,6 +4,7 @@ import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
+import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.requestModels.RequestEvento;
 import com.fertigApp.backend.services.EventoService;
@@ -167,4 +168,38 @@ public class EventoController {
         this.notificationSystem.cancelScheduledEventNotification(id);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
+
+    @PostMapping(path = "/event/{id}/copy")
+    public ResponseEntity<MessageResponse> copyEvento(@PathVariable Integer id) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Evento> optionalEvento = this.eventoService.findById(id);
+        if (optionalEvento.isEmpty()) {
+            LOGGER.info(EV_NO_ENCONTRADO);
+            return ResponseEntity.badRequest().body(new MessageResponse(EV_NO_ENCONTRADO));
+        }
+        Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
+        Usuario usuario = optionalUsuario.orElse(new Usuario());
+        Evento evento = optionalEvento.get();
+        if (evento.getUsuario().getUsuario().equals(userDetails.getUsername())) {
+            LOGGER.info("El evento ya pertenece al usuario");
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el evento ya pertenece al usuario"));
+        }
+        Evento copy = new Evento();
+        copy.setUsuario(usuario);
+        copy.setNombre(evento.getNombre());
+        copy.setDuracion(evento.getDuracion());
+        copy.setDescripcion(evento.getDescripcion());
+        copy.setPrioridad(evento.getPrioridad());
+        copy.setFechaInicio(evento.getFechaInicio());
+        copy.setFechaFin(evento.getFechaFin());
+        copy.setRecurrencia(evento.getRecurrencia());
+        copy.setEtiqueta(evento.getEtiqueta());
+        copy.setRecordatorio(evento.getRecordatorio());
+        Evento savedEvent = this.eventoService.save(copy);
+        if (savedEvent.getRecordatorio() != null) {
+            this.notificationSystem.scheduleEventNotification(userDetails.getUsername(), savedEvent.getId());
+        }
+        return ResponseEntity.ok(new MessageResponse("Evento copiado"));
+    }
+
 }

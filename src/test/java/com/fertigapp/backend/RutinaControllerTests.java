@@ -1260,4 +1260,44 @@ class RutinaControllerTests {
 //        this.rutinaService.deleteById(routine.getId());
 //        this.usuarioService.deleteById(user.getUsuario());
 //    }
+
+    @Test
+    void copyRoutine() throws Exception {
+        String uri1 = "/routine/";
+        String uri2 = "/copy";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Rutina rutina = setUpRutina(user);
+        String token = getToken(user);
+
+        this.mockMvc.perform(post(uri1 + (rutina.getId() + 1) + uri2).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri1 + rutina.getId() + uri2).header("Authorization", "Bearer " + token))
+                .andExpect(status().isBadRequest());
+
+        Usuario newUser = new Usuario();
+        newUser.setUsuario("newUser");
+        newUser.setNombre("New User");
+        newUser.setCorreo("new_user@test.com");
+        newUser.setPassword(this.passwordEncoder.encode("testing"));
+        this.usuarioService.save(newUser);
+
+        Rutina newRutina = setUpRutina(newUser);
+
+        this.mockMvc.perform(post(uri1 + newRutina.getId() + uri2).header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
+        List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findAll();
+        for (Rutina r : rutinas) {
+            this.completadaService.deleteAllByRutina(r);
+            this.rutinaService.deleteById(r.getId());
+        }
+        this.usuarioService.deleteById(newUser.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
 }

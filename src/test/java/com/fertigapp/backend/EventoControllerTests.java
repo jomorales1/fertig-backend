@@ -661,4 +661,42 @@ class EventoControllerTests {
         this.usuarioService.deleteById(user.getUsuario());
     }
 
+    @Test
+    void copyEvent() throws Exception {
+        String uri1 = "/event/";
+        String uri2 = "/copy";
+        Usuario user;
+        if (this.usuarioService.findById("test_user").isEmpty())
+            user = setUpUsuario();
+        else user = this.usuarioService.findById("test_user").get();
+        Evento event = setUpEvento(user);
+        String token = getToken(user);
+
+        this.mockMvc.perform(post(uri1 + (event.getId() + 1) + uri2)
+            .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
+        this.mockMvc.perform(post(uri1 + event.getId() + uri2)
+                .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
+
+        Usuario newUser = new Usuario();
+        newUser.setUsuario("newUser");
+        newUser.setNombre("New User");
+        newUser.setCorreo("new_user@test.com");
+        newUser.setPassword(this.passwordEncoder.encode("testing"));
+        this.usuarioService.save(newUser);
+
+        Evento newEvento = setUpEvento(newUser);
+
+        this.mockMvc.perform(post(uri1 + newEvento.getId() + uri2)
+                .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
+
+        this.notificationSystem.cancelAllScheduledEventNotifications();
+        List<Evento> eventos = (List<Evento>) this.eventoService.findAll();
+        for (Evento e : eventos) {
+            this.eventoService.deleteById(e.getId());
+        }
+        this.usuarioService.deleteById(newUser.getUsuario());
+        this.usuarioService.deleteById(user.getUsuario());
+    }
+
 }
