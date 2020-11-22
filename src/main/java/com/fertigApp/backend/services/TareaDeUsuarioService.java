@@ -30,6 +30,10 @@ public class TareaDeUsuarioService {
         return tareaDeUsuarioRepository.findTareasByUsuario(usuario);
     }
 
+    public Iterable<Tarea> findTareasPendientesByUsuario(Usuario usuario) {
+        return tareaDeUsuarioRepository.findTareasPendientesByUsuario(usuario);
+    }
+
     public Iterable<TareaDeUsuario> findAllByTarea(Tarea tarea) {
         return tareaDeUsuarioRepository.findAllByTarea(tarea);
     }

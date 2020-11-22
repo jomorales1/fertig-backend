@@ -16,6 +16,8 @@ import java.util.Optional;
 public interface TareaDeUsuarioRepository extends CrudRepository<TareaDeUsuario, Integer> {
     @Query(value = "select t from Tarea t where t in (select tu.tarea from TareaDeUsuario tu where tu.usuario = :user)")
     Iterable<Tarea> findTareasByUsuario(@Param("user") Usuario user);
+    @Query(value = "select t from Tarea t where t in (select tu.tarea from TareaDeUsuario tu where tu.usuario = :user and tu.tarea.hecha = false)")
+    Iterable<Tarea> findTareasPendientesByUsuario(@Param("user") Usuario user);
     Iterable<TareaDeUsuario> findAllByTarea(Tarea tarea);
     Optional<TareaDeUsuario> findByUsuarioAndTarea(Usuario usuario, Tarea tarea);
 
