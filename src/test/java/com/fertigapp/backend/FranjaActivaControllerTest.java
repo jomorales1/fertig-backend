@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.*;
-import com.fertigApp.backend.payload.response.RecurrenteResponse;
 import com.fertigApp.backend.payload.response.TareaSugeridaResponse;
 import com.fertigApp.backend.requestModels.FranjaActivaRequest;
 import com.fertigApp.backend.requestModels.LoginRequest;
@@ -322,6 +321,8 @@ public class FranjaActivaControllerTest {
         String token = getToken(usuario);
         FranjaActiva franjaActiva1 = setUpFranjaActiva(usuario, 1);
         FranjaActiva franjaActiva2 = setUpFranjaActiva(usuario, 2, LocalTime.of(0, 0, 0), LocalTime.of(0, 0, 0));
+        FranjaActiva franjaActiva3 = setUpFranjaActiva(usuario, 3, LocalTime.of(23, 59, 59), LocalTime.of(23, 59, 59));
+        Tarea tarea = setUpTarea(usuario, 1, 1, OffsetDateTime.now().plusDays(8));
         Tarea tareaMasProx = setUpTarea(usuario, 1, 1, OffsetDateTime.now().plusDays(3));
         Tarea tareaMasPrio = setUpTarea(usuario, 5, 1, OffsetDateTime.now().plusDays(5));
         Tarea tareaMasEsti = setUpTarea(usuario, 1, 5, OffsetDateTime.now().plusDays(7));
@@ -352,7 +353,18 @@ public class FranjaActivaControllerTest {
                 .andExpect(status().isOk());
         mvcResult = resultActions.andReturn();
         response = mvcResult.getResponse().getContentAsString();
-        assertEquals(0, response.length());
+        tareasSugeridas = objectMapper.readValue(response, javaList);
+        assertEquals(0, tareasSugeridas.size());
+
+        // Valid request -> status 400 expected
+        // Sin actividades sugeridas
+        resultActions = this.mockMvc.perform(get(uri + 3)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+        tareasSugeridas = objectMapper.readValue(response, javaList);
+        assertEquals(0, tareasSugeridas.size());
 
         this.tareaDeUsuarioService.deleteAllByUsuario(usuario);
         this.tareaService.deleteById(tareaMasProx.getId());

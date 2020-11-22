@@ -10,7 +10,6 @@ import com.fertigApp.backend.services.FranjaActivaService;
 import com.fertigApp.backend.services.TareaDeUsuarioService;
 import com.fertigApp.backend.services.TareaService;
 import com.fertigApp.backend.services.UsuarioService;
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,16 +33,17 @@ public class FranjaActivaController {
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FranjaActiva.class);
 
-    // Repositorio responsable del manejo de la tabla "tarea" en la DB.
+    // Servicio responsable del manejo de la tabla "franja activa" en la DB
+    private final FranjaActivaService franjaActivaService;
+
+    // Servicio responsable del manejo de la tabla "tarea" en la DB.
     private final TareaService tareaService;
 
-    // Repositorio responsable del manejo de la tabla "usuario" en la DB.
+    // Servicio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
-    // Repositorio responsable del manejo de la tabla "Tarea" en la DB.
+    // Servicio responsable del manejo de la tabla "Tarea" en la DB.
     private final TareaDeUsuarioService tareaDeUsuarioService;
-
-    private final FranjaActivaService franjaActivaService;
 
     public FranjaActivaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, FranjaActivaService franjaActivaService) {
         this.tareaService = tareaService;
@@ -136,15 +136,16 @@ public class FranjaActivaController {
             LocalTime currentTime = LocalTime.now();
             FranjaActiva franjaActiva = optionalFranjaActiva.get();
             if(currentTime.compareTo(franjaActiva.getFranjaInicio()) < 0 || currentTime.compareTo(franjaActiva.getFranjaFin()) > 0){
-                return ResponseEntity.ok(null);
+                return ResponseEntity.ok(new ArrayList<>());
             }
         }
 
         List<TareaSugeridaResponse> tareasSugeridas = new ArrayList<>();
         ArrayList<Tarea> tareas = (ArrayList<Tarea>) this.tareaDeUsuarioService.findTareasPendientesByUsuario(usuario);
 
-        Tarea masCercana, mayorPrioridad, mayorEstimacion;
-        masCercana = mayorPrioridad = mayorEstimacion = tareas.get(0);
+        Tarea masCercana = tareas.get(0);
+        Tarea mayorPrioridad = tareas.get(0);
+        Tarea mayorEstimacion = tareas.get(0);
         for(int i = 1; i < tareas.size(); i++){
             Tarea current = tareas.get(i);
             if(masCercana.getFechaFin().compareTo(current.getFechaFin()) > 0)
