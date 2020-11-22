@@ -29,7 +29,7 @@ public class FranjaActivaService {
     }
 
     public Optional<FranjaActiva> findByUserAndDay(Usuario usuario, int day){
-        return franjaActivaRepository.findAllByUsuarioFLAAndDay(usuario, day);
+        return franjaActivaRepository.findAllByUsuarioFLAndDay(usuario, day);
     }
 
     public void deleteById(int id){

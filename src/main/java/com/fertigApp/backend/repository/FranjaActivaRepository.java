@@ -11,7 +11,7 @@ import java.util.Optional;
 @Repository
 public interface FranjaActivaRepository extends CrudRepository<FranjaActiva, Integer> {
     Iterable<FranjaActiva> findAllByUsuarioFL(Usuario usuario);
-    Optional<FranjaActiva> findAllByUsuarioFLAAndDay(Usuario usuario, Integer day);
+    Optional<FranjaActiva> findAllByUsuarioFLAndDay(Usuario usuario, Integer day);
 
     @Transactional
     void deleteAllByUsuarioFL(Usuario usuario);

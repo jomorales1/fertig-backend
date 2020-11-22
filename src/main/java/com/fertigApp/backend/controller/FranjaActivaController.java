@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalTime;
 import java.util.*;
 
 /*
@@ -73,7 +74,7 @@ public class FranjaActivaController {
     }
 
     @GetMapping(path="/franja-activa/franjas")
-    public ResponseEntity<List<FranjaActiva>> getAllFranjasLibresByUsuario() {
+    public ResponseEntity<List<FranjaActiva>> getAllFranjasActivasByUsuario() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -129,7 +130,15 @@ public class FranjaActivaController {
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());
 
-        //comparacion de las franjas y eso feo
+        //comparacion de las franjas
+        Optional<FranjaActiva> optionalFranjaActiva = this.franjaActivaService.findByUserAndDay(usuario, day);
+        if(optionalFranjaActiva.isPresent()){
+            LocalTime currentTime = LocalTime.now();
+            FranjaActiva franjaActiva = optionalFranjaActiva.get();
+            if(currentTime.compareTo(franjaActiva.getFranjaInicio()) < 0 || currentTime.compareTo(franjaActiva.getFranjaFin()) > 0){
+                return ResponseEntity.ok(null);
+            }
+        }
 
         List<TareaSugeridaResponse> tareasSugeridas = new ArrayList<>();
         ArrayList<Tarea> tareas = (ArrayList<Tarea>) this.tareaDeUsuarioService.findTareasPendientesByUsuario(usuario);
@@ -137,11 +146,12 @@ public class FranjaActivaController {
         Tarea masCercana, mayorPrioridad, mayorEstimacion;
         masCercana = mayorPrioridad = mayorEstimacion = tareas.get(0);
         for(int i = 1; i < tareas.size(); i++){
-            if(masCercana.getFechaFin().compareTo(tareas.get(i).getFechaFin()) < 0)
+            Tarea current = tareas.get(i);
+            if(masCercana.getFechaFin().compareTo(current.getFechaFin()) > 0)
                 masCercana = tareas.get(i);
-            if(mayorPrioridad.getPrioridad() < tareas.get(i).getPrioridad())
+            if(mayorPrioridad.getPrioridad() < current.getPrioridad())
                 mayorPrioridad = tareas.get(i);
-            if(mayorEstimacion.getEstimacion() < tareas.get(i).getEstimacion())
+            if(mayorEstimacion.getEstimacion() < current.getEstimacion())
                 mayorEstimacion = tareas.get(i);
         }
 
@@ -150,10 +160,12 @@ public class FranjaActivaController {
         tsr.setCriterio("Tarea mas cercana");
         tareasSugeridas.add(tsr);
 
+        tsr = new TareaSugeridaResponse();
         tsr.setId(mayorPrioridad.getId());
         tsr.setCriterio("Tarea con mas prioridad");
         tareasSugeridas.add(tsr);
 
+        tsr = new TareaSugeridaResponse();
         tsr.setId(mayorEstimacion.getId());
         tsr.setCriterio("Tarea que se espera dure mas tiempo");
         tareasSugeridas.add(tsr);
