@@ -1,13 +1,25 @@
 package com.fertigApp.backend.model;
 
+import org.checkerframework.checker.units.qual.Time;
+import org.hibernate.annotations.Columns;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
+@Embeddable
 public class IdTiempo implements Serializable {
 
+    @ManyToOne
+    @JoinColumns(value = {
+            @JoinColumn(name = "tarea", referencedColumnName = "tarea"),
+            @JoinColumn(name = "usuario", referencedColumnName = "usuario")
+    })
     private TareaDeUsuario tareaDeUsuario;
 
+    @Column(columnDefinition = "DATETIME")
     private OffsetDateTime fecha;
 
     public IdTiempo() {
@@ -50,6 +62,7 @@ public class IdTiempo implements Serializable {
         if (obj == null) return false;
         if (getClass() != obj.getClass()) return false;
         IdTiempo other = (IdTiempo) obj;
-        return Objects.equals(getTareaDeUsuario(), other.tareaDeUsuario) && Objects.equals(getFecha(), other.getFecha());
+        return Objects.equals(this.tareaDeUsuario, other.tareaDeUsuario) && Objects.equals(getFecha(), other.getFecha());
     }
+
 }

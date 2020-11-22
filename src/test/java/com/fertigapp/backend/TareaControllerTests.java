@@ -5,12 +5,14 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
+import com.fertigApp.backend.model.Tiempo;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.OwnerResponse;
 import com.fertigApp.backend.requestModels.LoginRequest;
 import com.fertigApp.backend.requestModels.RequestTarea;
 import com.fertigApp.backend.services.TareaDeUsuarioService;
 import com.fertigApp.backend.services.TareaService;
+import com.fertigApp.backend.services.TiempoService;
 import com.fertigApp.backend.services.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,9 @@ class TareaControllerTests {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private TiempoService tiempoService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -1130,8 +1135,10 @@ class TareaControllerTests {
                 .andExpect(status().isOk());
 
         task = this.tareaService.findById(task.getId()).get();
-        assertEquals(10, task.getTiempoInvertido());
+        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
+        assertEquals(10, tiempos.get(0).getInvertido());
 
+        this.tiempoService.deleteById(tiempos.get(0).getId());
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
         this.tareaService.deleteById(task.getId());

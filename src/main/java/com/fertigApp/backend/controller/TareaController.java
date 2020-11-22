@@ -3,6 +3,7 @@ package com.fertigApp.backend.controller;
 import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
+import com.fertigApp.backend.model.Tiempo;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.MessageResponse;
 import com.fertigApp.backend.payload.response.OwnerResponse;
@@ -15,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,12 +43,15 @@ public class TareaController {
 
     private final TareaDeUsuarioService tareaDeUsuarioService;
 
+    private final TiempoService tiempoService;
+
     private final NotificationSystem notificationSystem;
 
-    public TareaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, NotificationSystem notificationSystem) {
+    public TareaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, TiempoService tiempoService, NotificationSystem notificationSystem) {
         this.tareaService = tareaService;
         this.usuarioService = usuarioService;
         this.tareaDeUsuarioService = tareaDeUsuarioService;
+        this.tiempoService = tiempoService;
         this.notificationSystem = notificationSystem;
     }
 
@@ -178,6 +183,10 @@ public class TareaController {
         if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info(US_NO_ADMIN);
             return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ADMIN));
+        }
+        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(usuario, tarea);
+        for (Tiempo tiempo : tiempos) {
+            this.tiempoService.deleteById(tiempo.getId());
         }
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaService.deleteById(tarea.getId());
@@ -526,13 +535,16 @@ public class TareaController {
         } else if (tarea.getNivel() == 3) {
             parent = tarea.getPadre().getPadre();
         }
-        if (this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent).isEmpty()) {
+        Optional<TareaDeUsuario> optionalTareaDeUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, parent);
+        if (optionalTareaDeUsuario.isEmpty()) {
             LOGGER.info(TAR_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
         }
-        Integer newTime = tarea.getTiempoInvertido() + time;
-        tarea.setTiempoInvertido(newTime);
-        this.tareaService.save(tarea);
+        Tiempo tiempo = new Tiempo();
+        tiempo.setFecha(OffsetDateTime.now().minusMinutes(time));
+        tiempo.setInvertido(time);
+        tiempo.setTareaDeUsuario(optionalTareaDeUsuario.get());
+        this.tiempoService.save(tiempo);
         return ResponseEntity.ok(new MessageResponse("Tiempo agregado"));
     }
 
