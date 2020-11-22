@@ -366,6 +366,19 @@ public class FranjaActivaControllerTest {
         tareasSugeridas = objectMapper.readValue(response, javaList);
         assertEquals(0, tareasSugeridas.size());
 
+        // Valid request -> status 200 expected
+        // Actividades sugeridas cuando no hay una franja definida para el dia
+        resultActions = this.mockMvc.perform(get(uri + 4)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
+        mvcResult = resultActions.andReturn();
+        response = mvcResult.getResponse().getContentAsString();
+        tareasSugeridas = objectMapper.readValue(response, javaList);
+        assertNotNull(tareasSugeridas);
+        assertEquals(tareaMasProx.getId(), tareasSugeridas.get(0).getId());
+        assertEquals(tareaMasPrio.getId(), tareasSugeridas.get(1).getId());
+        assertEquals(tareaMasEsti.getId(), tareasSugeridas.get(2).getId());
+
         this.tareaDeUsuarioService.deleteAllByUsuario(usuario);
         this.tareaService.deleteById(tareaMasProx.getId());
         this.tareaService.deleteById(tareaMasPrio.getId());
