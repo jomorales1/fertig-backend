@@ -1,11 +1,12 @@
 package com.fertigapp.backend;
 
 import com.fertigApp.backend.BackendApplication;
-import com.fertigApp.backend.model.IdPreferido;
-import com.fertigApp.backend.model.IdTareaUsuario;
+import com.fertigApp.backend.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,6 +42,23 @@ class CompositeKeysTests {
         boolean compare = idTareaUsuario.equals(idTareaUsuario1);
         assertFalse(compare);
         int hash = idTareaUsuario.hashCode();
+    }
+
+    @Test
+    void idTiempo() throws Exception {
+        TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
+        OffsetDateTime dateTime = OffsetDateTime.now();
+        IdTiempo idTiempo = new IdTiempo(tareaDeUsuario, dateTime);
+        TareaDeUsuario tareaDeUsuario1 = idTiempo.getTareaDeUsuario();
+        OffsetDateTime dateTime1 = idTiempo.getFecha();
+        int hash = idTiempo.hashCode();
+        IdTiempo idTiempo1 = new IdTiempo();
+        boolean compare = idTiempo.equals(idTiempo1);
+        assertFalse(compare);
+        Tiempo tiempo = new Tiempo();
+        tiempo.setId(idTiempo);
+        TareaDeUsuario tareaDeUsuario2 = tiempo.getTareaDeUsuario();
+        OffsetDateTime dateTime2 = tiempo.getFecha();
     }
 
 }
