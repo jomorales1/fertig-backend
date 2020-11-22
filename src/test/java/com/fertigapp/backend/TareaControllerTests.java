@@ -3,6 +3,7 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Tarea;
 import com.fertigApp.backend.model.TareaDeUsuario;
 import com.fertigApp.backend.model.Tiempo;
@@ -53,6 +54,9 @@ class TareaControllerTests {
 
     @Autowired
     private TiempoService tiempoService;
+
+    @Autowired
+    private NotificationSystem notificationSystem;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -143,6 +147,8 @@ class TareaControllerTests {
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, Tarea.class);
         List<Tarea> tasks = objectMapper.readValue(response, javaList);
         assertNotNull(tasks);
+
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -166,6 +172,8 @@ class TareaControllerTests {
         List<Tarea> tasks = objectMapper.readValue(response, javaList);
         assertNotNull(tasks);
         assertEquals(tasks.get(0).getNombre(), task.getNombre());
+
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tasks.get(0));
         this.tareaService.deleteById(tasks.get(0).getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -191,6 +199,7 @@ class TareaControllerTests {
         this.mockMvc.perform(get(uri + (task.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(task.getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -261,6 +270,7 @@ class TareaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(obtainedTask);
         this.tareaService.deleteById(tarea.getId());
@@ -320,6 +330,7 @@ class TareaControllerTests {
         this.mockMvc.perform(patch(uri + tarea.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(optionalTarea.orElse(null));
         this.tareaService.deleteById(tarea.getId());
@@ -351,6 +362,7 @@ class TareaControllerTests {
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isCreated());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         List<Tarea> tasks = (List<Tarea>) this.tareaService.findAll();
         for (Tarea task : tasks) {
             this.tareaDeUsuarioService.deleteAllByTarea(task);
@@ -412,6 +424,7 @@ class TareaControllerTests {
         this.mockMvc.perform(delete(uri + tarea.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaService.deleteById(tarea.getId());
         this.usuarioService.deleteById(usuario.getUsuario());
@@ -471,6 +484,7 @@ class TareaControllerTests {
         this.mockMvc.perform(get(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
@@ -552,6 +566,7 @@ class TareaControllerTests {
         assertTrue(optionalTareaDeUsuario.isPresent());
         assertTrue(optionalTareaDeUsuario.get().isAdmin());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
@@ -638,6 +653,7 @@ class TareaControllerTests {
         TareaDeUsuario tareaDeUsuario3 = this.tareaDeUsuarioService.findByUsuarioAndTarea(newAdmin, task).get();
         assertFalse(tareaDeUsuario3.isAdmin());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
@@ -697,6 +713,7 @@ class TareaControllerTests {
         this.mockMvc.perform(post(uri1 + task.getId() + uri2 + newOwner.getUsuario())
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaService.deleteById(task.getId());
@@ -774,6 +791,7 @@ class TareaControllerTests {
         Optional<TareaDeUsuario> optional = this.tareaDeUsuarioService.findByUsuarioAndTarea(newAdmin, task);
         assertTrue(optional.isEmpty());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(tarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
@@ -850,6 +868,7 @@ class TareaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isCreated());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaDeUsuarioService.deleteAllByTarea(tarea2);
         this.tareaService.deleteById(task.getId());
@@ -939,6 +958,7 @@ class TareaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(newTarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(newTarea.getId());
@@ -1021,6 +1041,7 @@ class TareaControllerTests {
         subtarea = this.tareaService.findById(indexA).get();
         assertFalse(subtarea.getHecha());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaDeUsuarioService.deleteAllByTarea(newTarea);
         this.tareaService.deleteById(task.getId());
@@ -1094,6 +1115,7 @@ class TareaControllerTests {
         this.mockMvc.perform(delete(uri1 + indexA + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByTarea(newTarea);
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(newTarea.getId());
@@ -1138,6 +1160,7 @@ class TareaControllerTests {
         List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
         assertEquals(10, tiempos.get(0).getInvertido());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tiempoService.deleteById(tiempos.get(0).getId());
         this.tareaDeUsuarioService.deleteAllByTarea(task);
         this.tareaService.deleteById(tarea.getId());
@@ -1221,6 +1244,7 @@ class TareaControllerTests {
         this.mockMvc.perform(post(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.tareaDeUsuarioService.deleteAllByUsuario(user);
         this.tareaDeUsuarioService.deleteAllByUsuario(usuario);
         List<Tarea> tareas = (List<Tarea>) this.tareaService.findAll();

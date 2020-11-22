@@ -72,6 +72,14 @@ public class NotificationSystem {
         }
     }
 
+    public void cancelAllScheduledTaskNotifications() {
+        for (Integer id : this.scheduledTasks.keySet()) {
+            for (NotificationEvent event : this.scheduledTasks.get(id)) {
+                event.getScheduled().cancel(false);
+            }
+        }
+    }
+
     public void scheduleRoutineNotification(String username, Integer idRutina) {
         Optional<Rutina> optionalRutina = rutinaService.findById(idRutina);
         Rutina rutina = optionalRutina.orElse(new Rutina());
@@ -91,6 +99,12 @@ public class NotificationSystem {
         this.scheduledRoutines.remove(id);
     }
 
+    public void cancelAllScheduledRoutineNotifications() {
+        for (Integer id : this.scheduledRoutines.keySet()) {
+            this.scheduledRoutines.get(id).getScheduled().cancel(true);
+        }
+    }
+
     public void scheduleEventNotification(String username, Integer idEvento) {
         Optional<Evento> optionalEvento = this.eventoService.findById(idEvento);
         Evento evento = optionalEvento.orElse(new Evento());
@@ -106,6 +120,12 @@ public class NotificationSystem {
         if (!this.scheduledEvents.containsKey(id)) return;
         this.scheduledEvents.get(id).getScheduled().cancel(true);
         this.scheduledEvents.remove(id);
+    }
+
+    public void cancelAllScheduledEventNotifications() {
+        for (Integer id : this.scheduledEvents.keySet()) {
+            this.scheduledEvents.get(id).getScheduled().cancel(true);
+        }
     }
 
     static class NotificationEvent {

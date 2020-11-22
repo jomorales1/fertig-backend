@@ -3,6 +3,7 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
@@ -66,6 +67,9 @@ class RutinaControllerTests {
 
     @Autowired
     private RutinaService rutinaService;
+
+    @Autowired
+    private NotificationSystem notificationSystem;
 
     private final Jackson2ObjectMapperBuilder mapperBuilder = new Jackson2ObjectMapperBuilder();
 
@@ -253,6 +257,7 @@ class RutinaControllerTests {
         assertEquals(rutinas.get(0).getNombre(), rutina.getNombre());
         assertEquals(rutinas.get(0).getUsuario().getUsuario(), user.getUsuario());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -297,6 +302,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
         assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,4,7,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
@@ -318,6 +324,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
         assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
@@ -339,6 +346,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
         assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
@@ -360,6 +368,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
         assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2020,12,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
 
@@ -381,6 +390,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
         assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
         this.rutinaService.deleteById(routine.getId());
     }
@@ -413,6 +423,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(get(uri + "/" + (rutina.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -431,6 +442,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.usuarioService.deleteById(user.getUsuario());
@@ -484,6 +496,7 @@ class RutinaControllerTests {
             assertTrue(obtainedDates.contains(date));
         }
         expectedDates.clear();
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
 
@@ -514,6 +527,7 @@ class RutinaControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         expectedDates.clear();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -545,6 +559,7 @@ class RutinaControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         expectedDates.clear();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -576,6 +591,7 @@ class RutinaControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         expectedDates.clear();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -611,6 +627,7 @@ class RutinaControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         expectedDates.clear();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -668,6 +685,7 @@ class RutinaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestRutina)))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.completadaService.deleteAllByRutina(newRutina);
@@ -708,6 +726,7 @@ class RutinaControllerTests {
         assertEquals(rutinas.get(0).getNombre(), requestRutina.getNombre());
         assertEquals(rutinas.get(0).getDescripcion(), requestRutina.getDescripcion());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         for (Rutina rutina : rutinas) {
             this.completadaService.deleteAllByRutina(rutina);
             this.rutinaService.deleteById(rutina.getId());
@@ -768,6 +787,7 @@ class RutinaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isCreated());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
         this.completadaService.deleteAllByRutina(routine);
@@ -859,6 +879,7 @@ class RutinaControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
                 .andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.tareaService.deleteById(subtarea.getId());
         this.tareaService.deleteById(newSubtarea.getId());
         this.completadaService.deleteAllByRutina(rutina);
@@ -934,6 +955,7 @@ class RutinaControllerTests {
         subtarea = this.tareaService.findById(subtarea.getId()).get();
         assertFalse(subtarea.getHecha());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.tareaService.deleteById(subtarea.getId());
         this.tareaService.deleteById(newSubtarea.getId());
         this.completadaService.deleteAllByRutina(rutina);
@@ -1000,6 +1022,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(delete(uri1 + subtarea.getId() + uri2).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.tareaService.deleteById(newSubtarea.getId());
         this.completadaService.deleteAllByRutina(rutina);
         this.rutinaService.deleteById(rutina.getId());
@@ -1061,6 +1084,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(patch(uri + String.valueOf(rutinaUsuario.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutinaUsuario);
         this.completadaService.deleteAllByRutina(rutinaE);
         this.completadaService.deleteAllByRutina(rutinaF);
@@ -1143,6 +1167,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(patch(uri + String.valueOf(rutinaNDC.getId()))
                 .header("Authorization", "Bearer " + token)).andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(rutinaUsuario);
         this.completadaService.deleteAllByRutina(rutinaNDC);
         this.completadaService.deleteAllByRutina(rutinaF);
@@ -1186,6 +1211,7 @@ class RutinaControllerTests {
         this.mockMvc.perform(delete(uri + newRutina.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(newRutina);
         this.rutinaService.deleteById(newRutina.getId());
         this.usuarioService.deleteById(newUser.getUsuario());

@@ -109,6 +109,9 @@ public class TareaController {
         tarea.setTiempoInvertido(task.getTiempoInvertido());
         this.tareaService.save(tarea);
         LOGGER.info("Tarea actualizada");
+        this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), tarea.getId());
+        if (tarea.getFechaFin() != null && tarea.getRecordatorio() != null)
+        this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), tarea.getId());
         return ResponseEntity.ok().body(tarea);
     }
 

@@ -3,6 +3,7 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.payload.response.EventoRepeticionesResponse;
@@ -46,6 +47,9 @@ class EventoControllerTests {
 
     @Autowired
     private UsuarioService usuarioService;
+
+    @Autowired
+    private NotificationSystem notificationSystem;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -153,6 +157,8 @@ class EventoControllerTests {
         assertEquals(events.get(0).getUsuario().getUsuario(), event.getUsuario().getUsuario());
         assertEquals(events.get(0).getNombre(), event.getNombre());
         assertEquals(events.get(0).getDescripcion(), event.getDescripcion());
+
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -198,6 +204,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA DIARIA
@@ -218,6 +225,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA CADA 2 SEMANAS
@@ -238,6 +246,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA MENSUAL
@@ -258,6 +267,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA DOS SEMANAS
@@ -278,8 +288,8 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
-
         this.usuarioService.deleteById(user.getUsuario());
     }
 
@@ -331,6 +341,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -361,6 +372,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -391,6 +403,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -421,6 +434,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -451,6 +465,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -485,6 +500,7 @@ class EventoControllerTests {
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         expectedDates.clear();
         this.eventoService.deleteById(event.getId());
 
@@ -511,7 +527,7 @@ class EventoControllerTests {
         this.mockMvc.perform(get(uri + (event.getId() + 1)).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
-
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -567,6 +583,7 @@ class EventoControllerTests {
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestEvento)))
                 .andExpect(status().isBadRequest());
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(evento.getId());
         this.eventoService.deleteById(event.getId());
         this.usuarioService.deleteById(usuario.getUsuario());
@@ -604,6 +621,7 @@ class EventoControllerTests {
         assertEquals(events.get(0).getNombre(), requestEvento.getNombre());
         assertEquals(events.get(0).getDescripcion(), requestEvento.getDescripcion());
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(events.get(0).getId());
         this.usuarioService.deleteById(user.getUsuario());
     }
@@ -618,6 +636,7 @@ class EventoControllerTests {
         Evento event = setUpEvento(user);
         String token = getToken(user);
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.mockMvc.perform(delete(uri + event.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isAccepted());
 
@@ -633,6 +652,7 @@ class EventoControllerTests {
 
         Evento evento = setUpEvento(usuario);
 
+        this.notificationSystem.cancelAllScheduledEventNotifications();
         this.mockMvc.perform(delete(uri + evento.getId()).header("Authorization", "Bearer " + token))
                 .andExpect(status().isBadRequest());
 
