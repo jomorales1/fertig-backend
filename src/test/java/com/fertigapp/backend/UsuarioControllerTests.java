@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,9 +53,9 @@ class UsuarioControllerTests {
         user.setCorreo("test@email.com");
         user.setNombre("Test User");
         user.setPassword(passwordEncoder.encode("testing"));
-        user.setTareas(new ArrayList<>());
-        user.setRutinas(new ArrayList<>());
-        user.setEventos(new ArrayList<>());
+        user.setTareas(new HashSet<>());
+        user.setRutinas(new HashSet<>());
+        user.setEventos(new HashSet<>());
 
         this.usuarioService.save(user);
         return user;

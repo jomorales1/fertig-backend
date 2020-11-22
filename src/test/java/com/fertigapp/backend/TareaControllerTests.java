@@ -1222,9 +1222,9 @@ class TareaControllerTests {
         subtask2.setHecha(false);
         subtask2.setRecordatorio(2);
         subtask2.setTiempoInvertido(0);
-        subtask2.setPadre(tarea.getSubtareas().get(0));
-        tarea.getSubtareas().get(0).addSubtarea(subtask2);
-        this.tareaService.save(tarea.getSubtareas().get(0));
+        subtask2.setPadre(tarea.getSubtareas().iterator().next());
+        tarea.getSubtareas().iterator().next().addSubtarea(subtask2);
+        this.tareaService.save(tarea.getSubtareas().iterator().next());
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);

@@ -7,7 +7,6 @@ import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -54,7 +53,7 @@ public class Rutina implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")
-    private List<Completada> completadas;
+    private Set<Completada> completadas;
 
     @OneToMany(mappedBy = "rutinaT", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Tarea> subtareas;
@@ -157,11 +156,11 @@ public class Rutina implements Serializable {
         this.franjaFin = franjaFin;
     }
 
-    public List<Completada> getCompletadas() {
+    public Set<Completada> getCompletadas() {
         return completadas;
     }
 
-    public void setCompletadas(List<Completada> completadas) {
+    public void setCompletadas(Set<Completada> completadas) {
         this.completadas = completadas;
     }
 

@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name="tarea")
@@ -23,7 +21,7 @@ public class Tarea implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "tarea")
-    private List<TareaDeUsuario> usuariosT;
+    private Set<TareaDeUsuario> usuariosT;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
@@ -31,7 +29,7 @@ public class Tarea implements Serializable {
     private Tarea padre;
 
     @OneToMany(mappedBy = "padre", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Tarea> subtareas;
+    private Set<Tarea> subtareas;
 
     protected String nombre;
 
@@ -64,7 +62,7 @@ public class Tarea implements Serializable {
 
     public void addSubtarea(Tarea tarea) {
         if (this.subtareas == null) {
-            this.subtareas = new ArrayList<>();
+            this.subtareas = new HashSet<>();
         }
         this.subtareas.add(tarea);
     }
@@ -121,7 +119,7 @@ public class Tarea implements Serializable {
         this.recordatorio = recordatorio;
     }
 
-    public List<TareaDeUsuario> getUsuariosT() {
+    public Set<TareaDeUsuario> getUsuariosT() {
         return usuariosT;
     }
 
@@ -129,7 +127,7 @@ public class Tarea implements Serializable {
         return padre;
     }
 
-    public List<Tarea> getSubtareas() {
+    public Set<Tarea> getSubtareas() {
         return subtareas;
     }
 
@@ -181,7 +179,7 @@ public class Tarea implements Serializable {
         this.nivel = nivel;
     }
 
-    public void setUsuariosT(List<TareaDeUsuario> usuariosT) {
+    public void setUsuariosT(Set<TareaDeUsuario> usuariosT) {
         this.usuariosT = usuariosT;
     }
 
@@ -189,7 +187,7 @@ public class Tarea implements Serializable {
         this.padre = padre;
     }
 
-    public void setSubtareas(List<Tarea> subtareas) {
+    public void setSubtareas(Set<Tarea> subtareas) {
         this.subtareas = subtareas;
     }
 

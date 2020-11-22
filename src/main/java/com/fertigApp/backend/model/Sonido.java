@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "sonido")
@@ -17,11 +17,11 @@ public class Sonido implements Serializable {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "sonidos")
-    private List<Usuario> usuarios;
+    private Set<Usuario> usuarios;
 
     public void addUsuario(Usuario usuario) {
         if (this.usuarios == null) {
-            this.usuarios = new ArrayList<>();
+            this.usuarios = new HashSet<>();
         }
         this.usuarios.add(usuario);
     }

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class Usuario implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuario")
-	private List<TareaDeUsuario> tareas;
+	private Set<TareaDeUsuario> tareas;
 
 	@JsonIgnore
 	@ManyToMany(cascade = {CascadeType.ALL})
@@ -38,19 +39,19 @@ public class Usuario implements Serializable {
 			joinColumns = {@JoinColumn(name="usuario")},
 			inverseJoinColumns = {@JoinColumn(name="id_sonido")}
 	)
-	List<Sonido> sonidos;
+	Set<Sonido> sonidos;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioE")
-	private List<Evento> eventos;
+	private Set<Evento> eventos;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioR")
-	private List<Rutina> rutinas;
+	private Set<Rutina> rutinas;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "agregados", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    List<Usuario> agregadores;
+    Set<Usuario> agregadores;
 
     @JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
@@ -59,7 +60,7 @@ public class Usuario implements Serializable {
 			joinColumns = {@JoinColumn(name = "agregador")},
 			inverseJoinColumns = {@JoinColumn(name = "agregado")}
 	)
-	private List<Usuario> agregados;
+	private Set<Usuario> agregados;
 
     @JsonIgnore
 	@OneToMany(mappedBy = "usuarioF")
@@ -80,7 +81,7 @@ public class Usuario implements Serializable {
 
 	public void addAmigo(Usuario amigo) {
 		if (this.agregados == null) {
-			this.agregados = new ArrayList<>();
+			this.agregados = new HashSet<>();
 		}
 		amigo.addAgregador(this);
 		this.agregados.add(amigo);
@@ -88,7 +89,7 @@ public class Usuario implements Serializable {
 
 	public void addAgregador(Usuario agregador) {
 		if (this.agregadores == null) {
-			this.agregadores = new ArrayList<>();
+			this.agregadores = new HashSet<>();
 		}
 		this.agregadores.add(agregador);
 	}
@@ -135,19 +136,19 @@ public class Usuario implements Serializable {
 		this.usuario = usuario;
 	}
 
-	public List<Evento> getEventos() {
+	public Set<Evento> getEventos() {
 		return eventos;
 	}
 
-	public void setEventos(List<Evento> eventos) {
+	public void setEventos(Set<Evento> eventos) {
 		this.eventos = eventos;
 	}
 
-	public List<Rutina> getRutinas() {
+	public Set<Rutina> getRutinas() {
 		return rutinas;
 	}
 
-	public void setRutinas(List<Rutina> rutinas) {
+	public void setRutinas(Set<Rutina> rutinas) {
 		this.rutinas = rutinas;
 	}
 
@@ -167,35 +168,35 @@ public class Usuario implements Serializable {
 		this.facebook = facebook;
 	}
 
-	public List<TareaDeUsuario> getTareas() {
+	public Set<TareaDeUsuario> getTareas() {
 		return tareas;
 	}
 
-	public void setTareas(List<TareaDeUsuario> tareas) {
+	public void setTareas(Set<TareaDeUsuario> tareas) {
 		this.tareas = tareas;
 	}
 
-	public List<Sonido> getSonidos() {
+	public Set<Sonido> getSonidos() {
 		return sonidos;
 	}
 
-	public void setSonidos(List<Sonido> sonidos) {
+	public void setSonidos(Set<Sonido> sonidos) {
 		this.sonidos = sonidos;
 	}
 
-	public List<Usuario> getAgregadores() {
+	public Set<Usuario> getAgregadores() {
 		return agregadores;
 	}
 
-	public void setAgregadores(List<Usuario> amigos) {
+	public void setAgregadores(Set<Usuario> amigos) {
 		this.agregadores = amigos;
 	}
 
-	public List<Usuario> getAgregados() {
+	public Set<Usuario> getAgregados() {
 		return agregados;
 	}
 
-	public void setAgregados(List<Usuario> agregados) {
+	public void setAgregados(Set<Usuario> agregados) {
 		this.agregados = agregados;
 	}
 

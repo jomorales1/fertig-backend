@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /*
@@ -142,7 +143,7 @@ public class UsuarioController {
     }
 
     @GetMapping(path = "/user/friends")
-    public ResponseEntity<List<Usuario>> getFriends() {
+    public ResponseEntity<Set<Usuario>> getFriends() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario usuario = optionalUsuario.orElse(new Usuario());

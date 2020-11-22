@@ -35,6 +35,7 @@ import java.time.OffsetTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -84,7 +85,7 @@ class RutinaControllerTests {
         user.setCorreo("test@email.com");
         user.setNombre("Test User");
         user.setPassword(passwordEncoder.encode("testing"));
-        user.setRutinas(new ArrayList<>());
+        user.setRutinas(new HashSet<>());
 
         this.usuarioService.save(user);
         return user;
@@ -714,7 +715,7 @@ class RutinaControllerTests {
         requestRutina.setFechaFin(OffsetDateTime.now().plusWeeks(2));
         requestRutina.setRecurrencia("D2");
         requestRutina.setRecordatorio(60);
-        requestRutina.setCompletadas(new ArrayList<>());
+        requestRutina.setCompletadas(new HashSet<>());
 
         this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestRutina)))
