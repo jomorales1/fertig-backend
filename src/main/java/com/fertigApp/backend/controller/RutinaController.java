@@ -219,7 +219,6 @@ public class RutinaController {
         subtarea.setNombre(requestTarea.getNombre());
         subtarea.setPrioridad(requestTarea.getPrioridad());
         subtarea.setRecordatorio(requestTarea.getRecordatorio());
-        subtarea.setTiempoInvertido(0);
         subtarea.setRutinaT(rutina);
         rutina.addSubtarea(subtarea);
         this.rutinaService.save(rutina);
@@ -255,7 +254,6 @@ public class RutinaController {
         subtask.setFechaFin(requestTarea.getFechaFin());
         subtask.setHecha(requestTarea.getHecha());
         subtask.setRecordatorio(requestTarea.getRecordatorio());
-        subtask.setTiempoInvertido(requestTarea.getTiempoInvertido());
         this.tareaService.save(subtask);
         return ResponseEntity.ok(new MessageResponse("Subtarea actualizada"));
     }

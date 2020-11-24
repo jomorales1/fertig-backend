@@ -42,9 +42,6 @@ public class Tarea implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     protected Integer estimacion;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    protected Integer tiempoInvertido;
-
     @Column(name="fecha_fin", columnDefinition="DATETIME")
     protected OffsetDateTime fechaFin;
 
@@ -135,10 +132,6 @@ public class Tarea implements Serializable {
         return hecha;
     }
 
-    public Integer getTiempoInvertido() {
-        return tiempoInvertido;
-    }
-
     public Rutina getRutinaT() {
         return rutinaT;
     }
@@ -191,7 +184,4 @@ public class Tarea implements Serializable {
         this.subtareas = subtareas;
     }
 
-    public void setTiempoInvertido(Integer tiempoInvertido) {
-        this.tiempoInvertido = tiempoInvertido;
-    }
 }

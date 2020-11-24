@@ -76,7 +76,6 @@ class NotificationSystemTests {
         task.setFechaFin(OffsetDateTime.now().plusSeconds(15));
         task.setHecha(false);
         task.setRecordatorio(2);
-        task.setTiempoInvertido(0);
         task = this.tareaService.save(task);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();

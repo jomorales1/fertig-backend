@@ -763,7 +763,6 @@ class RutinaControllerTests {
         requestTarea.setEstimacion(4);
         requestTarea.setHecha(false);
         requestTarea.setRecordatorio(2);
-        requestTarea.setTiempoInvertido(0);
 
         this.mockMvc.perform(post(uri1 + (rutina.getId() + 1) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -826,7 +825,6 @@ class RutinaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setRutinaT(rutina);
         subtarea = this.tareaService.save(subtarea);
         this.rutinaService.save(rutina);
@@ -840,7 +838,6 @@ class RutinaControllerTests {
         subtarea1.setHecha(false);
         subtarea1.setNivel(3);
         subtarea1.setRecordatorio(2);
-        subtarea1.setTiempoInvertido(0);
         subtarea1.setPadre(subtarea);
         subtarea.addSubtarea(subtarea1);
         subtarea = this.tareaService.save(subtarea);
@@ -853,7 +850,6 @@ class RutinaControllerTests {
         requestTarea.setEstimacion(subtarea.getEstimacion());
         requestTarea.setHecha(subtarea.getHecha());
         requestTarea.setRecordatorio(subtarea.getRecordatorio());
-        requestTarea.setTiempoInvertido(subtarea.getTiempoInvertido());
 
         this.mockMvc.perform(put(uri1 + (subtarea.getId() + 2) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -876,7 +872,6 @@ class RutinaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setRutinaT(newRutina);
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
@@ -920,7 +915,6 @@ class RutinaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setRutinaT(rutina);
         subtarea = this.tareaService.save(subtarea);
         this.rutinaService.save(rutina);
@@ -945,7 +939,6 @@ class RutinaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setRutinaT(newRutina);
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
@@ -996,7 +989,6 @@ class RutinaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setRutinaT(rutina);
         subtarea = this.tareaService.save(subtarea);
         this.rutinaService.save(rutina);
@@ -1021,7 +1013,6 @@ class RutinaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setRutinaT(newRutina);
         newSubtarea = this.tareaService.save(newSubtarea);
         this.rutinaService.save(rutina);
