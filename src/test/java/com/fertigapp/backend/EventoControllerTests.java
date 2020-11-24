@@ -286,7 +286,7 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,13,12,0,0,0, ZoneOffset.UTC));//aqui
+        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
         this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());

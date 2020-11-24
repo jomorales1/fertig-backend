@@ -358,7 +358,7 @@ public class RutinaController {
                     rutina.getFechaInicio(),
                     rutina.getFechaFin(),
                     rutina.getRecurrencia(),
-                    completada.getFecha())
+                    completada.getFecha()).plusMinutes(10)
             );
         } else {
             newCompletada.setFecha(AbstractRecurrenteResponse.findSiguiente(
@@ -368,7 +368,7 @@ public class RutinaController {
                     rutina.getDuracion(),
                     rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC),
                     rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC),
-                    completada.getFecha())
+                    completada.getFecha()).plusMinutes(10)
             );
         }
         newCompletada.setHecha(false);

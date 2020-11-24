@@ -100,18 +100,23 @@ class RutinaControllerTests {
         routine.setRecurrencia("D2");
         routine.setRecordatorio(60);
 
+        Rutina saved =  this.rutinaService.save(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
-                        routine.getFechaFin(),
-                        routine.getRecurrencia(),
-                        OffsetDateTime.now()));
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                routine.getFechaInicio(),
+                routine.getFechaFin(),
+                routine.getRecurrencia(),
+                routine.getDuracion(),
+                routine.getFranjaInicio(),
+                routine.getFranjaFin(),
+                routine.getFechaInicio())
+        );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
-        Rutina saved = this.rutinaService.save(routine);
-
         this.completadaService.save(completada);
+
         return saved;
     }
 
@@ -129,18 +134,23 @@ class RutinaControllerTests {
         routine.setRecurrencia(recurrencia);
         routine.setRecordatorio(60);
 
+        Rutina saved =  this.rutinaService.save(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
-                        routine.getFechaFin(),
-                        routine.getRecurrencia(),
-                        OffsetDateTime.now()));
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                routine.getFechaInicio(),
+                routine.getFechaFin(),
+                routine.getRecurrencia(),
+                routine.getDuracion(),
+                routine.getFranjaInicio(),
+                routine.getFranjaFin(),
+                routine.getFechaInicio())
+        );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
-        Rutina saved = this.rutinaService.save(routine);
-
         this.completadaService.save(completada);
+
         return saved;
     }
 
@@ -158,18 +168,20 @@ class RutinaControllerTests {
         routine.setRecurrencia(recurrencia);
         routine.setRecordatorio(60);
 
+        Rutina saved =  this.rutinaService.save(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
-                        routine.getFechaFin(),
-                        routine.getRecurrencia(),
-                        OffsetDateTime.now()));
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                routine.getFechaInicio(),
+                routine.getFechaFin(),
+                routine.getRecurrencia(),
+                routine.getFechaInicio())
+        );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
-        Rutina saved = this.rutinaService.save(routine);
-
         this.completadaService.save(completada);
+
         return saved;
     }
 
@@ -189,21 +201,23 @@ class RutinaControllerTests {
         routine.setFranjaInicio(franjaI);
         routine.setFranjaFin(franjaF);
 
+        Rutina saved =  this.rutinaService.save(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
-                        routine.getFechaFin(),
-                        routine.getRecurrencia(),
-                        routine.getDuracion(),
-                        routine.getFranjaInicio(),
-                        routine.getFranjaFin(),
-                        OffsetDateTime.now()));
+        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                routine.getFechaInicio(),
+                routine.getFechaFin(),
+                routine.getRecurrencia(),
+                routine.getDuracion(),
+                routine.getFranjaInicio(),
+                routine.getFranjaFin(),
+                routine.getFechaInicio())
+        );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
-        Rutina saved = this.rutinaService.save(routine);
-
         this.completadaService.save(completada);
+
         return saved;
     }
 
@@ -296,7 +310,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,2,15,13,0,0,0, ZoneOffset.UTC));//aqui
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,4,7,0,0,0, ZoneOffset.UTC));
 
         this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
@@ -384,7 +398,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,13,12,0,0,0, ZoneOffset.UTC));//aqui
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
 
         this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
@@ -487,7 +501,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), rutina.getDescripcion());
         obtainedDates = obtainedRoutine.getFuturas();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
@@ -519,7 +533,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), rutina.getDescripcion());
         obtainedDates = obtainedRoutine.getFuturas();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
@@ -551,7 +565,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), rutina.getDescripcion());
         obtainedDates = obtainedRoutine.getFuturas();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
@@ -583,7 +597,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), rutina.getDescripcion());
         obtainedDates = obtainedRoutine.getFuturas();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
@@ -619,7 +633,7 @@ class RutinaControllerTests {
         assertEquals(obtainedRoutine.getDescripcion(), rutina.getDescripcion());
         obtainedDates = obtainedRoutine.getFuturas();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
