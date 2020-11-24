@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -182,7 +183,7 @@ public class RutinaController {
                 rutina.getDuracion(),
                 rutina.getFranjaInicio(),
                 rutina.getFranjaFin(),
-                OffsetDateTime.now())
+                rutina.getFechaInicio())
         );
         completada.setFechaAjustada(null);
         completada.setHecha(false);
@@ -352,15 +353,24 @@ public class RutinaController {
         this.completadaService.save(completada);
         Completada newCompletada = new Completada();
         newCompletada.setRutinaC(rutina);
-        newCompletada.setFecha( AbstractRecurrenteResponse.findSiguiente(
-                rutina.getFechaInicio(),
-                rutina.getFechaFin(),
-                rutina.getRecurrencia(),
-                rutina.getDuracion(),
-                rutina.getFranjaInicio(),
-                rutina.getFranjaFin(),
-                completada.getFecha())
-        );
+        if(rutina.getFranjaInicio() == null || rutina.getFranjaFin()==null){
+            newCompletada.setFecha( AbstractRecurrenteResponse.findSiguiente(
+                    rutina.getFechaInicio(),
+                    rutina.getFechaFin(),
+                    rutina.getRecurrencia(),
+                    completada.getFecha())
+            );
+        } else {
+            newCompletada.setFecha(AbstractRecurrenteResponse.findSiguiente(
+                    rutina.getFechaInicio(),
+                    rutina.getFechaFin(),
+                    rutina.getRecurrencia(),
+                    rutina.getDuracion(),
+                    rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC),
+                    rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC),
+                    completada.getFecha())
+            );
+        }
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
             this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());

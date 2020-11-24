@@ -91,23 +91,25 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             fechas.add(OffsetDateTime.from(fechaFin));
         } else if(recurrencia.charAt(0) == 'H'){
             OffsetDateTime franjaI = fechaInicio.toLocalDate().atTime(franjaInicio);
-            OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaInicio);
+            OffsetDateTime franjaF = fechaInicio.toLocalDate().atTime(franjaFin);
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
-            if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
+            if(franjaI.isAfter(franjaF)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fechaFin)) {
-                if (fechaI.isAfter(franjaI) && fechaI.isBefore(franjaF)) fechas.add(fechaI);
-                fechaI = fechaI.plusHours(d);
                 if(fechaI.isAfter(franjaF)){
                     franjaI = franjaI.plusDays(1);
                     franjaF = franjaF.plusDays(1);
                 }
+                if (fechaI.isAfter(franjaI) && fechaI.isBefore(franjaF)) fechas.add(fechaI);
+                fechaI = fechaI.plusHours(d);
             }
         } else{
             return findFechas(fechaInicio, fechaFin, recurrencia);
         }
         return fechas;
     }
+
+
 
     public static OffsetDateTime add(OffsetDateTime fecha, int n, Character t){
         OffsetDateTime fechaFinal;
@@ -160,19 +162,16 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         if(recurrencia == null) {
             return OffsetDateTime.from(fechaFin);
         } else if(recurrencia.charAt(0) == 'H'){
-            fecha = (OffsetDateTime.now().isAfter(fecha) ? OffsetDateTime.now() : fecha.plusMinutes(10));
-            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
-            OffsetDateTime franjaI;
-            OffsetDateTime franjaF;
-            if(fecha.compareTo(fechaInicio) < 0){
-//                fecha = fechaInicio;
-                franjaI = fechaInicio.toLocalDate().atTime(franjaInicio);
-                franjaF = fechaInicio.toLocalDate().atTime(franjaFin);
+            if (OffsetDateTime.now().isAfter(fecha)){
+                fecha = OffsetDateTime.now();
             } else {
-                franjaI = fecha.toLocalDate().atTime(franjaInicio);
-                franjaF = fecha.toLocalDate().atTime(franjaFin);
+                fecha = fecha.plusMinutes(10);
             }
-            if(!franjaF.isAfter(franjaI)) franjaF = franjaF.plusDays(1);
+            // fecha > fechaInicio siempre.
+            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
+            OffsetDateTime franjaI = fecha.toLocalDate().atTime(franjaInicio);
+            OffsetDateTime franjaF = fecha.toLocalDate().atTime(franjaFin);
+            if(franjaI.isAfter(franjaF)) franjaF = franjaF.plusDays(1);
             int d = Integer.parseInt(recurrencia.substring(1));
             while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
                 fechaI = fechaI.plusHours(d);

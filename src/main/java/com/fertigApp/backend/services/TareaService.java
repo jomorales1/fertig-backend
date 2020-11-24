@@ -1,16 +1,21 @@
 package com.fertigApp.backend.services;
 
 import com.fertigApp.backend.model.Tarea;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.TareaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @Service
 public class TareaService {
 
-    private final TareaRepository tareaRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TareaService.class);
 
+    private final TareaRepository tareaRepository;
 
     public TareaService(TareaRepository tareaRepository) {
         this.tareaRepository = tareaRepository;
@@ -32,4 +37,7 @@ public class TareaService {
         tareaRepository.deleteById(id);
     }
 
+    public Integer countTareasBetween(OffsetDateTime inicio, OffsetDateTime fin, Usuario usuario){
+        return this.tareaRepository.countTareasBetween(inicio, fin, usuario);
+    }
 }

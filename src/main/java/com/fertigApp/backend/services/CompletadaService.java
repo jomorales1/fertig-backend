@@ -2,6 +2,7 @@ package com.fertigApp.backend.services;
 
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.CompletadaRepository;
 import org.springframework.stereotype.Service;
 
@@ -46,5 +47,13 @@ public class CompletadaService {
 
     public Completada findMaxCompletada(Rutina rutina){
         return this.completadaRepository.findMaxCompletada(rutina);
+    }
+
+    public Integer countCompletadasBetween(OffsetDateTime inicio, OffsetDateTime fin, Usuario usuario){
+        return this.completadaRepository.countCompletadasBetween(inicio, fin, usuario);
+    }
+
+    public Integer countTiempoCompletadasBetween(OffsetDateTime inicio, OffsetDateTime fin, Usuario usuario){
+        return this.completadaRepository.countTiempoCompletadasBetween(inicio, fin, usuario);
     }
 }

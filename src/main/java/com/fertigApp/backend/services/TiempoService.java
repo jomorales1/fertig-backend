@@ -7,6 +7,8 @@ import com.fertigApp.backend.model.Usuario;
 import com.fertigApp.backend.repository.TiempoRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+
 @Service
 public class TiempoService {
 
@@ -26,6 +28,10 @@ public class TiempoService {
 
     public void deleteById(IdTiempo id) {
         this.tiempoRepository.deleteById(id);
+    }
+
+    public Integer countTiempoTareaBetween(OffsetDateTime inicio, OffsetDateTime fin, Usuario usuario){
+        return this.tiempoRepository.countTiempoTareasBetween(inicio, fin, usuario);
     }
 
 }

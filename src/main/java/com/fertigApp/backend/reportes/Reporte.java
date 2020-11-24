@@ -3,10 +3,29 @@ package com.fertigApp.backend.reportes;
 public abstract class Reporte {
 
     protected Integer tareas;
-    protected Integer horas;
+    protected Integer minutos;
 
-    public Reporte(Integer tareas, Integer horas) {
+    public Reporte(Integer tareas, Integer minutos) {
         this.tareas = tareas;
-        this.horas = horas;
+        this.minutos = minutos;
+    }
+
+    public Reporte() {
+    }
+
+    public Integer getTareas() {
+        return tareas;
+    }
+
+    public void setTareas(Integer tareas) {
+        this.tareas = tareas;
+    }
+
+    public Integer getMinutos() {
+        return minutos;
+    }
+
+    public void setMinutos(Integer minutos) {
+        this.minutos = minutos;
     }
 }

@@ -31,20 +31,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.OffsetTime;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = BackendApplication.class)
@@ -273,7 +268,7 @@ class RutinaControllerTests {
         Rutina routine;
         String recurrencia;
         OffsetDateTime fechaInicio, fechaFin = OffsetDateTime.of(2021,1,31,12,0,0,0, ZoneOffset.UTC);
-        OffsetTime franjaIncio = OffsetTime.of(7,0,0,0,ZoneOffset.UTC);
+        OffsetTime franjaInicio = OffsetTime.of(7,0,0,0,ZoneOffset.UTC);
         OffsetTime franjaFin  = OffsetTime.of(13,0,0,0,ZoneOffset.UTC);
         RecurrenteResponse obtainedRoutine;
 
@@ -288,7 +283,7 @@ class RutinaControllerTests {
 
         recurrencia = "H13";
         fechaInicio = OffsetDateTime.of(2021,1,1,14,0,0,0, ZoneOffset.UTC);
-        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin, franjaIncio, franjaFin);
+        routine = setUpRutina(user, recurrencia, fechaInicio, fechaFin, franjaInicio, franjaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
@@ -301,7 +296,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,4,7,0,0,0, ZoneOffset.UTC));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,2,15,13,0,0,0, ZoneOffset.UTC));//aqui
 
         this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);
@@ -389,7 +384,7 @@ class RutinaControllerTests {
         assertNotNull(obtainedRoutine);
         assertEquals(obtainedRoutine.getNombre(), routine.getNombre());
         assertEquals(obtainedRoutine.getDescripcion(), routine.getDescripcion());
-        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
+        assertEquals(obtainedRoutine.getFecha(), OffsetDateTime.of(2021,1,13,12,0,0,0, ZoneOffset.UTC));//aqui
 
         this.notificationSystem.cancelAllScheduledRoutineNotifications();
         this.completadaService.deleteAllByRutina(routine);

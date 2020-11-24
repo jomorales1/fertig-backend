@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fertigApp.backend.model.Rutina;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 //Response con la información de un evento y las fechas de todas sus repeticiones
@@ -23,7 +24,7 @@ public class RutinaRepeticionesResponse extends AbstractRecurrenteResponse  {
         this.completadas = completadas;
         OffsetDateTime fechaIdeal = (completadas.isEmpty()) ? rutina.getFechaInicio() : completadas.get(completadas.size()-1);
         if(rutina.getRecurrencia().charAt(0) == 'H')
-            this.futuras = AbstractRecurrenteResponse.findFechas(fechaIdeal, rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(), rutina.getFranjaInicio(), rutina.getFranjaFin());
+            this.futuras = AbstractRecurrenteResponse.findFechas(fechaIdeal, rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(), rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC), rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC));
         else
             this.futuras = AbstractRecurrenteResponse.findFechas(fechaIdeal, rutina.getFechaFin(), rutina.getRecurrencia());
         //completadas: select de las completadas hechas
