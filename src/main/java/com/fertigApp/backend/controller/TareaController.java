@@ -106,7 +106,6 @@ public class TareaController {
         if(task.getFechaFin() != null) tarea.setFechaFin(task.getFechaFin());
         tarea.setHecha(task.getHecha());
         tarea.setRecordatorio(task.getRecordatorio());
-        tarea.setTiempoInvertido(task.getTiempoInvertido());
         this.tareaService.save(tarea);
         LOGGER.info("Tarea actualizada");
         this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), tarea.getId());
@@ -153,7 +152,6 @@ public class TareaController {
         tarea.setNombre(requestTarea.getNombre());
         tarea.setPrioridad(requestTarea.getPrioridad());
         tarea.setRecordatorio(requestTarea.getRecordatorio());
-        tarea.setTiempoInvertido(0);
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(usuario);
         Tarea savedTask = this.tareaService.save(tarea);
@@ -425,7 +423,6 @@ public class TareaController {
         subtarea.setNombre(subTask.getNombre());
         subtarea.setPrioridad(subTask.getPrioridad());
         subtarea.setRecordatorio(subTask.getRecordatorio());
-        subtarea.setTiempoInvertido(0);
         subtarea.setPadre(tarea);
         tarea.addSubtarea(subtarea);
         this.tareaService.save(tarea);
@@ -485,7 +482,6 @@ public class TareaController {
         subtask.setFechaFin(requestTarea.getFechaFin());
         subtask.setEtiqueta(requestTarea.getEtiqueta());
         subtask.setEstimacion(requestTarea.getEstimacion());
-        subtask.setTiempoInvertido(requestTarea.getTiempoInvertido());
         subtask.setHecha(requestTarea.getHecha());
         subtask.setRecordatorio(requestTarea.getRecordatorio());
         this.tareaService.save(subtask);
@@ -576,7 +572,6 @@ public class TareaController {
         copy.setPrioridad(tarea.getPrioridad());
         copy.setEtiqueta(tarea.getEtiqueta());
         copy.setEstimacion(tarea.getEstimacion());
-        copy.setTiempoInvertido(0);
         copy.setFechaFin(tarea.getFechaFin());
         copy.setNivel(tarea.getNivel());
         copy.setRecordatorio(tarea.getRecordatorio());
@@ -589,7 +584,6 @@ public class TareaController {
                 subtarea.setPrioridad(subtareaSN.getPrioridad());
                 subtarea.setEtiqueta(subtareaSN.getEtiqueta());
                 subtarea.setEstimacion(subtareaSN.getEstimacion());
-                subtarea.setTiempoInvertido(0);
                 subtarea.setFechaFin(subtareaSN.getFechaFin());
                 subtarea.setNivel(subtareaSN.getNivel());
                 subtarea.setRecordatorio(subtareaSN.getRecordatorio());
@@ -602,7 +596,6 @@ public class TareaController {
                         subtarea1.setPrioridad(subtareaTN.getPrioridad());
                         subtarea1.setEtiqueta(subtareaTN.getEtiqueta());
                         subtarea1.setEstimacion(subtareaTN.getEstimacion());
-                        subtarea1.setTiempoInvertido(0);
                         subtarea1.setFechaFin(subtareaTN.getFechaFin());
                         subtarea1.setNivel(subtareaTN.getNivel());
                         subtarea1.setRecordatorio(subtareaTN.getRecordatorio());

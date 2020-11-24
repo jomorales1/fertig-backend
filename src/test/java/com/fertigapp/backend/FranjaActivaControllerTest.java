@@ -104,7 +104,6 @@ public class FranjaActivaControllerTest {
         task.setNivel(1);
         task.setHecha(false);
         task.setRecordatorio(2);
-        task.setTiempoInvertido(0);
         task.setFechaFin(OffsetDateTime.of(2030, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC));
         task = this.tareaService.save(task);
 
@@ -127,7 +126,6 @@ public class FranjaActivaControllerTest {
         task.setNivel(1);
         task.setHecha(false);
         task.setRecordatorio(2);
-        task.setTiempoInvertido(0);
         task.setFechaFin(fechaFin);
         task = this.tareaService.save(task);
 

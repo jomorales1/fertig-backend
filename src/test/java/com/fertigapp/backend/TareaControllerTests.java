@@ -114,7 +114,6 @@ class TareaControllerTests {
         task.setNivel(1);
         task.setHecha(false);
         task.setRecordatorio(2);
-        task.setTiempoInvertido(0);
         task = this.tareaService.save(task);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -223,7 +222,6 @@ class TareaControllerTests {
         requestTarea.setEstimacion(task.getEstimacion());
         requestTarea.setHecha(task.getHecha());
         requestTarea.setRecordatorio(task.getRecordatorio());
-        requestTarea.setTiempoInvertido(task.getTiempoInvertido());
 
         // Valid request -> status 200 expected
         ResultActions resultActions = this.mockMvc.perform(put(uri + task.getId()).header("Authorization", "Bearer " + token)
@@ -257,7 +255,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -318,7 +315,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -356,7 +352,6 @@ class TareaControllerTests {
         requestTarea.setEstimacion(4);
         requestTarea.setHecha(false);
         requestTarea.setRecordatorio(2);
-        requestTarea.setTiempoInvertido(0);
 
         this.mockMvc.perform(post(uri).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -403,7 +398,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -472,7 +466,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
@@ -529,7 +522,6 @@ class TareaControllerTests {
         tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
@@ -617,7 +609,6 @@ class TareaControllerTests {
         tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(patch(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
@@ -695,7 +686,6 @@ class TareaControllerTests {
         tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(post(uri1 + tarea.getId() + uri2 + newOwner.getUsuario())
@@ -764,7 +754,6 @@ class TareaControllerTests {
         tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(delete(uri1 + tarea.getId() + uri2 + newAdmin.getUsuario())
@@ -819,7 +808,6 @@ class TareaControllerTests {
         requestTarea.setEstimacion(4);
         requestTarea.setHecha(false);
         requestTarea.setRecordatorio(2);
-        requestTarea.setTiempoInvertido(0);
 
         this.mockMvc.perform(post(uri1 + (task.getId() + 1) + uri2).header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -834,7 +822,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(post(uri1 + tarea.getId() + uri2).header("Authorization", "Bearer " + token)
@@ -852,7 +839,6 @@ class TareaControllerTests {
         tarea2.setNivel(3);
         tarea2.setHecha(false);
         tarea2.setRecordatorio(2);
-        tarea2.setTiempoInvertido(0);
         tarea2 = this.tareaService.save(tarea2);
         TareaDeUsuario tareaDeUsuario = new TareaDeUsuario();
         tareaDeUsuario.setUsuario(user);
@@ -896,7 +882,6 @@ class TareaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
         this.tareaService.save(task);
@@ -909,7 +894,6 @@ class TareaControllerTests {
         requestTarea.setEstimacion(subtarea.getEstimacion());
         requestTarea.setHecha(subtarea.getHecha());
         requestTarea.setRecordatorio(subtarea.getRecordatorio());
-        requestTarea.setTiempoInvertido(subtarea.getTiempoInvertido());
 
         this.mockMvc.perform(put(uri1 + (task.getId() + 2) + uri2).header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON_VALUE).content(objectMapper.writeValueAsString(requestTarea)))
@@ -932,7 +916,6 @@ class TareaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
         newTarea.addSubtarea(newSubtarea);
         this.tareaService.save(newTarea);
@@ -987,7 +970,6 @@ class TareaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
         this.tareaService.save(task);
@@ -1012,7 +994,6 @@ class TareaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
         newTarea.addSubtarea(newSubtarea);
         this.tareaService.save(newTarea);
@@ -1070,7 +1051,6 @@ class TareaControllerTests {
         subtarea.setHecha(false);
         subtarea.setNivel(2);
         subtarea.setRecordatorio(2);
-        subtarea.setTiempoInvertido(0);
         subtarea.setPadre(task);
         task.addSubtarea(subtarea);
         this.tareaService.save(task);
@@ -1095,7 +1075,6 @@ class TareaControllerTests {
         newSubtarea.setHecha(false);
         newSubtarea.setNivel(2);
         newSubtarea.setRecordatorio(2);
-        newSubtarea.setTiempoInvertido(0);
         newSubtarea.setPadre(newTarea);
         newTarea.addSubtarea(newSubtarea);
         this.tareaService.save(newTarea);
@@ -1147,7 +1126,6 @@ class TareaControllerTests {
         tarea.setNivel(2);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         this.mockMvc.perform(put(uri1 + tarea.getId() + uri2 + "10").header("Authorization", "Bearer " + token))
@@ -1195,7 +1173,6 @@ class TareaControllerTests {
         tarea.setNivel(1);
         tarea.setHecha(false);
         tarea.setRecordatorio(2);
-        tarea.setTiempoInvertido(0);
         tarea = this.tareaService.save(tarea);
 
         Tarea subtask1 = new Tarea();
@@ -1207,7 +1184,6 @@ class TareaControllerTests {
         subtask1.setNivel(2);
         subtask1.setHecha(false);
         subtask1.setRecordatorio(2);
-        subtask1.setTiempoInvertido(0);
         subtask1.setPadre(tarea);
         tarea.addSubtarea(subtask1);
         tarea = this.tareaService.save(tarea);
@@ -1221,7 +1197,6 @@ class TareaControllerTests {
         subtask2.setNivel(3);
         subtask2.setHecha(false);
         subtask2.setRecordatorio(2);
-        subtask2.setTiempoInvertido(0);
         subtask2.setPadre(tarea.getSubtareas().iterator().next());
         tarea.getSubtareas().iterator().next().addSubtarea(subtask2);
         this.tareaService.save(tarea.getSubtareas().iterator().next());
