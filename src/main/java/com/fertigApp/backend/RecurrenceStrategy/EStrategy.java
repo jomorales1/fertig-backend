@@ -9,6 +9,28 @@ public class EStrategy implements RecurrenceStrategy{
 
     private RecurrenceStrategy recurrenceStrategy;
 
+    public EStrategy(String recurrence){
+        int point = recurrence.indexOf(".");
+        this.n = Integer.parseInt(recurrence.substring(1, point));
+        switch (recurrence.charAt(point+1)){
+            case 'H':
+                recurrenceStrategy = new HStrategy(recurrence.substring(point+1));
+                break;
+            case 'D':
+                recurrenceStrategy = new DStrategy(recurrence.substring(point+1));
+                break;
+            case 'S':
+                recurrenceStrategy = new WStrategy(recurrence.substring(point+1));
+                break;
+            case 'M':
+                recurrenceStrategy = new MStrategy(recurrence.substring(point+1));
+                break;
+            case 'A':
+                recurrenceStrategy = new YStrategy(recurrence.substring(point+1));
+                break;
+        }
+    }
+
     private boolean[] getRecurrenceDays(){
         boolean []recurrenceDays = new boolean[7];
         int dias = n;
@@ -75,29 +97,5 @@ public class EStrategy implements RecurrenceStrategy{
         }
 
         return  nextDate;
-    }
-
-    @Override
-    public void set(String recurrence) {
-        int point = recurrence.indexOf(".");
-        this.n = Integer.parseInt(recurrence.substring(1, point));
-        switch (recurrence.charAt(point+1)){
-            case 'H':
-                recurrenceStrategy = new HStrategy();
-                break;
-            case 'D':
-                recurrenceStrategy = new DStrategy();
-                break;
-            case 'S':
-                recurrenceStrategy = new WStrategy();
-                break;
-            case 'M':
-                recurrenceStrategy = new MStrategy();
-                break;
-            case 'A':
-                recurrenceStrategy = new YStrategy();
-                break;
-        }
-        recurrenceStrategy.set(recurrence.substring(point+1));
     }
 }

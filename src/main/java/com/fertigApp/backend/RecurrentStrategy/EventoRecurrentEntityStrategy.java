@@ -2,13 +2,10 @@ package com.fertigApp.backend.RecurrentStrategy;
 
 import com.fertigApp.backend.RecurrenceStrategy.*;
 import com.fertigApp.backend.model.Evento;
-import com.fertigApp.backend.services.EventoService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 
 public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
@@ -18,27 +15,29 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     public EventoRecurrentEntityStrategy(Evento evento){
         this.evento = evento;
+        if(evento.getRecurrencia() == null){
+            recurrenceStrategy = new NullStrategy(evento.getFechaFin());
+        }
         switch (evento.getRecurrencia().charAt(0)){
             case 'H':
-                recurrenceStrategy = new HStrategy();
+                recurrenceStrategy = new HStrategy(evento.getRecurrencia());
                 break;
             case 'D':
-                recurrenceStrategy = new DStrategy();
+                recurrenceStrategy = new DStrategy(evento.getRecurrencia());
                 break;
             case 'S':
-                recurrenceStrategy = new WStrategy();
+                recurrenceStrategy = new WStrategy(evento.getRecurrencia());
                 break;
             case 'M':
-                recurrenceStrategy = new MStrategy();
+                recurrenceStrategy = new MStrategy(evento.getRecurrencia());
                 break;
             case 'A':
-                recurrenceStrategy = new YStrategy();
+                recurrenceStrategy = new YStrategy(evento.getRecurrencia());
                 break;
             case 'E':
-                recurrenceStrategy = new EStrategy();
+                recurrenceStrategy = new EStrategy(evento.getRecurrencia());
                 break;
         }
-        recurrenceStrategy.set(evento.getRecurrencia());
     }
 
     @Override
