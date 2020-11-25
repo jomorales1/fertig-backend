@@ -100,7 +100,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
                     franjaI = franjaI.plusDays(1);
                     franjaF = franjaF.plusDays(1);
                 }
-                if (fechaI.isAfter(franjaI) && fechaI.isBefore(franjaF)) fechas.add(fechaI);
+                if (!fechaI.isBefore(franjaI) && !fechaI.isAfter(franjaF)) fechas.add(fechaI);
                 fechaI = fechaI.plusHours(d);
             }
         } else{
