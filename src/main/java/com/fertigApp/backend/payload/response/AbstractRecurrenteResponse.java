@@ -1,5 +1,7 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 
@@ -108,7 +110,6 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         }
         return fechas;
     }
-
 
 
     public static OffsetDateTime add(OffsetDateTime fecha, int n, Character t){
