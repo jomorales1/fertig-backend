@@ -1,6 +1,5 @@
 package com.fertigapp.backend;
 
-import com.fertigApp.backend.BackendApplication;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.SpringApplication;

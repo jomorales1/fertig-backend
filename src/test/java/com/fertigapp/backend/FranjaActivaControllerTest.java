@@ -2,12 +2,9 @@ package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fertigApp.backend.BackendApplication;
-import com.fertigApp.backend.model.*;
-import com.fertigApp.backend.payload.response.TareaSugeridaResponse;
-import com.fertigApp.backend.requestModels.FranjaActivaRequest;
-import com.fertigApp.backend.requestModels.LoginRequest;
-import com.fertigApp.backend.services.*;
+import com.fertigapp.backend.payload.response.TareaSugeridaResponse;
+import com.fertigapp.backend.requestModels.FranjaActivaRequest;
+import com.fertigapp.backend.requestModels.LoginRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -20,7 +17,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;

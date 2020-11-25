@@ -1,9 +1,6 @@
 package com.fertigapp.backend;
 
-import com.fertigApp.backend.BackendApplication;
-import com.fertigApp.backend.model.*;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.OffsetDateTime;
