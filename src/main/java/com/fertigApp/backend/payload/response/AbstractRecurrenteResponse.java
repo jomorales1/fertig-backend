@@ -124,13 +124,8 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
     }
 
     public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, OffsetDateTime fecha) {
-        if (OffsetDateTime.now().isAfter(fecha)){
-            fecha = OffsetDateTime.now();
-            if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
-        } else {
-            if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
-            fecha = fecha.plusMinutes(10);
-        }
+        if (OffsetDateTime.now().isAfter(fecha)) fecha = OffsetDateTime.from(OffsetDateTime.now());
+        if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
         if(recurrencia == null) {
             return OffsetDateTime.from(fechaFin);
         } else if(recurrencia.charAt(0) == 'E'){
@@ -146,7 +141,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             fechaI = OffsetDateTime.from(fechaInicio);
             fechaI = fechaI.plusDays((long) dia-fechaI.getDayOfWeek().getValue());
             while (fechaI.isBefore(fecha) || fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
-            if (fechaI.isAfter(fecha)) return fechaI;
+            if (!fechaI.isBefore(fecha)) return fechaI;
             return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto),fecha);
         } else {
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
@@ -162,11 +157,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         if(recurrencia == null) {
             return OffsetDateTime.from(fechaFin);
         } else if(recurrencia.charAt(0) == 'H'){
-            if (OffsetDateTime.now().isAfter(fecha)){
-                fecha = OffsetDateTime.now();
-            } else {
-                fecha = fecha.plusMinutes(10);
-            }
+            if (OffsetDateTime.now().isAfter(fecha)) fecha = OffsetDateTime.now();
             // fecha > fechaInicio siempre.
             OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
             OffsetDateTime franjaI = fecha.toLocalDate().atTime(franjaInicio);
