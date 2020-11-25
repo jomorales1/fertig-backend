@@ -1,5 +1,7 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 
@@ -39,6 +41,7 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.fechaInicio = evento.getFechaInicio();
         this.fechaFin = evento.getFechaFin();
         this.recurrencia = evento.getRecurrencia();
+        this.mensajeRecurrencia = new EventoRecurrentEntityStrategy(evento).getRecurrenceStrategy().getRecurrenceMessage();
     }
 
     protected AbstractRecurrenteResponse(Rutina rutina){
@@ -53,8 +56,8 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.franjaInicio = rutina.getFranjaInicio();
         this.franjaFin = rutina.getFranjaFin();
         this.recurrencia = rutina.getRecurrencia();
+        this.mensajeRecurrencia = new RutinaRecurrentEntityStrategy(rutina).getRecurrenceStrategy().getRecurrenceMessage();
     }
-
 
     public static OffsetDateTime add(OffsetDateTime fecha, int n, Character t){
         OffsetDateTime fechaFinal;
@@ -66,60 +69,6 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
             default : fechaFinal = fecha.plusHours(n); break;
         }
         return fechaFinal;
-    }
-
-    public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, OffsetDateTime fecha) {
-        if (OffsetDateTime.now().isAfter(fecha)) fecha = OffsetDateTime.from(OffsetDateTime.now());
-        if(fecha.toOffsetTime().isAfter(fechaInicio.toOffsetTime())) fecha = fecha.plusDays(1);
-        if(recurrencia == null) {
-            return OffsetDateTime.from(fechaFin);
-        } else if(recurrencia.charAt(0) == 'E'){
-            int punto = recurrencia.indexOf(".") ;
-            int d = Integer.parseInt(recurrencia.substring(1, punto));
-            int dia = fecha.getDayOfWeek().getValue() - 1;
-            OffsetDateTime fechaI = OffsetDateTime.from(fecha);
-            while(fechaI.compareTo(fechaFin)<1 && ((d >> dia) & 1) != 1) {
-                dia = (dia+1)%7;
-                fechaI = fechaI.plusDays(1);
-            }
-            dia = fechaI.getDayOfWeek().getValue();
-            fechaI = OffsetDateTime.from(fechaInicio);
-            fechaI = fechaI.plusDays((long) dia-fechaI.getDayOfWeek().getValue());
-            while (fechaI.isBefore(fecha) || fechaI.isBefore(fechaInicio)) fechaI = fechaI.plusWeeks(Integer.parseInt(recurrencia.substring(punto+2)));
-            if (!fechaI.isBefore(fecha)) return fechaI;
-            return findSiguiente(fechaInicio, fechaFin, 'E'+Integer.toString(d&(127-(int)Math.pow(2, fechaI.getDayOfWeek().getValue())))+recurrencia.substring(punto),fecha);
-        } else {
-            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
-            int d = Integer.parseInt(recurrencia.substring(1));
-            while(fechaI.isBefore(fecha)){
-                fechaI = add(fechaI,d,recurrencia.charAt(0));
-            }
-            return fechaI;
-        }
-    }
-
-    public static OffsetDateTime findSiguiente(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia, int duracion, OffsetTime franjaInicio, OffsetTime franjaFin, OffsetDateTime fecha) {
-        if(recurrencia == null) {
-            return OffsetDateTime.from(fechaFin);
-        } else if(recurrencia.charAt(0) == 'H'){
-            if (OffsetDateTime.now().isAfter(fecha)) fecha = OffsetDateTime.now();
-            // fecha > fechaInicio siempre.
-            OffsetDateTime fechaI = OffsetDateTime.from(fechaInicio);
-            OffsetDateTime franjaI = fecha.toLocalDate().atTime(franjaInicio);
-            OffsetDateTime franjaF = fecha.toLocalDate().atTime(franjaFin);
-            if(franjaI.isAfter(franjaF)) franjaF = franjaF.plusDays(1);
-            int d = Integer.parseInt(recurrencia.substring(1));
-            while(fechaI.isBefore(fecha) || fechaI.isBefore(franjaI) || fechaI.isAfter(franjaF)){
-                fechaI = fechaI.plusHours(d);
-                if(fechaI.isAfter(franjaF)){
-                    franjaF = franjaF.plusDays(1);
-                    franjaI = franjaI.plusDays(1);
-                }
-            }
-            return fechaI;
-        } else {
-            return findSiguiente(fechaInicio, fechaFin, recurrencia, fecha);
-        }
     }
 
     public static OffsetDateTime findAnterior(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia) {

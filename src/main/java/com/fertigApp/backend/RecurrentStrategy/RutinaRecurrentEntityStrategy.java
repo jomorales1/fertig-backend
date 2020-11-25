@@ -3,9 +3,7 @@ package com.fertigApp.backend.RecurrentStrategy;
 import com.fertigApp.backend.RecurrenceStrategy.*;
 import com.fertigApp.backend.model.Rutina;
 
-import java.time.LocalTime;
 import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +58,7 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
         OffsetDateTime fechaInicio = rutina.getFechaInicio();
         OffsetDateTime nextDate = OffsetDateTime.from(fechaInicio);
 
-        while(nextDate.isBefore(currentDate)){
+        while(nextDate != null && nextDate.isBefore(currentDate)){
             nextDate = findNextFromValidDate(nextDate);
         }
 

@@ -1,6 +1,9 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
 import com.fertigApp.backend.model.Evento;
 import com.fertigApp.backend.model.Rutina;
 import com.fertigApp.backend.model.Tarea;
@@ -16,13 +19,17 @@ public class RecurrenteResponse extends AbstractRecurrenteResponse {
     @JsonInclude
     private Set<Tarea> subtareas;
 
+    @JsonIgnore
+    private RecurrentEntityStrategy recurrentEntityStrategy;
+
     public RecurrenteResponse(){
         super();
     }
 
     public RecurrenteResponse(Evento evento) {
         super(evento);
-        this.fecha = findSiguiente(evento.getFechaInicio(), evento.getFechaFin(), evento.getRecurrencia(), evento.getFechaInicio());
+        recurrentEntityStrategy = new EventoRecurrentEntityStrategy(evento);
+        this.fecha = recurrentEntityStrategy.findSiguiente(evento.getFechaInicio());
     }
 
     public RecurrenteResponse(Rutina rutina, OffsetDateTime fecha) {

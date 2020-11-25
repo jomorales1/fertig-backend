@@ -1,5 +1,6 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
 import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
 import com.fertigApp.backend.model.Evento;
@@ -12,6 +13,7 @@ public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
 
     private List<OffsetDateTime> repeticiones;
 
+    @JsonIgnore
     private RecurrentEntityStrategy recurrentEntityStrategy;
 
     public EventoRepeticionesResponse(){
@@ -22,7 +24,6 @@ public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
         super(evento);
         this.recurrentEntityStrategy = new EventoRecurrentEntityStrategy(evento);
         this.repeticiones = recurrentEntityStrategy.findFechas();
-        super.mensajeRecurrencia = recurrentEntityStrategy.getRecurrenceStrategy().getRecurrenceMessage();
     }
 
     public List<OffsetDateTime> getRepeticiones(){

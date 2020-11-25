@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface RecurrentEntityStrategy {
     List<OffsetDateTime> findFechas();
-    OffsetDateTime findSiguiente(OffsetDateTime currentTime);
-    OffsetDateTime findAnterior(OffsetDateTime currentTime);
+    OffsetDateTime findSiguiente(OffsetDateTime currentDate);
+    OffsetDateTime findAnterior(OffsetDateTime currentDate);
     RecurrenceStrategy getRecurrenceStrategy();
 }

@@ -49,44 +49,60 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
         while(currentDate != null){
             fechas.add(currentDate);
-            currentDate = findSiguiente(currentDate);
+            currentDate = findNextFromValidDate(currentDate);
         }
 
         return fechas;
     }
 
     @Override
-    public OffsetDateTime findSiguiente(OffsetDateTime currentTime) {
+    public OffsetDateTime findSiguiente(OffsetDateTime currentDate) {
+        OffsetDateTime fechaInicio = evento.getFechaInicio();
+        OffsetDateTime nextDate = OffsetDateTime.from(fechaInicio);
+
+        while(nextDate != null && nextDate.isBefore(currentDate)){
+            nextDate = findNextFromValidDate(nextDate);
+        }
+
+        return nextDate;
+    }
+
+    @Override
+    public OffsetDateTime findAnterior(OffsetDateTime currentDate) {
+        OffsetDateTime nextDate = findSiguiente(currentDate);
+        return  nextDate == null ? nextDate : findPreviousFromValidDate(nextDate);
+    }
+
+    @Override
+    public RecurrenceStrategy getRecurrenceStrategy() {
+        return recurrenceStrategy;
+    }
+
+    private OffsetDateTime findNextFromValidDate(OffsetDateTime currentDate){
         OffsetDateTime fechaInicio = evento.getFechaInicio();
         OffsetDateTime fechaFin = evento.getFechaFin();
-        if(currentTime.isBefore(fechaInicio)){
+        if(currentDate.isBefore(fechaInicio)){
             return fechaInicio;
         }
 
-        OffsetDateTime nextDate = recurrenceStrategy.add(currentTime);
+        OffsetDateTime nextDate = recurrenceStrategy.add(currentDate);
         if(!nextDate.isBefore(fechaFin)){
             return null;
         }
         return nextDate;
     }
 
-    @Override
-    public OffsetDateTime findAnterior(OffsetDateTime currentTime) {
+    private OffsetDateTime findPreviousFromValidDate(OffsetDateTime currentDate){
         OffsetDateTime fechaInicio = evento.getFechaInicio();
         OffsetDateTime fechaFin = evento.getFechaFin();
-        if(fechaFin.isBefore(currentTime)){
+        if(fechaFin.isBefore(currentDate)){
             return fechaFin;
         }
 
-        OffsetDateTime previous = recurrenceStrategy.minus(currentTime);
+        OffsetDateTime previous = recurrenceStrategy.minus(currentDate);
         if(previous.isBefore(fechaInicio)){
             return null;
         }
         return previous;
-    }
-
-    @Override
-    public RecurrenceStrategy getRecurrenceStrategy() {
-        return recurrenceStrategy;
     }
 }

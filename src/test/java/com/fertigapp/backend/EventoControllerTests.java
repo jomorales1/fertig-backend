@@ -250,7 +250,7 @@ class EventoControllerTests {
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA MENSUAL
-        recurrencia = "S2";
+        recurrencia = "M2";
         fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
@@ -272,7 +272,7 @@ class EventoControllerTests {
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA DOS SEMANAS
         recurrencia = "E5.S2";
-        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
+        fechaInicio = OffsetDateTime.of(2021,1,4,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))

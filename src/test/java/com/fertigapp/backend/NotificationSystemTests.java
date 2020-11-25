@@ -1,6 +1,7 @@
 package com.fertigapp.backend;
 
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
 import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.*;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
@@ -108,13 +109,11 @@ class NotificationSystemTests {
         routine.setRecurrencia("D2");
         routine.setRecordatorio(60);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(
-                AbstractRecurrenteResponse.findSiguiente(routine.getFechaInicio(),
-                        routine.getFechaFin(),
-                        routine.getRecurrencia(),
-                        OffsetDateTime.now()));
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         Rutina saved = this.rutinaService.save(routine);

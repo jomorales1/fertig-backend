@@ -1,5 +1,7 @@
 package com.fertigApp.backend.firebase;
 
+import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
 import com.fertigApp.backend.model.*;
 import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigApp.backend.requestModels.PushNotificationRequest;
@@ -83,9 +85,8 @@ public class NotificationSystem {
     public void scheduleRoutineNotification(String username, Integer idRutina) {
         Optional<Rutina> optionalRutina = rutinaService.findById(idRutina);
         Rutina rutina = optionalRutina.orElse(new Rutina());
-        OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
-                rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
-                rutina.getFranjaInicio(), rutina.getFranjaFin(), OffsetDateTime.now());
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+        OffsetDateTime next = rutinaRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now());
         Date date = nextDate(next, rutina.getRecordatorio());
         NotificationEvent event = new NotificationEvent(username, this.taskScheduler.schedule(new RoutineNotification(username, idRutina), date));
         if (!this.scheduledRoutines.containsKey(rutina.getId()))
@@ -191,9 +192,8 @@ public class NotificationSystem {
         public void run() {
             Optional<Rutina> optionalRutina = rutinaService.findById(this.idRutina);
             Rutina rutina = optionalRutina.orElse(new Rutina());
-            OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(rutina.getFechaInicio(),
-                    rutina.getFechaFin(), rutina.getRecurrencia(), rutina.getDuracion(),
-                    rutina.getFranjaInicio(), rutina.getFranjaFin(), OffsetDateTime.now());
+            RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+            OffsetDateTime next = rutinaRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now());
             Date date = nextDate(next, rutina.getRecordatorio());
             Optional<Usuario> optionalUsuario = usuarioService.findById(this.username);
             Usuario usuario = optionalUsuario.orElse(new Usuario());
@@ -227,8 +227,8 @@ public class NotificationSystem {
             Usuario usuario = optionalUsuario.orElse(new Usuario());
             Optional<Evento> optionalEvento = eventoService.findById(this.idEvento);
             Evento evento = optionalEvento.orElse(new Evento());
-            OffsetDateTime next = AbstractRecurrenteResponse.findSiguiente(evento.getFechaInicio(),
-                    evento.getFechaFin(), evento.getRecurrencia(), OffsetDateTime.now());
+            EventoRecurrentEntityStrategy eventoRecurrentEntityStrategy = new EventoRecurrentEntityStrategy(evento);
+            OffsetDateTime next = eventoRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now());
             Date date = nextDate(next, evento.getRecordatorio());
             List<FirebaseNotificationToken> notificationTokens = (List<FirebaseNotificationToken>) firebaseNTService.findAllByUsuario(usuario);
             for (FirebaseNotificationToken token : notificationTokens) {

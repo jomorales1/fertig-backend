@@ -1,5 +1,6 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
 import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
@@ -17,9 +18,10 @@ public class RutinaRepeticionesResponse extends AbstractRecurrenteResponse  {
     @JsonInclude
     private List<OffsetDateTime> futuras;
 
+    @JsonIgnore
     private RecurrentEntityStrategy recurrentEntityStrategy;
 
-    public RutinaRepeticionesResponse(){
+    public RutinaRepeticionesResponse() {
         super();
     }
 
@@ -28,7 +30,6 @@ public class RutinaRepeticionesResponse extends AbstractRecurrenteResponse  {
         this.completadas = completadas;
         this.recurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
         futuras =  recurrentEntityStrategy.findFechas();
-        super.mensajeRecurrencia = recurrentEntityStrategy.getRecurrenceStrategy().getRecurrenceMessage();
     }
 
     public List<OffsetDateTime> getCompletadas() {

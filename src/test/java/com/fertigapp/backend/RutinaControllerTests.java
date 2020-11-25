@@ -3,6 +3,7 @@ package com.fertigapp.backend;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
 import com.fertigApp.backend.firebase.NotificationSystem;
 import com.fertigApp.backend.model.Completada;
 import com.fertigApp.backend.model.Rutina;
@@ -102,17 +103,11 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -136,17 +131,10 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -170,14 +158,11 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -203,17 +188,10 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
