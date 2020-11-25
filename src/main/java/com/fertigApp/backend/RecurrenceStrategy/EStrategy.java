@@ -1,6 +1,5 @@
 package com.fertigApp.backend.RecurrenceStrategy;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
 
@@ -99,6 +98,16 @@ public class EStrategy implements RecurrenceStrategy{
         }
 
         return  nextDate;
+    }
+
+    public OffsetDateTime findValid(OffsetDateTime currentDate, OffsetDateTime endDate){
+        int day = currentDate.getDayOfWeek().getValue()-1;
+        while(currentDate.compareTo(endDate)<1 && !getRecurrenceDays()[day]) {
+            day++;
+        }
+        if (day>6) day -= 7;
+        currentDate = currentDate.plusDays(day-currentDate.getDayOfWeek().getValue());
+        return (currentDate.isAfter(endDate) ? null : currentDate);
     }
 
     @Override
