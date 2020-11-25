@@ -1,5 +1,5 @@
 package com.fertigapp.backend;
-
+import com.fertigapp.backend.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

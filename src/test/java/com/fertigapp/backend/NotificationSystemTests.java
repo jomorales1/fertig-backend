@@ -2,6 +2,8 @@ package com.fertigapp.backend;
 
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
+import com.fertigapp.backend.services.*;
+import com.fertigapp.backend.model.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

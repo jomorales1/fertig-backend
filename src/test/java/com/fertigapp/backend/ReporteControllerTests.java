@@ -2,8 +2,10 @@ package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fertigapp.backend.firebase.NotificationSystem;
+import com.fertigapp.backend.model.*;
 import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigapp.backend.requestModels.LoginRequest;
+import com.fertigapp.backend.services.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
