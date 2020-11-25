@@ -19,4 +19,17 @@ public class HStrategy implements RecurrenceStrategy{
     public OffsetDateTime minus(OffsetDateTime currentDate) {
         return OffsetDateTime.of(currentDate.toLocalDateTime().minusHours(n), currentDate.getOffset());
     }
+
+    @Override
+    public String getRecurrenceMessage() {
+        StringBuilder message = new StringBuilder();
+        message.append("Cada ");
+        if(n > 1){
+            message.append(n);
+            message.append("horas.");
+        } else {
+            message.append("hora.");
+        }
+        return message.toString();
+    }
 }

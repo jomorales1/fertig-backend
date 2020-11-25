@@ -84,4 +84,9 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
         }
         return previous;
     }
+
+    @Override
+    public RecurrenceStrategy getRecurrenceStrategy() {
+        return recurrenceStrategy;
+    }
 }

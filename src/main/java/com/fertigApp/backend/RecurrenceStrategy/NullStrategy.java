@@ -19,4 +19,9 @@ public class NullStrategy implements RecurrenceStrategy {
     public OffsetDateTime minus(OffsetDateTime currentDate) {
         return fechaFin;
     }
+
+    @Override
+    public String getRecurrenceMessage() {
+        return "Sin repeticiones.";
+    }
 }

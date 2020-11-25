@@ -19,4 +19,17 @@ public class MStrategy implements RecurrenceStrategy{
     public OffsetDateTime minus(OffsetDateTime currentDate) {
         return OffsetDateTime.of(currentDate.toLocalDateTime().minusMonths(n), currentDate.getOffset());
     }
+
+    @Override
+    public String getRecurrenceMessage() {
+        StringBuilder message = new StringBuilder();
+        message.append("Cada ");
+        if(n > 1){
+            message.append(n);
+            message.append("meses.");
+        } else {
+            message.append("mes.");
+        }
+        return message.toString();
+    }
 }

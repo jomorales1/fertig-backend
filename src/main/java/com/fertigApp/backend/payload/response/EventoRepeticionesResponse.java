@@ -22,6 +22,7 @@ public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
         super(evento);
         this.recurrentEntityStrategy = new EventoRecurrentEntityStrategy(evento);
         this.repeticiones = recurrentEntityStrategy.findFechas();
+        super.mensajeRecurrencia = recurrentEntityStrategy.getRecurrenceStrategy().getRecurrenceMessage();
     }
 
     public List<OffsetDateTime> getRepeticiones(){

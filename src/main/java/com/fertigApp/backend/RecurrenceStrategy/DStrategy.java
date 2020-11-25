@@ -19,4 +19,17 @@ public class DStrategy implements RecurrenceStrategy{
     public OffsetDateTime minus(OffsetDateTime currentDate) {
         return OffsetDateTime.of(currentDate.toLocalDateTime().minusDays(n), currentDate.getOffset());
     }
+
+    @Override
+    public String getRecurrenceMessage() {
+        StringBuilder message = new StringBuilder();
+        message.append("Cada ");
+        if(n > 1){
+            message.append(n);
+            message.append("días.");
+        } else {
+            message.append("día.");
+        }
+        return message.toString();
+    }
 }

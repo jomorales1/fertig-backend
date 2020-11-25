@@ -19,4 +19,17 @@ public class WStrategy implements RecurrenceStrategy{
     public OffsetDateTime minus(OffsetDateTime currentDate) {
         return OffsetDateTime.of(currentDate.toLocalDateTime().minusWeeks(n), currentDate.getOffset());
     }
+
+    @Override
+    public String getRecurrenceMessage() {
+        StringBuilder message = new StringBuilder();
+        message.append("Cada ");
+        if(n > 1){
+            message.append(n);
+            message.append("semanas.");
+        } else {
+            message.append("semana.");
+        }
+        return message.toString();
+    }
 }
