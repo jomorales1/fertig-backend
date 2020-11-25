@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalTime;
+import java.time.OffsetTime;
 
 @Entity
 @Table(name="franja_libre")
@@ -20,10 +21,10 @@ public class FranjaActiva implements Serializable {
     protected int day;
 
     @Column(name="franja_inicio",columnDefinition = "TIME")
-    protected LocalTime franjaInicio;
+    protected OffsetTime franjaInicio;
 
     @Column(name="franja_fin",columnDefinition = "TIME")
-    protected LocalTime franjaFin;
+    protected OffsetTime franjaFin;
 
     @JsonIgnore
     @ManyToOne
@@ -46,19 +47,19 @@ public class FranjaActiva implements Serializable {
         this.day = day;
     }
 
-    public LocalTime getFranjaInicio() {
+    public OffsetTime getFranjaInicio() {
         return franjaInicio;
     }
 
-    public void setFranjaInicio(LocalTime franjaInicio) {
+    public void setFranjaInicio(OffsetTime franjaInicio) {
         this.franjaInicio = franjaInicio;
     }
 
-    public LocalTime getFranjaFin() {
+    public OffsetTime getFranjaFin() {
         return franjaFin;
     }
 
-    public void setFranjaFin(LocalTime franjaFin) {
+    public void setFranjaFin(OffsetTime franjaFin) {
         this.franjaFin = franjaFin;
     }
 

@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalTime;
+import java.time.OffsetTime;
 import java.util.*;
 
 /*
@@ -133,7 +133,7 @@ public class FranjaActivaController {
         //comparacion de las franjas
         Optional<FranjaActiva> optionalFranjaActiva = this.franjaActivaService.findByUserAndDay(usuario, day);
         if(optionalFranjaActiva.isPresent()){
-            LocalTime currentTime = LocalTime.now();
+            OffsetTime currentTime = OffsetTime.now();
             FranjaActiva franjaActiva = optionalFranjaActiva.get();
             if(currentTime.compareTo(franjaActiva.getFranjaInicio()) < 0 || currentTime.compareTo(franjaActiva.getFranjaFin()) > 0){
                 return ResponseEntity.ok(new ArrayList<>());
