@@ -42,7 +42,6 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     @Override
     public List<OffsetDateTime> findFechas() {
-
         OffsetDateTime fechaInicio = evento.getFechaInicio();
         OffsetDateTime currentDate = fechaInicio;
 
