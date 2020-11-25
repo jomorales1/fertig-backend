@@ -22,7 +22,7 @@ public class GraficaAnualBuilder implements GraficaBuilder{
 
     @Override
     public Grafica crearGrafica(OffsetDateTime fecha, Usuario usuario) {
-        OffsetDateTime inicio = OffsetDateTime.of(fecha.getYear(),1,1,0,0,0,0,fecha.getOffset()).minusDays(fecha.getDayOfYear());
+        OffsetDateTime inicio = OffsetDateTime.of(fecha.getYear(),1,1,0,0,0,0,fecha.getOffset());
         OffsetDateTime fin = OffsetDateTime.from(inicio).plusYears(1);
         List<OffsetDateTime> fechas = new LinkedList<>();
         List<Integer> minutos = new LinkedList<>();
