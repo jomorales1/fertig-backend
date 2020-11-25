@@ -1,5 +1,7 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
 import com.fertigApp.backend.model.Evento;
 
 import java.time.OffsetDateTime;
@@ -10,17 +12,16 @@ public class EventoRepeticionesResponse extends AbstractRecurrenteResponse {
 
     private List<OffsetDateTime> repeticiones;
 
+    private RecurrentEntityStrategy recurrentEntityStrategy;
+
     public EventoRepeticionesResponse(){
         super();
     }
 
     public EventoRepeticionesResponse(Evento evento) {
         super(evento);
-        this.repeticiones = AbstractRecurrenteResponse.findFechas(
-                evento.getFechaInicio(),
-                evento.getFechaFin(),
-                evento.getRecurrencia()
-        );
+        this.recurrentEntityStrategy = new EventoRecurrentEntityStrategy(evento);
+        this.repeticiones = recurrentEntityStrategy.findFechas();
     }
 
     public List<OffsetDateTime> getRepeticiones(){

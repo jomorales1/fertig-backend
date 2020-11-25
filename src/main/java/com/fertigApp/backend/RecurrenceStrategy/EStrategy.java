@@ -1,0 +1,103 @@
+package com.fertigApp.backend.RecurrenceStrategy;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+public class EStrategy implements RecurrenceStrategy{
+
+    private int n;
+
+    private RecurrenceStrategy recurrenceStrategy;
+
+    private boolean[] getRecurrenceDays(){
+        boolean []recurrenceDays = new boolean[7];
+        int dias = n;
+        for(int i = 0; i < 7; i++){
+            recurrenceDays[i] = ((dias & 1) == 1);
+            dias = dias >> 1;
+        }
+        return  recurrenceDays;
+    }
+
+    @Override
+    public OffsetDateTime add(OffsetDateTime currentDate) {
+        int day = currentDate.getDayOfWeek().getValue();
+        boolean []recurrenceDays = getRecurrenceDays();
+
+        OffsetDateTime nextDate = null;
+
+        boolean find = false;
+        for(int i = day; i<7; i++){
+            if(recurrenceDays[i]){
+                find = true;
+                nextDate = currentDate.plusDays(i+1-day);
+                break;
+            }
+        }
+
+        if(!find){
+            for(int i = 0; i<day; i++){
+                if(recurrenceDays[i]){
+                    nextDate = currentDate.minusDays(day-(i+1));
+                    nextDate = recurrenceStrategy.add(nextDate);
+                    break;
+                }
+            }
+        }
+
+        return nextDate;
+    }
+
+    @Override
+    public OffsetDateTime minus(OffsetDateTime currentDate) {
+        int day = currentDate.getDayOfWeek().getValue(); //4
+        boolean []recurrenceDays = getRecurrenceDays();
+
+        OffsetDateTime nextDate = null;
+
+        boolean find = false;
+        for(int i = day-2; i>=0; i--){ //1
+            if(recurrenceDays[i]){
+                find = true;
+                nextDate = currentDate.minusDays(day-(i+1));
+                break;
+            }
+        }
+
+        if(!find){
+            for(int i = 6; i>=day; i++){
+                if(recurrenceDays[i]){
+                    nextDate = currentDate.plusDays(i+1-day);
+                    nextDate = recurrenceStrategy.minus(nextDate);
+                    break;
+                }
+            }
+        }
+
+        return  nextDate;
+    }
+
+    @Override
+    public void set(String recurrence) {
+        int point = recurrence.indexOf(".");
+        this.n = Integer.parseInt(recurrence.substring(1, point));
+        switch (recurrence.charAt(point+1)){
+            case 'H':
+                recurrenceStrategy = new HStrategy();
+                break;
+            case 'D':
+                recurrenceStrategy = new DStrategy();
+                break;
+            case 'S':
+                recurrenceStrategy = new WStrategy();
+                break;
+            case 'M':
+                recurrenceStrategy = new MStrategy();
+                break;
+            case 'A':
+                recurrenceStrategy = new YStrategy();
+                break;
+        }
+        recurrenceStrategy.set(recurrence.substring(point+1));
+    }
+}

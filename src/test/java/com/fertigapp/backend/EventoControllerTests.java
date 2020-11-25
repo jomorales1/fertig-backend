@@ -337,7 +337,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
