@@ -20,7 +20,7 @@ public class ReporteAnualBuilder implements ReporteBuilder{
 
     @Override
     public Reporte crearReporte(OffsetDateTime fecha, Usuario usuario) {
-        OffsetDateTime inicio = OffsetDateTime.of(fecha.getYear(),1,1,0,0,0,0,fecha.getOffset()).minusDays(fecha.getDayOfYear());
+        OffsetDateTime inicio = OffsetDateTime.of(fecha.getYear(),1,1,0,0,0,0,fecha.getOffset());
         OffsetDateTime fin = OffsetDateTime.from(inicio).plusYears(1);
         Integer a = tiempoService.countTiempoTareaBetween(inicio,fin,usuario);
         Integer b = completadaService.countTiempoCompletadasBetween(inicio,fin,usuario);
