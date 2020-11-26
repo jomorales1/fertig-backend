@@ -53,7 +53,7 @@ public class EStrategy implements RecurrenceStrategy{
         for(int i = day; i<7; i++){
             if(recurrenceDays[i]){
                 find = true;
-                nextDate = currentDate.plusDays(i+1-day);
+                nextDate = currentDate.plusDays(i+1-(long)day);
                 break;
             }
         }
@@ -61,7 +61,7 @@ public class EStrategy implements RecurrenceStrategy{
         if(!find){
             for(int i = 0; i<day; i++){
                 if(recurrenceDays[i]){
-                    nextDate = currentDate.minusDays(day-(i+1));
+                    nextDate = currentDate.minusDays(day-(long)(i+1));
                     nextDate = recurrenceStrategy.add(nextDate);
                     break;
                 }
@@ -73,25 +73,24 @@ public class EStrategy implements RecurrenceStrategy{
 
     @Override
     public OffsetDateTime minus(OffsetDateTime currentDate) {
-        int day = currentDate.getDayOfWeek().getValue(); //4
+        int day = currentDate.getDayOfWeek().getValue();
         boolean []recurrenceDays = getRecurrenceDays();
 
         OffsetDateTime nextDate = null;
 
         boolean find = false;
-        for(int i = day-2; i>=0; i--){ //1
+        for(int i = day-2; i>=0; i--){
             if(recurrenceDays[i]){
                 find = true;
-                nextDate = currentDate.minusDays(day-(i+1));
+                nextDate = currentDate.minusDays(day-(long)(i+1));
                 break;
             }
         }
 
         if(!find){
-            for(int i = 6; i>=day; i++){
+            for(int i = 6; i>=day; i--){
                 if(recurrenceDays[i]){
-                    nextDate = currentDate.plusDays(i+1-day);
-                    nextDate = recurrenceStrategy.minus(nextDate);
+                    nextDate = recurrenceStrategy.minus(currentDate.plusDays(i+1-(long)day));
                     break;
                 }
             }
