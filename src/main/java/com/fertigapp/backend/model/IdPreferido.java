@@ -25,8 +25,8 @@ public class IdPreferido implements Serializable {
         return idSonido;
     }
 
-    public void setIdSonido(String id_sonido) {
-        this.idSonido = id_sonido;
+    public void setIdSonido(String idSonido) {
+        this.idSonido = idSonido;
     }
 
     public String getUsuario() {

@@ -1,4 +1,4 @@
-package com.fertigapp.backend.requestModels;
+package com.fertigapp.backend.requestmodels;
 
 import com.fertigapp.backend.model.Tarea;
 

@@ -1,7 +1,7 @@
 package com.fertigapp.backend.services;
 
 import com.fertigapp.backend.firebase.FCMService;
-import com.fertigapp.backend.requestModels.PushNotificationRequest;
+import com.fertigapp.backend.requestmodels.PushNotificationRequest;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 

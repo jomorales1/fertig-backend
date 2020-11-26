@@ -2,7 +2,6 @@ package com.fertigapp.backend.controller;
 
 import com.fertigapp.backend.auth.jwt.JwtUtil;
 import com.fertigapp.backend.auth.services.UserDetailsServiceImpl;
-import com.fertigapp.backend.model.Completada;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.JwtResponse;
 import com.fertigapp.backend.services.UsuarioService;
@@ -15,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /*
@@ -54,7 +53,7 @@ public class GoogleController {
 
     // Método POST para la verificación del token obtenido de la API de autenticación de Google.
     @PostMapping(path="/login/oauth2/code/google")
-    public ResponseEntity<?> GoogleAuthentication(@RequestParam String Token){
+    public ResponseEntity<?> googleAuthentication(@RequestParam String token){
 
         // Client ID asociada a la api de autenticación de Google.
         String clienId = "756516316743-7fcc8028epqmhnftjeclt9dqo0dk3tls.apps.googleusercontent.com";
@@ -63,7 +62,7 @@ public class GoogleController {
                 .setAudience(Collections.singletonList(clienId)).build();
 
         try {
-            GoogleIdToken googleToken = verifier.verify(Token);
+            GoogleIdToken googleToken = verifier.verify(token);
 
             if(googleToken != null){
                 Payload payLoad = googleToken.getPayload();
@@ -104,12 +103,15 @@ public class GoogleController {
                     user.setGoogle(true);
 
                     String userName = googleEmail.substring(0, googleEmail.indexOf("@"));
-                    String comparator = userName;
-                    while(usuarioService.existsById(comparator)){
-                        comparator = userName;
-                        comparator += String.valueOf((int)(Math.random()));
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(userName);
+                    while (usuarioService.existsById(builder.toString())) {
+                        builder = new StringBuilder();
+                        builder.append(userName);
+                        Random random = new Random();
+                        builder.append((int) (random.nextInt()));
                     }
-                    userName = comparator;
+                    userName = builder.toString();
                     user.setUsuario(userName);
 
                     usuarioService.save(user);

@@ -6,7 +6,7 @@ import com.fertigapp.backend.model.Preferido;
 import com.fertigapp.backend.model.Sonido;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.SonidoResponse;
-import com.fertigapp.backend.requestModels.LoginRequest;
+import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.services.PreferidoService;
 import com.fertigapp.backend.services.SonidoService;
 import com.fertigapp.backend.services.UsuarioService;

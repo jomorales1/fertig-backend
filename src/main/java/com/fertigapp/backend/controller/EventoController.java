@@ -6,7 +6,7 @@ import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.EventoRepeticionesResponse;
 import com.fertigapp.backend.payload.response.MessageResponse;
 import com.fertigapp.backend.payload.response.RecurrenteResponse;
-import com.fertigapp.backend.requestModels.RequestEvento;
+import com.fertigapp.backend.requestmodels.RequestEvento;
 import com.fertigapp.backend.services.EventoService;
 import com.fertigapp.backend.services.UsuarioService;
 import org.slf4j.Logger;

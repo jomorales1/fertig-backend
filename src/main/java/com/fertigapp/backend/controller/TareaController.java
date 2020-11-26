@@ -7,7 +7,7 @@ import com.fertigapp.backend.model.Tiempo;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.MessageResponse;
 import com.fertigapp.backend.payload.response.OwnerResponse;
-import com.fertigapp.backend.requestModels.RequestTarea;
+import com.fertigapp.backend.requestmodels.RequestTarea;
 import com.fertigapp.backend.services.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -33,7 +33,7 @@ public class TareaController {
     private static final String TAR_NO_ENCONTRADA = "Tarea no encontrada";
     private static final String US_NO_ADMIN = "El usuario no es un administrador de la tarea";
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(Tarea.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TareaController.class);
 
     // Repositorio responsable del manejo de la tabla "tarea" en la DB.
     private final TareaService tareaService;

@@ -6,11 +6,8 @@ import com.fertigapp.backend.recurrentstrategy.EventoRecurrentEntityStrategy;
 import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
-import java.util.LinkedList;
-import java.util.List;
 
 //Clase principal de la cual heredan los eventos y las rutinas para obtener la fechas y los mensajes de repetición de
 //los eventos y rutinas

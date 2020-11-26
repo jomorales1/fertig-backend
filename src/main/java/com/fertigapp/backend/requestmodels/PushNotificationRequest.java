@@ -1,4 +1,4 @@
-package com.fertigapp.backend.requestModels;
+package com.fertigapp.backend.requestmodels;
 
 public class PushNotificationRequest {
 

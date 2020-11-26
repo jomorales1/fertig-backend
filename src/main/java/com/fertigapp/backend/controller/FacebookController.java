@@ -2,7 +2,6 @@ package com.fertigapp.backend.controller;
 
 import com.fertigapp.backend.auth.jwt.JwtUtil;
 import com.fertigapp.backend.auth.services.UserDetailsServiceImpl;
-import com.fertigapp.backend.model.Completada;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.JwtResponse;
 import com.fertigapp.backend.services.UsuarioService;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -44,8 +44,8 @@ public class FacebookController {
     }
 
     @PostMapping(path="/login/oauth2/code/facebook")
-    public ResponseEntity<JwtResponse>  facebook(@RequestParam String Token) {
-        Facebook facebook = new FacebookTemplate(Token);
+    public ResponseEntity<JwtResponse> facebook(@RequestParam String token) {
+        Facebook facebook = new FacebookTemplate(token);
         final String[] fields = {"email", "name"};
         User facebookUser = facebook.fetchObject("me", User.class, fields);
 
@@ -97,12 +97,15 @@ public class FacebookController {
             } else {
                 userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
             }
-            String comparator = userName;
-            while (usuarioService.existsById(comparator)) {
-                comparator = userName;
-                comparator += String.valueOf((int) (Math.random()));
+            StringBuilder builder = new StringBuilder();
+            builder.append(userName);
+            while (usuarioService.existsById(builder.toString())) {
+                builder = new StringBuilder();
+                builder.append(userName);
+                Random random = new Random();
+                builder.append((int) (random.nextInt()));
             }
-            userName = comparator;
+            userName = builder.toString();
             user.setUsuario(userName);
 
             usuarioService.save(user);

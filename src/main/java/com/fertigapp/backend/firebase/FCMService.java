@@ -1,6 +1,6 @@
 package com.fertigapp.backend.firebase;
 
-import com.fertigapp.backend.requestModels.PushNotificationRequest;
+import com.fertigapp.backend.requestmodels.PushNotificationRequest;
 import com.google.firebase.messaging.*;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

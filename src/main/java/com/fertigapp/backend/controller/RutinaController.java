@@ -3,12 +3,11 @@ package com.fertigapp.backend.controller;
 import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.model.*;
-import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
 import com.fertigapp.backend.payload.response.MessageResponse;
 import com.fertigapp.backend.payload.response.RecurrenteResponse;
 import com.fertigapp.backend.payload.response.RutinaRepeticionesResponse;
-import com.fertigapp.backend.requestModels.RequestRutina;
-import com.fertigapp.backend.requestModels.RequestTarea;
+import com.fertigapp.backend.requestmodels.RequestRutina;
+import com.fertigapp.backend.requestmodels.RequestTarea;
 import com.fertigapp.backend.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +31,7 @@ import java.util.Optional;
 @RestController
 public class RutinaController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Rutina.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(RutinaController.class);
 
     private static final String RUT_NO_PERTENECE = "La rutina no pertenece al usuario";
     private static final String RUT_NO_ENCONTRADA = "Rutina no encontrada";

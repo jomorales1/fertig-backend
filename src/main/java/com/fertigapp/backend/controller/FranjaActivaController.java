@@ -5,7 +5,7 @@ import com.fertigapp.backend.model.Tarea;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.MessageResponse;
 import com.fertigapp.backend.payload.response.TareaSugeridaResponse;
-import com.fertigapp.backend.requestModels.FranjaActivaRequest;
+import com.fertigapp.backend.requestmodels.FranjaActivaRequest;
 import com.fertigapp.backend.services.FranjaActivaService;
 import com.fertigapp.backend.services.TareaDeUsuarioService;
 import com.fertigapp.backend.services.TareaService;
@@ -31,7 +31,7 @@ public class FranjaActivaController {
     private static final String FA_IS_NOT_PRESENT = "Franja no encontrada";
     private static final String FA_DOES_NOT_BELONG = "El usuario no es dueño de la franja";
 
-    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FranjaActiva.class);
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(FranjaActivaController.class);
 
     // Servicio responsable del manejo de la tabla "franja activa" en la DB
     private final FranjaActivaService franjaActivaService;

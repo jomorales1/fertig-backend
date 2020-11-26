@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fertigapp.backend.model.FirebaseNotificationToken;
 import com.fertigapp.backend.model.Usuario;
-import com.fertigapp.backend.requestModels.LoginRequest;
+import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.services.FirebaseNTService;
 import com.fertigapp.backend.services.UsuarioService;
 import org.junit.jupiter.api.Test;
