@@ -2,8 +2,8 @@ package com.fertigapp.backend.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fertigapp.backend.RecurrentStrategy.RecurrentEntityStrategy;
-import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigapp.backend.recurrentstrategy.RecurrentEntityStrategy;
+import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.model.Rutina;
 
 import java.time.OffsetDateTime;

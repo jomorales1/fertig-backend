@@ -1,4 +1,4 @@
-package com.fertigapp.backend.RecurrenceStrategy;
+package com.fertigapp.backend.recurrencestrategy;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
@@ -26,7 +26,7 @@ public class EStrategy implements RecurrenceStrategy{
             case 'M':
                 recurrenceStrategy = new MStrategy(recurrence.substring(point+1));
                 break;
-            case 'A':
+            default:
                 recurrenceStrategy = new YStrategy(recurrence.substring(point+1));
                 break;
         }

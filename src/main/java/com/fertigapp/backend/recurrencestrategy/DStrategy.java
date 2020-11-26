@@ -1,23 +1,23 @@
-package com.fertigapp.backend.RecurrenceStrategy;
+package com.fertigapp.backend.recurrencestrategy;
 
 import java.time.OffsetDateTime;
 
-public class HStrategy implements RecurrenceStrategy{
+public class DStrategy implements RecurrenceStrategy{
 
     private int n;
 
-    public HStrategy(String recurrence){
+    public DStrategy(String recurrence){
         this.n = Integer.parseInt(recurrence.substring(1));
     }
 
     @Override
     public OffsetDateTime add(OffsetDateTime currentDate) {
-        return OffsetDateTime.of(currentDate.toLocalDateTime().plusHours(n), currentDate.getOffset());
+        return OffsetDateTime.of(currentDate.toLocalDateTime().plusDays(n), currentDate.getOffset());
     }
 
     @Override
     public OffsetDateTime minus(OffsetDateTime currentDate) {
-        return OffsetDateTime.of(currentDate.toLocalDateTime().minusHours(n), currentDate.getOffset());
+        return OffsetDateTime.of(currentDate.toLocalDateTime().minusDays(n), currentDate.getOffset());
     }
 
     @Override
@@ -26,9 +26,9 @@ public class HStrategy implements RecurrenceStrategy{
         message.append("Cada ");
         if(n > 1){
             message.append(n);
-            message.append("horas.");
+            message.append("días.");
         } else {
-            message.append("hora.");
+            message.append("día.");
         }
         return message.toString();
     }

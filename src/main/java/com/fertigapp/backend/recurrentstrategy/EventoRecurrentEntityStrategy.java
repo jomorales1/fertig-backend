@@ -1,6 +1,6 @@
-package com.fertigapp.backend.RecurrentStrategy;
+package com.fertigapp.backend.recurrentstrategy;
 
-import com.fertigapp.backend.RecurrenceStrategy.*;
+import com.fertigapp.backend.recurrencestrategy.*;
 import com.fertigapp.backend.model.Evento;
 
 import java.time.OffsetDateTime;
@@ -41,7 +41,7 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
                 recurrenceStrategy = new YStrategy(evento.getRecurrencia());
                 firstValidDate = evento.getFechaInicio();
                 break;
-            case 'E':
+            default:
                 EStrategy eStrategy = new EStrategy(evento.getRecurrencia());
                 boolean []recurrenceDays = (eStrategy).getRecurrenceDays();
                 if (recurrenceDays[evento.getFechaInicio().getDayOfWeek().getValue() - 1]) {

@@ -1,4 +1,4 @@
-package com.fertigapp.backend.RecurrenceStrategy;
+package com.fertigapp.backend.recurrencestrategy;
 
 import java.time.OffsetDateTime;
 

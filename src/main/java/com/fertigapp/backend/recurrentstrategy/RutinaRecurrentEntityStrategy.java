@@ -1,6 +1,6 @@
-package com.fertigapp.backend.RecurrentStrategy;
+package com.fertigapp.backend.recurrentstrategy;
 
-import com.fertigapp.backend.RecurrenceStrategy.*;
+import com.fertigapp.backend.recurrencestrategy.*;
 import com.fertigapp.backend.model.Rutina;
 
 import java.time.OffsetDateTime;
@@ -50,7 +50,7 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
                 recurrenceStrategy = new YStrategy(rutina.getRecurrencia());
                 firstValidDate = rutina.getFechaInicio();
                 break;
-            case 'E':
+            default:
                 EStrategy eStrategy = new EStrategy(rutina.getRecurrencia());
                 boolean []recurrenceDays = (eStrategy).getRecurrenceDays();
                 if (recurrenceDays[rutina.getFechaInicio().getDayOfWeek().getValue() - 1]) {

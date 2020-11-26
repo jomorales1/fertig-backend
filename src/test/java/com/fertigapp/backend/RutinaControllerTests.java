@@ -2,7 +2,7 @@ package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.model.Completada;
 import com.fertigapp.backend.model.Rutina;

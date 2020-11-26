@@ -1,6 +1,6 @@
 package com.fertigapp.backend.controller;
 
-import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.model.*;
 import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
