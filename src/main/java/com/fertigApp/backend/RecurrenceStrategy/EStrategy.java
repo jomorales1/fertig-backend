@@ -32,7 +32,7 @@ public class EStrategy implements RecurrenceStrategy{
         }
     }
 
-    private boolean[] getRecurrenceDays(){
+    public boolean[] getRecurrenceDays(){
         boolean []recurrenceDays = new boolean[7];
         int dias = n;
         for(int i = 0; i < 7; i++){
@@ -98,16 +98,6 @@ public class EStrategy implements RecurrenceStrategy{
         }
 
         return  nextDate;
-    }
-
-    public OffsetDateTime findValid(OffsetDateTime currentDate, OffsetDateTime endDate){
-        int day = currentDate.getDayOfWeek().getValue()-1;
-        while(currentDate.compareTo(endDate)<1 && !getRecurrenceDays()[day]) {
-            day++;
-        }
-        if (day>6) day -= 7;
-        currentDate = currentDate.plusDays(day-currentDate.getDayOfWeek().getValue());
-        return (currentDate.isAfter(endDate) ? null : currentDate);
     }
 
     @Override

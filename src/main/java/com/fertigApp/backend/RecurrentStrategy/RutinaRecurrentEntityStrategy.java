@@ -14,34 +14,58 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     private RecurrenceStrategy recurrenceStrategy;
 
+    private OffsetDateTime firstValidDate;
+
     public RutinaRecurrentEntityStrategy(Rutina rutina){
         this.rutina = rutina;
         switch (rutina.getRecurrencia().charAt(0)){
             case 'H':
                 recurrenceStrategy = new HStrategy(rutina.getRecurrencia());
+                OffsetDateTime fechaInicio = rutina.getFechaInicio();
+                firstValidDate = fechaInicio;
+                if(rutina.getFranjaInicio() != null){
+                    OffsetDateTime franjaInico = fechaInicio.toLocalDate().atTime(rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC));
+                    OffsetDateTime franjaFin = fechaInicio.toLocalDate().atTime(rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC));
+
+                    if(franjaInico.isAfter(franjaFin))
+                        franjaFin = franjaFin.plusDays(1);
+
+                    if (fechaInicio.isBefore(franjaInico) || fechaInicio.isAfter(franjaFin))
+                        firstValidDate = findNextFromValidDate(fechaInicio);
+                }
                 break;
             case 'D':
                 recurrenceStrategy = new DStrategy(rutina.getRecurrencia());
+                firstValidDate = rutina.getFechaInicio();
                 break;
             case 'S':
                 recurrenceStrategy = new WStrategy(rutina.getRecurrencia());
+                firstValidDate = rutina.getFechaInicio();
                 break;
             case 'M':
                 recurrenceStrategy = new MStrategy(rutina.getRecurrencia());
+                firstValidDate = rutina.getFechaInicio();
                 break;
             case 'A':
                 recurrenceStrategy = new YStrategy(rutina.getRecurrencia());
+                firstValidDate = rutina.getFechaInicio();
                 break;
             case 'E':
-                recurrenceStrategy = new EStrategy(rutina.getRecurrencia());
+                EStrategy eStrategy = new EStrategy(rutina.getRecurrencia());
+                boolean []recurrenceDays = (eStrategy).getRecurrenceDays();
+                if (recurrenceDays[rutina.getFechaInicio().getDayOfWeek().getValue() - 1]) {
+                    firstValidDate = rutina.getFechaInicio();
+                } else {
+                    firstValidDate = eStrategy.add(rutina.getFechaInicio());
+                }
+                recurrenceStrategy = eStrategy;
                 break;
         }
     }
 
     @Override
     public List<OffsetDateTime> findFechas() {
-        OffsetDateTime fechaInicio = rutina.getFechaInicio();
-        OffsetDateTime currentDate = OffsetDateTime.from(fechaInicio);
+        OffsetDateTime currentDate = OffsetDateTime.from(firstValidDate);
 
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
 
@@ -55,8 +79,7 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     @Override
     public OffsetDateTime findSiguiente(OffsetDateTime currentDate) {
-        OffsetDateTime fechaInicio = rutina.getFechaInicio();
-        OffsetDateTime nextDate = OffsetDateTime.from(fechaInicio);
+        OffsetDateTime nextDate = OffsetDateTime.from(firstValidDate);
 
         while(nextDate != null && nextDate.isBefore(currentDate)){
             nextDate = findNextFromValidDate(nextDate);
@@ -76,11 +99,10 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
     }
 
     private OffsetDateTime findNextFromValidDate(OffsetDateTime currentDate) {
-        OffsetDateTime fechaInicio = rutina.getFechaInicio();
         OffsetDateTime fechaFin = rutina.getFechaFin();
 
-        if(currentDate.isBefore(fechaInicio)){
-            return fechaInicio;
+        if(currentDate.isBefore(firstValidDate)){
+            return firstValidDate;
         }
 
         OffsetDateTime nextDate = OffsetDateTime.from(currentDate);
@@ -110,7 +132,6 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     private OffsetDateTime findPreviousFromValidDate(OffsetDateTime currentDate) {
         OffsetDateTime fechaFin = rutina.getFechaFin();
-        OffsetDateTime fechaInicio = rutina.getFechaInicio();
 
         if(currentDate.isAfter(fechaFin)){
             return fechaFin;
@@ -135,7 +156,7 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
             } while(previousDate.isAfter(franjaFin));
         }
 
-        if(!previousDate.isAfter(fechaInicio)){
+        if(!previousDate.isAfter(firstValidDate)){
             return null;
         }
         return previousDate;

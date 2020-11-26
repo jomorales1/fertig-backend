@@ -272,7 +272,7 @@ class EventoControllerTests {
 
         //RECURRENCIA ESPECIAL - LUNES Y MIERCOLES CADA DOS SEMANAS
         recurrencia = "E5.S2";
-        fechaInicio = OffsetDateTime.of(2021,1,4,12,0,0,0, ZoneOffset.UTC);
+        fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
         resultActions = this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token))
@@ -286,7 +286,7 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
+        assertEquals(OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC), obtainedEvent.getFecha());
 
         this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());

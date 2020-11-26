@@ -1,5 +1,8 @@
 package com.fertigApp.backend.payload.response;
 
+import com.fertigApp.backend.model.Evento;
+import com.fertigApp.backend.model.Rutina;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -28,33 +31,33 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
 
     }
 
-//    protected AbstractRecurrenteResponse(Evento evento){
-//        this.id = evento.getId();
-//        this.nombre = evento.getNombre();
-//        this.descripcion = evento.getDescripcion();
-//        this.prioridad = evento.getPrioridad();
-//        this.etiqueta = evento.getEtiqueta();
-//        this.duracion = evento.getDuracion();
-//        this.fechaInicio = evento.getFechaInicio();
-//        this.fechaFin = evento.getFechaFin();
-//        this.recurrencia = evento.getRecurrencia();
-//        this.mensajeRecurrencia = getMensajeRecurrencia(evento.getRecurrencia());
-//    }
-//
-//    protected AbstractRecurrenteResponse(Rutina rutina){
-//        this.id = rutina.getId();
-//        this.nombre = rutina.getNombre();
-//        this.descripcion = rutina.getDescripcion();
-//        this.prioridad = rutina.getPrioridad();
-//        this.etiqueta = rutina.getEtiqueta();
-//        this.duracion = rutina.getDuracion();
-//        this.fechaInicio = rutina.getFechaInicio();
-//        this.fechaFin = rutina.getFechaFin();
-//        this.franjaInicio = rutina.getFranjaInicio();
-//        this.franjaFin = rutina.getFranjaFin();
-//        this.recurrencia = rutina.getRecurrencia();
-//        this.mensajeRecurrencia = getMensajeRecurrencia(rutina.getRecurrencia());
-//    }
+    protected AbstractRecurrenteResponse(Evento evento){
+        this.id = evento.getId();
+        this.nombre = evento.getNombre();
+        this.descripcion = evento.getDescripcion();
+        this.prioridad = evento.getPrioridad();
+        this.etiqueta = evento.getEtiqueta();
+        this.duracion = evento.getDuracion();
+        this.fechaInicio = evento.getFechaInicio();
+        this.fechaFin = evento.getFechaFin();
+        this.recurrencia = evento.getRecurrencia();
+        this.mensajeRecurrencia = getMensajeRecurrencia(evento.getRecurrencia());
+    }
+
+    protected AbstractRecurrenteResponse(Rutina rutina){
+        this.id = rutina.getId();
+        this.nombre = rutina.getNombre();
+        this.descripcion = rutina.getDescripcion();
+        this.prioridad = rutina.getPrioridad();
+        this.etiqueta = rutina.getEtiqueta();
+        this.duracion = rutina.getDuracion();
+        this.fechaInicio = rutina.getFechaInicio();
+        this.fechaFin = rutina.getFechaFin();
+        this.franjaInicio = rutina.getFranjaInicio();
+        this.franjaFin = rutina.getFranjaFin();
+        this.recurrencia = rutina.getRecurrencia();
+        this.mensajeRecurrencia = getMensajeRecurrencia(rutina.getRecurrencia());
+    }
 
     public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia){
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();

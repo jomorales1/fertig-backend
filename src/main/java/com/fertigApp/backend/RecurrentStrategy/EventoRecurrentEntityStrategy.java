@@ -13,6 +13,8 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     private RecurrenceStrategy recurrenceStrategy;
 
+    private OffsetDateTime firstValidDate;
+
     public EventoRecurrentEntityStrategy(Evento evento){
         this.evento = evento;
         if(evento.getRecurrencia() == null){
@@ -21,29 +23,40 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
         switch (evento.getRecurrencia().charAt(0)){
             case 'H':
                 recurrenceStrategy = new HStrategy(evento.getRecurrencia());
+                firstValidDate = evento.getFechaInicio();
                 break;
             case 'D':
                 recurrenceStrategy = new DStrategy(evento.getRecurrencia());
+                firstValidDate = evento.getFechaInicio();
                 break;
             case 'S':
                 recurrenceStrategy = new WStrategy(evento.getRecurrencia());
+                firstValidDate = evento.getFechaInicio();
                 break;
             case 'M':
                 recurrenceStrategy = new MStrategy(evento.getRecurrencia());
+                firstValidDate = evento.getFechaInicio();
                 break;
             case 'A':
                 recurrenceStrategy = new YStrategy(evento.getRecurrencia());
+                firstValidDate = evento.getFechaInicio();
                 break;
             case 'E':
-                recurrenceStrategy = new EStrategy(evento.getRecurrencia());
+                EStrategy eStrategy = new EStrategy(evento.getRecurrencia());
+                boolean []recurrenceDays = (eStrategy).getRecurrenceDays();
+                if (recurrenceDays[evento.getFechaInicio().getDayOfWeek().getValue() - 1]) {
+                    firstValidDate = evento.getFechaInicio();
+                } else {
+                    firstValidDate = eStrategy.add(evento.getFechaInicio());
+                }
+                recurrenceStrategy = eStrategy;
                 break;
         }
     }
 
     @Override
     public List<OffsetDateTime> findFechas() {
-        OffsetDateTime fechaInicio = evento.getFechaInicio();
-        OffsetDateTime currentDate = fechaInicio;
+        OffsetDateTime currentDate = OffsetDateTime.from(firstValidDate);
 
         LinkedList<OffsetDateTime> fechas = new LinkedList<>();
 
@@ -57,8 +70,7 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
     @Override
     public OffsetDateTime findSiguiente(OffsetDateTime currentDate) {
-        OffsetDateTime fechaInicio = evento.getFechaInicio();
-        OffsetDateTime nextDate = OffsetDateTime.from(fechaInicio);
+        OffsetDateTime nextDate = OffsetDateTime.from(firstValidDate);
 
         while(nextDate != null && nextDate.isBefore(currentDate)){
             nextDate = findNextFromValidDate(nextDate);
@@ -79,10 +91,9 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
     }
 
     private OffsetDateTime findNextFromValidDate(OffsetDateTime currentDate){
-        OffsetDateTime fechaInicio = evento.getFechaInicio();
         OffsetDateTime fechaFin = evento.getFechaFin();
-        if(currentDate.isBefore(fechaInicio)){
-            return fechaInicio;
+        if(currentDate.isBefore(firstValidDate)){
+            return firstValidDate;
         }
 
         OffsetDateTime nextDate = recurrenceStrategy.add(currentDate);
@@ -93,14 +104,13 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
     }
 
     private OffsetDateTime findPreviousFromValidDate(OffsetDateTime currentDate){
-        OffsetDateTime fechaInicio = evento.getFechaInicio();
         OffsetDateTime fechaFin = evento.getFechaFin();
         if(fechaFin.isBefore(currentDate)){
             return fechaFin;
         }
 
         OffsetDateTime previous = recurrenceStrategy.minus(currentDate);
-        if(previous.isBefore(fechaInicio)){
+        if(previous.isBefore(firstValidDate)){
             return null;
         }
         return previous;
