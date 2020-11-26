@@ -57,7 +57,6 @@ public abstract class AbstractRecurrenteResponse implements Serializable {
         this.franjaFin = rutina.getFranjaFin();
         this.recurrencia = rutina.getRecurrencia();
         this.mensajeRecurrencia = getMensajeRecurrencia(rutina.getRecurrencia());
-
     }
 
     public static List<OffsetDateTime> findFechas(OffsetDateTime fechaInicio, OffsetDateTime fechaFin, String recurrencia){

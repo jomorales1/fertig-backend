@@ -174,17 +174,11 @@ public class RutinaController {
         rutina.setFranjaFin(requestRutina.getFranjaFin());
         Rutina savedRutina =  this.rutinaService.save(rutina);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+
         Completada completada = new Completada();
         completada.setRutinaC(rutina);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                rutina.getFechaInicio(),
-                rutina.getFechaFin(),
-                rutina.getRecurrencia(),
-                rutina.getDuracion(),
-                rutina.getFranjaInicio(),
-                rutina.getFranjaFin(),
-                rutina.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(rutina.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -351,24 +345,9 @@ public class RutinaController {
         this.completadaService.save(completada);
         Completada newCompletada = new Completada();
         newCompletada.setRutinaC(rutina);
-        if(rutina.getFranjaInicio() == null || rutina.getFranjaFin()==null){
-            newCompletada.setFecha( AbstractRecurrenteResponse.findSiguiente(
-                    rutina.getFechaInicio(),
-                    rutina.getFechaFin(),
-                    rutina.getRecurrencia(),
-                    completada.getFecha()).plusMinutes(10)
-            );
-        } else {
-            newCompletada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                    rutina.getFechaInicio(),
-                    rutina.getFechaFin(),
-                    rutina.getRecurrencia(),
-                    rutina.getDuracion(),
-                    rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC),
-                    rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC),
-                    completada.getFecha()).plusMinutes(10)
-            );
-        }
+
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+        newCompletada.setFecha( rutinaRecurrentEntityStrategy.findSiguiente(completada.getFecha()).plusMinutes(10));
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
             this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());
@@ -459,17 +438,11 @@ public class RutinaController {
         copy.setFranjaFin(rutina.getFranjaFin());
         Rutina savedRutina =  this.rutinaService.save(copy);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+
         Completada completada = new Completada();
         completada.setRutinaC(copy);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                copy.getFechaInicio(),
-                copy.getFechaFin(),
-                copy.getRecurrencia(),
-                copy.getDuracion(),
-                copy.getFranjaInicio(),
-                copy.getFranjaFin(),
-                OffsetDateTime.now())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -478,5 +451,4 @@ public class RutinaController {
         }
         return ResponseEntity.ok(new MessageResponse("Rutina creada"));
     }
-
 }

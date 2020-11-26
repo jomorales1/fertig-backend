@@ -2,21 +2,23 @@ package com.fertigapp.backend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fertigapp.backend.firebase.NotificationSystem;
-import com.fertigapp.backend.model.Completada;
-import com.fertigapp.backend.model.Rutina;
-import com.fertigapp.backend.model.Tarea;
-import com.fertigapp.backend.model.Usuario;
-import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
-import com.fertigapp.backend.payload.response.RecurrenteResponse;
-import com.fertigapp.backend.payload.response.RutinaRepeticionesResponse;
-import com.fertigapp.backend.requestModels.LoginRequest;
-import com.fertigapp.backend.requestModels.RequestRutina;
-import com.fertigapp.backend.requestModels.RequestTarea;
-import com.fertigapp.backend.services.CompletadaService;
-import com.fertigapp.backend.services.RutinaService;
-import com.fertigapp.backend.services.TareaService;
-import com.fertigapp.backend.services.UsuarioService;
+import com.fertigApp.backend.BackendApplication;
+import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigApp.backend.firebase.NotificationSystem;
+import com.fertigApp.backend.model.Completada;
+import com.fertigApp.backend.model.Rutina;
+import com.fertigApp.backend.model.Tarea;
+import com.fertigApp.backend.model.Usuario;
+import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
+import com.fertigApp.backend.payload.response.RecurrenteResponse;
+import com.fertigApp.backend.payload.response.RutinaRepeticionesResponse;
+import com.fertigApp.backend.requestModels.LoginRequest;
+import com.fertigApp.backend.requestModels.RequestRutina;
+import com.fertigApp.backend.requestModels.RequestTarea;
+import com.fertigApp.backend.services.CompletadaService;
+import com.fertigApp.backend.services.RutinaService;
+import com.fertigApp.backend.services.TareaService;
+import com.fertigApp.backend.services.UsuarioService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.json.JacksonJsonParser;
@@ -101,17 +103,11 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -135,17 +131,10 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -169,14 +158,11 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
+
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -202,17 +188,10 @@ class RutinaControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);

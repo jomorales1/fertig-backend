@@ -249,7 +249,7 @@ class EventoControllerTests {
         this.eventoService.deleteById(event.getId());
 
         //RECURRENCIA MENSUAL
-        recurrencia = "S2";
+        recurrencia = "M2";
         fechaInicio = OffsetDateTime.of(2021,1,1,12,0,0,0, ZoneOffset.UTC);
         event = setUpEvento(user, recurrencia, fechaInicio, fechaFin);
 
@@ -285,7 +285,7 @@ class EventoControllerTests {
         assertNotNull(obtainedEvent);
         assertEquals(obtainedEvent.getNombre(), event.getNombre());
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
-        assertEquals(obtainedEvent.getFecha(), OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC));
+        assertEquals(OffsetDateTime.of(2021,1,11,12,0,0,0, ZoneOffset.UTC), obtainedEvent.getFecha());
 
         this.notificationSystem.cancelAllScheduledEventNotifications();
         this.eventoService.deleteById(event.getId());
@@ -336,7 +336,7 @@ class EventoControllerTests {
         assertEquals(obtainedEvent.getDescripcion(), event.getDescripcion());
         obtainedDates = obtainedEvent.getRepeticiones();
 
-        assertTrue(obtainedDates.size() == expectedDates.size());
+        assertEquals(expectedDates.size(), obtainedDates.size());
         for(OffsetDateTime date : expectedDates){
             assertTrue(obtainedDates.contains(date));
         }
