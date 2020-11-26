@@ -1,6 +1,6 @@
-package com.fertigApp.backend.RecurrentStrategy;
+package com.fertigapp.backend.RecurrentStrategy;
 
-import com.fertigApp.backend.RecurrenceStrategy.RecurrenceStrategy;
+import com.fertigapp.backend.RecurrenceStrategy.RecurrenceStrategy;
 
 import java.time.OffsetDateTime;
 import java.util.List;

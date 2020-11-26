@@ -1,7 +1,7 @@
-package com.fertigApp.backend.RecurrentStrategy;
+package com.fertigapp.backend.RecurrentStrategy;
 
-import com.fertigApp.backend.RecurrenceStrategy.*;
-import com.fertigApp.backend.model.Rutina;
+import com.fertigapp.backend.RecurrenceStrategy.*;
+import com.fertigapp.backend.model.Rutina;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;

@@ -1,5 +1,6 @@
 package com.fertigapp.backend.controller;
 
+import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.model.*;
 import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
@@ -18,7 +19,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

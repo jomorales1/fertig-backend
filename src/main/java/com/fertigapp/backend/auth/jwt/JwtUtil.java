@@ -19,6 +19,7 @@ public class JwtUtil {
     private String jwtSecret;
     @Value("${fertigapp.app.jwtExpirationMs}")
     private int jwtExpirationMs;
+
     //metodo para generar tokens
     public String generateJwtToken(Authentication authentication) {
 
@@ -31,10 +32,12 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
+
     //obtener usuario desde el token desencriptando con nuestro secret
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
+
     //validar token con nuestro secret
     public boolean validateJwtToken(String authToken) {
         try {

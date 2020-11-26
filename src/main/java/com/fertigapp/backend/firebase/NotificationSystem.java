@@ -1,11 +1,10 @@
 package com.fertigapp.backend.firebase;
 
-import com.fertigApp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
-import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
-import com.fertigApp.backend.model.*;
-import com.fertigApp.backend.payload.response.AbstractRecurrenteResponse;
-import com.fertigApp.backend.requestModels.PushNotificationRequest;
-import com.fertigApp.backend.services.*;
+import com.fertigapp.backend.RecurrentStrategy.EventoRecurrentEntityStrategy;
+import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigapp.backend.model.*;
+import com.fertigapp.backend.requestModels.PushNotificationRequest;
+import com.fertigapp.backend.services.*;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Service;
 

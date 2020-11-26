@@ -2,12 +2,11 @@ package com.fertigapp.backend.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fertigApp.backend.RecurrentStrategy.RecurrentEntityStrategy;
-import com.fertigApp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
-import com.fertigApp.backend.model.Rutina;
+import com.fertigapp.backend.RecurrentStrategy.RecurrentEntityStrategy;
+import com.fertigapp.backend.RecurrentStrategy.RutinaRecurrentEntityStrategy;
+import com.fertigapp.backend.model.Rutina;
 
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 
 //Response con la información de un evento y las fechas de todas sus repeticiones
