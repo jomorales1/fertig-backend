@@ -185,7 +185,7 @@ public class TareaController {
         }
         if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info(US_NO_ADMIN);
-            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ADMIN));
+            return ResponseEntity.badRequest().body(new MessageResponse("Usted no es administrador de la tarea"));
         }
         List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(usuario, tarea);
         for (Tiempo tiempo : tiempos) {

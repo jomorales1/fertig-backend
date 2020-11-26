@@ -65,7 +65,7 @@ public class Usuario implements Serializable {
     private Set<FirebaseNotificationToken> notificationTokens;
 
 	@JsonIgnore
-	@OneToMany(mappedBy = "usuarioFL")
+	@OneToMany(mappedBy = "usuarioFL", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<FranjaActiva> franjasActivas;
 
 	public Usuario() { }
