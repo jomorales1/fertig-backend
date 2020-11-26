@@ -8,13 +8,10 @@ public abstract class Grafica {
     List<Integer> minutos;
     List<Integer> tareas;
 
-    public Grafica(List<OffsetDateTime> fechas, List<Integer> minutos, List<Integer> tareas) {
+    protected Grafica(List<OffsetDateTime> fechas, List<Integer> minutos, List<Integer> tareas) {
         this.fechas = fechas;
         this.minutos = minutos;
         this.tareas = tareas;
-    }
-
-    public Grafica() {
     }
 
     public List<OffsetDateTime> getFechas() {

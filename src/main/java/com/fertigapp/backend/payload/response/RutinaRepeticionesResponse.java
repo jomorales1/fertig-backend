@@ -24,7 +24,7 @@ public class RutinaRepeticionesResponse extends AbstractRecurrenteResponse  {
         super();
     }
 
-    public RutinaRepeticionesResponse(Rutina rutina, List<OffsetDateTime> completadas, OffsetDateTime maxAjustada) {
+    public RutinaRepeticionesResponse(Rutina rutina, List<OffsetDateTime> completadas) {
         super(rutina);
         this.completadas = completadas;
         this.recurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);

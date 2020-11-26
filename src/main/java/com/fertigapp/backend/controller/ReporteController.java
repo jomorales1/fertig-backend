@@ -6,12 +6,13 @@ import com.fertigapp.backend.services.CompletadaService;
 import com.fertigapp.backend.services.TareaService;
 import com.fertigapp.backend.services.TiempoService;
 import com.fertigapp.backend.services.UsuarioService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -19,8 +20,6 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class ReporteController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReporteController.class);
-
     private final UsuarioService usuarioService;
     private final TareaService tareaService;
     private final CompletadaService completadaService;

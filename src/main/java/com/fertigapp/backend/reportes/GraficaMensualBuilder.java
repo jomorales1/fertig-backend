@@ -4,16 +4,12 @@ import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.services.CompletadaService;
 import com.fertigapp.backend.services.TareaService;
 import com.fertigapp.backend.services.TiempoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
 public class GraficaMensualBuilder implements GraficaBuilder{
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(GraficaMensualBuilder.class);
 
     private final TareaService tareaService;
     private final CompletadaService completadaService;

@@ -77,8 +77,8 @@ public class NotificationSystem {
     }
 
     public void cancelAllScheduledTaskNotifications() {
-        for (Integer id : this.scheduledTasks.keySet()) {
-            for (NotificationEvent event : this.scheduledTasks.get(id)) {
+        for (Map.Entry<Integer, List<NotificationEvent>> entry : this.scheduledTasks.entrySet()) {
+            for (NotificationEvent event : entry.getValue()) {
                 event.getScheduled().cancel(false);
             }
         }
@@ -103,8 +103,8 @@ public class NotificationSystem {
     }
 
     public void cancelAllScheduledRoutineNotifications() {
-        for (Integer id : this.scheduledRoutines.keySet()) {
-            this.scheduledRoutines.get(id).getScheduled().cancel(true);
+        for (Map.Entry<Integer, NotificationEvent> entry : this.scheduledRoutines.entrySet()) {
+            entry.getValue().getScheduled().cancel(true);
         }
     }
 
@@ -126,8 +126,8 @@ public class NotificationSystem {
     }
 
     public void cancelAllScheduledEventNotifications() {
-        for (Integer id : this.scheduledEvents.keySet()) {
-            this.scheduledEvents.get(id).getScheduled().cancel(true);
+        for (Map.Entry<Integer, NotificationEvent> entry : this.scheduledEvents.entrySet()) {
+            entry.getValue().getScheduled().cancel(true);
         }
     }
 

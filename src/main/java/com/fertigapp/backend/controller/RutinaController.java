@@ -100,9 +100,9 @@ public class RutinaController {
         List<Rutina> rutinas = (List<Rutina>) this.rutinaService.findByUsuario(usuario);
         List<RutinaRepeticionesResponse> response = new LinkedList<>();
         for(Rutina rutina : rutinas){
-            response.add(new RutinaRepeticionesResponse(rutina,
-                    (List<OffsetDateTime>) completadaService.findFechasCompletadasByRutina(rutina),
-                    completadaService.findMaxFechaCompletadaByRutina(rutina)));
+            response.add(new RutinaRepeticionesResponse(
+                    rutina,
+                    (List<OffsetDateTime>) completadaService.findFechasCompletadasByRutina(rutina)));
         }
         return ResponseEntity.ok().body(response);
     }

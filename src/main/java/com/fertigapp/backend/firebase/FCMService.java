@@ -20,7 +20,7 @@ public class FCMService {
             throws InterruptedException, ExecutionException {
         Message message = getPreconfiguredMessageToToken(request);
         String response = sendAndGetResponse(message);
-        LOGGER.info("Sent message to token. Device token: " + request.getToken() + ", " + response);
+        LOGGER.info("Sent message to token. Device token: {},{}",request.getToken(),response);
     }
 
     private String sendAndGetResponse(Message message) throws InterruptedException, ExecutionException {

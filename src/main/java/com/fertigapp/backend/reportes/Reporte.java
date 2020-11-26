@@ -5,12 +5,9 @@ public abstract class Reporte {
     protected Integer tareas;
     protected Integer minutos;
 
-    public Reporte(Integer tareas, Integer minutos) {
+    protected Reporte(Integer tareas, Integer minutos) {
         this.tareas = tareas;
         this.minutos = minutos;
-    }
-
-    public Reporte() {
     }
 
     public Integer getTareas() {

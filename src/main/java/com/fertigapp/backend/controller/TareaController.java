@@ -291,7 +291,7 @@ public class TareaController {
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_PERTENECE));
         }
         if (optionalTareaUsuario.isEmpty()) {
-            LOGGER.info("El usuario no es un colaborador");
+            LOGGER.info(US_NO_COLAB);
             return ResponseEntity.badRequest().body(new MessageResponse(US_NO_COLAB));
         }
         if (!optionalTareaAdmin.get().isAdmin()) {

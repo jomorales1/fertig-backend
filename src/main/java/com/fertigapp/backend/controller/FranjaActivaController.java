@@ -8,7 +8,6 @@ import com.fertigapp.backend.payload.response.TareaSugeridaResponse;
 import com.fertigapp.backend.requestmodels.FranjaActivaRequest;
 import com.fertigapp.backend.services.FranjaActivaService;
 import com.fertigapp.backend.services.TareaDeUsuarioService;
-import com.fertigapp.backend.services.TareaService;
 import com.fertigapp.backend.services.UsuarioService;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.OffsetTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /*
  * Clase responsable de manejar request de tipo GET, POST, PUT y DELETE para
@@ -36,17 +37,13 @@ public class FranjaActivaController {
     // Servicio responsable del manejo de la tabla "franja activa" en la DB
     private final FranjaActivaService franjaActivaService;
 
-    // Servicio responsable del manejo de la tabla "tarea" en la DB.
-    private final TareaService tareaService;
-
     // Servicio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
     // Servicio responsable del manejo de la tabla "Tarea" en la DB.
     private final TareaDeUsuarioService tareaDeUsuarioService;
 
-    public FranjaActivaController(TareaService tareaService, UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, FranjaActivaService franjaActivaService) {
-        this.tareaService = tareaService;
+    public FranjaActivaController(UsuarioService usuarioService, TareaDeUsuarioService tareaDeUsuarioService, FranjaActivaService franjaActivaService) {
         this.usuarioService = usuarioService;
         this.tareaDeUsuarioService = tareaDeUsuarioService;
         this.franjaActivaService = franjaActivaService;
@@ -91,6 +88,8 @@ public class FranjaActivaController {
             return ResponseEntity.badRequest().body(new MessageResponse(response));
         }
 
+        if(optionalFranjaActiva.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Franja no encontrada"));
         FranjaActiva franjaActiva = optionalFranjaActiva.get();
         franjaActiva.setDay(franjaActivaRequest.getDay());
         franjaActiva.setFranjaInicio(franjaActivaRequest.getFranjaInicio());
