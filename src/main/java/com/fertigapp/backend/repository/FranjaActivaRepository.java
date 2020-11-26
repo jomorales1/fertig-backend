@@ -15,4 +15,6 @@ public interface FranjaActivaRepository extends CrudRepository<FranjaActiva, Int
 
     @Transactional
     void deleteAllByUsuarioFL(Usuario usuario);
+
+    void deleteById(int id);
 }
