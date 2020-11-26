@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,20 +29,17 @@ import java.util.stream.Collectors;
 @RestController
 public class FacebookController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Completada.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FacebookController.class);
 
     private final UsuarioService usuarioService;
 
     private final JwtUtil jwtUtil;
 
-    private final AuthenticationManager authenticationManager;
-
     private final UserDetailsServiceImpl userDetailsService;
 
-    public FacebookController(UsuarioService usuarioService, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
+    public FacebookController(UsuarioService usuarioService, JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
         this.usuarioService = usuarioService;
         this.jwtUtil = jwtUtil;
-        this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
     }
 

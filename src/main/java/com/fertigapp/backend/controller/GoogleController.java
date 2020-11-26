@@ -37,21 +37,18 @@ import java.util.stream.Collectors;
 @RestController
 public class GoogleController {
 
-    private static final Logger LOGGER= LoggerFactory.getLogger(Completada.class);
+    private static final Logger LOGGER= LoggerFactory.getLogger(GoogleController.class);
 
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
     private final JwtUtil jwtUtil;
 
-    private final AuthenticationManager authenticationManager;
-
     private final UserDetailsServiceImpl userDetailsService;
 
-    public GoogleController(UsuarioService usuarioService, JwtUtil jwtUtil, AuthenticationManager authenticationManager, UserDetailsServiceImpl userDetailsService) {
+    public GoogleController(UsuarioService usuarioService, JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
         this.usuarioService = usuarioService;
         this.jwtUtil = jwtUtil;
-        this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
     }
 

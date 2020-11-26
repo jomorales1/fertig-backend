@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fertigapp.backend.firebase.NotificationSystem;
 import com.fertigapp.backend.model.*;
 import com.fertigapp.backend.payload.response.AbstractRecurrenteResponse;
+import com.fertigapp.backend.recurrentstrategy.RutinaRecurrentEntityStrategy;
 import com.fertigapp.backend.requestModels.LoginRequest;
 import com.fertigapp.backend.services.*;
 import org.junit.jupiter.api.Test;
@@ -140,17 +141,10 @@ public class ReporteControllerTests {
 
         Rutina saved =  this.rutinaService.save(routine);
 
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(routine);
         Completada completada = new Completada();
         completada.setRutinaC(routine);
-        completada.setFecha(AbstractRecurrenteResponse.findSiguiente(
-                routine.getFechaInicio(),
-                routine.getFechaFin(),
-                routine.getRecurrencia(),
-                routine.getDuracion(),
-                routine.getFranjaInicio(),
-                routine.getFranjaFin(),
-                routine.getFechaInicio())
-        );
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(routine.getFechaInicio()));
         completada.setFechaAjustada(null);
         completada.setHecha(true);
         this.completadaService.save(completada);

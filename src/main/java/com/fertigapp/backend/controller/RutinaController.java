@@ -332,21 +332,17 @@ public class RutinaController {
             LOGGER.info(RUT_NO_PERTENECE);
             return ResponseEntity.badRequest().body(new MessageResponse(RUT_NO_PERTENECE));
         }
+        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
+
         Completada completada = this.completadaService.findTopHechaByRutinaAndHecha(rutina,false);
         if (completada == null) return ResponseEntity.badRequest().body(new MessageResponse("Rutina no se puede checkear"));
-        OffsetDateTime anterior = AbstractRecurrenteResponse.findAnterior(rutina.getFechaInicio(),
-                rutina.getFechaFin(),
-                rutina.getRecurrencia(),
-                rutina.getDuracion(),
-                rutina.getFranjaInicio(),
-                rutina.getFranjaFin());
+        OffsetDateTime anterior = rutinaRecurrentEntityStrategy.findAnterior(OffsetDateTime.now());
         if(anterior != null && anterior.isAfter(completada.getFecha())) completada.setFecha(anterior);
         completada.setHecha(true);
         this.completadaService.save(completada);
         Completada newCompletada = new Completada();
         newCompletada.setRutinaC(rutina);
 
-        RutinaRecurrentEntityStrategy rutinaRecurrentEntityStrategy = new RutinaRecurrentEntityStrategy(rutina);
         newCompletada.setFecha( rutinaRecurrentEntityStrategy.findSiguiente(completada.getFecha()).plusMinutes(10));
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
