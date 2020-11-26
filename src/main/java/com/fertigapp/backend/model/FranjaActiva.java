@@ -30,10 +30,6 @@ public class FranjaActiva implements Serializable {
     @JoinColumn(name = "usuario")
     protected Usuario usuarioFL;
 
-    public FranjaActiva() {
-
-    }
-
     public int getId() {
         return id;
     }

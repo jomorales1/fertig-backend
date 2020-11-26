@@ -37,7 +37,7 @@ public class Usuario implements Serializable {
 			joinColumns = {@JoinColumn(name="usuario")},
 			inverseJoinColumns = {@JoinColumn(name="id_sonido")}
 	)
-	Set<Sonido> sonidos;
+	private Set<Sonido> sonidos;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioE")
@@ -49,7 +49,7 @@ public class Usuario implements Serializable {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "agregados", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    Set<Usuario> agregadores;
+	private Set<Usuario> agregadores;
 
     @JsonIgnore
 	@ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
