@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -59,7 +60,7 @@ public class ReporteControllerTests {
 
     private final ObjectMapper objectMapper = mapperBuilder.build();
 
-    public Usuario createUser() {
+    Usuario createUser() {
         if (this.usuarioService.findById("test_user").isPresent())
             return this.usuarioService.findById("test_user").get();
 
@@ -73,7 +74,7 @@ public class ReporteControllerTests {
         return user;
     }
 
-    public String getToken(Usuario user) throws Exception {
+    String getToken(Usuario user) throws Exception {
         String token = "";
 
         if (usuarioService.existsById(user.getUsuario())) {
@@ -94,7 +95,7 @@ public class ReporteControllerTests {
         return token;
     }
 
-    public Tarea setUpTarea(Usuario user) {
+    Tarea setUpTarea(Usuario user) {
         if (usuarioService.findById(user.getUsuario()).isEmpty()) {
             this.usuarioService.save(user);
         }
@@ -157,8 +158,20 @@ public class ReporteControllerTests {
     }
 
     @Test
-    void getReporteMensual() throws Exception {
-        String uri = "/report/month";
+    void mainTest() throws Exception {
+        ArrayList<String> uris = new ArrayList<>();
+        uris.add("/report/month");
+        uris.add("/report/week");
+        uris.add("/report/year");
+        uris.add("/graphic/month");
+        uris.add("/graphic/week");
+        uris.add("/graphic/year");
+        for (String uri : uris) {
+            reporte(uri);
+        }
+    }
+
+    void reporte(String uri) throws Exception {
         Usuario user;
         if (this.usuarioService.findById("test_user").isEmpty())
             user = createUser();
@@ -171,151 +184,6 @@ public class ReporteControllerTests {
 
         this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
             .param("fecha", fecha)).andExpect(status().isOk());
-
-        this.notificationSystem.cancelAllScheduledTaskNotifications();
-        this.notificationSystem.cancelAllScheduledRoutineNotifications();
-        this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
-        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
-        for (Tiempo tiempo : tiempos) {
-            this.tiempoService.deleteById(tiempo.getId());
-        }
-        this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(user.getUsuario());
-    }
-
-    @Test
-    void getReporteSemanal() throws Exception {
-        String uri = "/report/week";
-        Usuario user;
-        if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
-        else user = this.usuarioService.findById("test_user").get();
-        String token = getToken(user);
-        Tarea task = setUpTarea(user);
-        Rutina rutina = setUpRutina(user);
-
-        String fecha = OffsetDateTime.now().toString();
-
-        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
-                .param("fecha", fecha)).andExpect(status().isOk());
-
-        this.notificationSystem.cancelAllScheduledTaskNotifications();
-        this.notificationSystem.cancelAllScheduledRoutineNotifications();
-        this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
-        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
-        for (Tiempo tiempo : tiempos) {
-            this.tiempoService.deleteById(tiempo.getId());
-        }
-        this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(user.getUsuario());
-    }
-
-    @Test
-    void getReporteAnual() throws Exception {
-        String uri = "/report/year";
-        Usuario user;
-        if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
-        else user = this.usuarioService.findById("test_user").get();
-        String token = getToken(user);
-        Tarea task = setUpTarea(user);
-        Rutina rutina = setUpRutina(user);
-
-        String fecha = OffsetDateTime.now().toString();
-
-        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
-                .param("fecha", fecha)).andExpect(status().isOk());
-
-        this.notificationSystem.cancelAllScheduledTaskNotifications();
-        this.notificationSystem.cancelAllScheduledRoutineNotifications();
-        this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
-        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
-        for (Tiempo tiempo : tiempos) {
-            this.tiempoService.deleteById(tiempo.getId());
-        }
-        this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(user.getUsuario());
-    }
-
-    @Test
-    void getGraficaMensual() throws Exception {
-        String uri = "/graphic/month";
-        Usuario user;
-        if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
-        else user = this.usuarioService.findById("test_user").get();
-        String token = getToken(user);
-        Tarea task = setUpTarea(user);
-        Rutina rutina = setUpRutina(user);
-
-        String fecha = OffsetDateTime.now().toString();
-
-        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
-                .param("fecha", fecha)).andExpect(status().isOk());
-
-        this.notificationSystem.cancelAllScheduledTaskNotifications();
-        this.notificationSystem.cancelAllScheduledRoutineNotifications();
-        this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
-        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
-        for (Tiempo tiempo : tiempos) {
-            this.tiempoService.deleteById(tiempo.getId());
-        }
-        this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(user.getUsuario());
-    }
-
-    @Test
-    void getGraficaSemanal() throws Exception {
-        String uri = "/graphic/week";
-        Usuario user;
-        if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
-        else user = this.usuarioService.findById("test_user").get();
-        String token = getToken(user);
-        Tarea task = setUpTarea(user);
-        Rutina rutina = setUpRutina(user);
-
-        String fecha = OffsetDateTime.now().toString();
-
-        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
-                .param("fecha", fecha)).andExpect(status().isOk());
-
-        this.notificationSystem.cancelAllScheduledTaskNotifications();
-        this.notificationSystem.cancelAllScheduledRoutineNotifications();
-        this.completadaService.deleteAllByRutina(rutina);
-        this.rutinaService.deleteById(rutina.getId());
-        List<Tiempo> tiempos = (List<Tiempo>) this.tiempoService.findAllByUsuarioAndTarea(user, task);
-        for (Tiempo tiempo : tiempos) {
-            this.tiempoService.deleteById(tiempo.getId());
-        }
-        this.tareaDeUsuarioService.deleteAllByTarea(task);
-        this.tareaService.deleteById(task.getId());
-        this.usuarioService.deleteById(user.getUsuario());
-    }
-
-    @Test
-    void getGraficaAnual() throws Exception {
-        String uri = "/graphic/year";
-        Usuario user;
-        if (this.usuarioService.findById("test_user").isEmpty())
-            user = createUser();
-        else user = this.usuarioService.findById("test_user").get();
-        String token = getToken(user);
-        Tarea task = setUpTarea(user);
-        Rutina rutina = setUpRutina(user);
-
-        String fecha = OffsetDateTime.now().toString();
-
-        this.mockMvc.perform(get(uri).header("Authorization", "Bearer " + token)
-                .param("fecha", fecha)).andExpect(status().isOk());
 
         this.notificationSystem.cancelAllScheduledTaskNotifications();
         this.notificationSystem.cancelAllScheduledRoutineNotifications();

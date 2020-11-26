@@ -127,7 +127,7 @@ class SonidoControllerTests {
         CollectionType javaList = objectMapper.getTypeFactory().constructCollectionType(List.class, SonidoResponse.class);
         List<SonidoResponse> sonidoResponses = objectMapper.readValue(response, javaList);
         assertNotNull(sonidoResponses);
-        assertEquals(sonidoResponses.size(), 2);
+        assertEquals(2, sonidoResponses.size());
 
         for (SonidoResponse sonidoResponse : sonidoResponses) {
             if (sonidoResponse.getSonido().equals(sonido.getId())) {
