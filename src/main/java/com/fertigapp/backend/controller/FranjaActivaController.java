@@ -88,9 +88,7 @@ public class FranjaActivaController {
             return ResponseEntity.badRequest().body(new MessageResponse(response));
         }
 
-        if(optionalFranjaActiva.isEmpty())
-            return ResponseEntity.badRequest().body(new MessageResponse("Franja no encontrada"));
-        FranjaActiva franjaActiva = optionalFranjaActiva.get();
+        FranjaActiva franjaActiva = optionalFranjaActiva.orElse(new FranjaActiva());
         franjaActiva.setDay(franjaActivaRequest.getDay());
         franjaActiva.setFranjaInicio(franjaActivaRequest.getFranjaInicio());
         franjaActiva.setFranjaFin(franjaActivaRequest.getFranjaFin());
