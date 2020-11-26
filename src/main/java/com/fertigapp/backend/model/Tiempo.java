@@ -11,20 +11,7 @@ public class Tiempo implements Serializable {
     @EmbeddedId
     private IdTiempo id = new IdTiempo();
 
-//    @MapsId("tareaDeUsuario")
-//    @ManyToOne(optional = false)
-//    private TareaDeUsuario tareaDeUsuario;
-
-//    @MapsId("fecha")
-////    @JoinColumn(name = "fecha", columnDefinition = "DATETIME")
-//    @Column(columnDefinition = "DATETIME")
-//    private OffsetDateTime fecha;
-
     private Integer invertido;
-
-    public Tiempo() {
-
-    }
 
     public IdTiempo getId() {
         return id;

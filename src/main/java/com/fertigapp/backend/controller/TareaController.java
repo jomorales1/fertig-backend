@@ -32,6 +32,8 @@ public class TareaController {
     private static final String TAR_NO_PERTENECE = "La tarea no pertenece al usuario";
     private static final String TAR_NO_ENCONTRADA = "Tarea no encontrada";
     private static final String US_NO_ADMIN = "El usuario no es un administrador de la tarea";
+    private static final String US_NO_ENCONTRADO = "Usuario no encontrado";
+    private static final String US_NO_COLAB = "El usuario no es un colaborador";
 
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(TareaController.class);
 
@@ -110,7 +112,7 @@ public class TareaController {
         LOGGER.info("Tarea actualizada");
         this.notificationSystem.cancelScheduledTaskNotification(userDetails.getUsername(), tarea.getId());
         if (tarea.getFechaFin() != null && tarea.getRecordatorio() != null)
-        this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), tarea.getId());
+            this.notificationSystem.scheduleTaskNotification(userDetails.getUsername(), tarea.getId());
         return ResponseEntity.ok().body(tarea);
     }
 
@@ -234,8 +236,8 @@ public class TareaController {
         }
         Optional<Usuario> optional = this.usuarioService.findById(username);
         if (optional.isEmpty()) {
-            LOGGER.info("Usuario no encontrado");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
+            LOGGER.info(US_NO_ENCONTRADO);
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ENCONTRADO));
         }
         Optional<Usuario> optionalUsuario = this.usuarioService.findById(userDetails.getUsername());
         Usuario admin = optionalUsuario.orElse(new Usuario());
@@ -249,7 +251,7 @@ public class TareaController {
         }
         if (optionalTareaDeUsuario1.isEmpty()) {
             LOGGER.info("El nuevo usuario no es un colaborador");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_COLAB));
         }
         if (!optionalTareaDeUsuario.get().isAdmin()) {
             LOGGER.info(US_NO_ADMIN);
@@ -290,7 +292,7 @@ public class TareaController {
         }
         if (optionalTareaUsuario.isEmpty()) {
             LOGGER.info("El usuario no es un colaborador");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_COLAB));
         }
         if (!optionalTareaAdmin.get().isAdmin()) {
             LOGGER.info(US_NO_ADMIN);
@@ -312,8 +314,8 @@ public class TareaController {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optional = this.usuarioService.findById(username);
         if (optional.isEmpty()) {
-            LOGGER.info("Usuario no encontrado");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
+            LOGGER.info(US_NO_ENCONTRADO);
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ENCONTRADO));
         }
         Optional<Tarea> optionalTarea = this.tareaService.findById(id);
         if (optionalTarea.isEmpty()) {
@@ -351,8 +353,8 @@ public class TareaController {
             return ResponseEntity.badRequest().body(new MessageResponse(TAR_NO_ENCONTRADA));
         }
         if (optionalUsuario.isEmpty()) {
-            LOGGER.info("Usuario no encontrado");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: usuario no encontrado"));
+            LOGGER.info(US_NO_ENCONTRADO);
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_ENCONTRADO));
         }
         if (username.equals(userDetails.getUsername())) {
             LOGGER.info("Un usuario no puede eliminarse asi mismo");
@@ -374,7 +376,7 @@ public class TareaController {
         Optional<TareaDeUsuario> optionalTareaUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
         if (optionalTareaUsuario.isEmpty()) {
             LOGGER.info("El usuario no es un colaborador");
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no es un colaborador"));
+            return ResponseEntity.badRequest().body(new MessageResponse(US_NO_COLAB));
         }
         TareaDeUsuario tareaDeUsuario = optionalTareaUsuario.get();
         this.tareaDeUsuarioService.deleteById(tareaDeUsuario.getId());

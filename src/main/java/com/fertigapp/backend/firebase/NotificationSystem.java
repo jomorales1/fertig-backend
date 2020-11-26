@@ -33,6 +33,9 @@ public class NotificationSystem {
     private final HashMap<Integer, NotificationEvent> scheduledRoutines;
     private final HashMap<Integer, NotificationEvent> scheduledEvents;
 
+    private static final String MENSAJE_COMP = " minutos, no lo olvides!";
+    private static final String RECORDATORIO = "Recordatorio";
+
     public NotificationSystem(PushNotificationService notificationService, ThreadPoolTaskScheduler taskScheduler, UsuarioService usuarioService, TareaService tareaService, RutinaService rutinaService, EventoService eventoService, FirebaseNTService firebaseNTService) {
         this.pushNotificationService = notificationService;
         this.taskScheduler = taskScheduler;
@@ -169,8 +172,8 @@ public class NotificationSystem {
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de tarea");
-                notificationRequest.setMessage("Tu tarea " + '"' + tarea.getNombre() + '"' + " vence en " + tarea.getRecordatorio() + " minutos, no lo olvides!");
-                notificationRequest.setTopic("Recordatorio");
+                notificationRequest.setMessage("Tu tarea " + '"' + tarea.getNombre() + '"' + " vence en " + tarea.getRecordatorio() + MENSAJE_COMP);
+                notificationRequest.setTopic(RECORDATORIO);
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
@@ -200,8 +203,8 @@ public class NotificationSystem {
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de rutina");
-                notificationRequest.setMessage("Tu rutina " + '"' + rutina.getNombre() + '"' + " empieza en " + rutina.getRecordatorio() + " minutos, no lo olvides!");
-                notificationRequest.setTopic("Recordatorio");
+                notificationRequest.setMessage("Tu rutina " + '"' + rutina.getNombre() + '"' + " empieza en " + rutina.getRecordatorio() + MENSAJE_COMP);
+                notificationRequest.setTopic(RECORDATORIO);
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
@@ -233,8 +236,8 @@ public class NotificationSystem {
             for (FirebaseNotificationToken token : notificationTokens) {
                 PushNotificationRequest notificationRequest = new PushNotificationRequest();
                 notificationRequest.setTitle("Recordatorio de evento");
-                notificationRequest.setMessage("Tu evento " + '"' + evento.getNombre() + '"' + " inicia en " + evento.getRecordatorio() + " minutos, no lo olvides!");
-                notificationRequest.setTopic("Recordatorio");
+                notificationRequest.setMessage("Tu evento " + '"' + evento.getNombre() + '"' + " inicia en " + evento.getRecordatorio() + MENSAJE_COMP);
+                notificationRequest.setTopic(RECORDATORIO);
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }

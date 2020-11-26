@@ -7,10 +7,6 @@ public class PushNotificationRequest {
     private String topic;
     private String token;
 
-    public PushNotificationRequest() {
-
-    }
-
     public String getTitle() {
         return title;
     }

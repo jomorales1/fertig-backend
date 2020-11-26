@@ -5,9 +5,6 @@ public class TareaSugeridaResponse {
     private int id;
     private String criterio;
 
-    public TareaSugeridaResponse() {
-    }
-
     public int getId() {
         return id;
     }
