@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -37,7 +39,9 @@ public class FacebookController {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    public FacebookController(UsuarioService usuarioService, JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) {
+    private Random random = SecureRandom.getInstanceStrong();
+
+    public FacebookController(UsuarioService usuarioService, JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) throws NoSuchAlgorithmException {
         this.usuarioService = usuarioService;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
@@ -98,12 +102,11 @@ public class FacebookController {
                 userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
             }
             StringBuilder builder = new StringBuilder();
-            Random random = new Random();
             builder.append(userName);
             while (usuarioService.existsById(builder.toString())) {
                 builder = new StringBuilder();
                 builder.append(userName);
-                builder.append((int) (random.nextInt()));
+                builder.append(this.random.nextInt());
             }
             userName = builder.toString();
             user.setUsuario(userName);
