@@ -98,11 +98,11 @@ public class FacebookController {
                 userName = facebookEmail.substring(0, facebookEmail.indexOf("@"));
             }
             StringBuilder builder = new StringBuilder();
+            Random random = new Random();
             builder.append(userName);
             while (usuarioService.existsById(builder.toString())) {
                 builder = new StringBuilder();
                 builder.append(userName);
-                Random random = new Random();
                 builder.append((int) (random.nextInt()));
             }
             userName = builder.toString();
