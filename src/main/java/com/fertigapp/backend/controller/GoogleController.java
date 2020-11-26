@@ -47,12 +47,13 @@ public class GoogleController {
 
     private final UserDetailsServiceImpl userDetailsService;
 
-    private Random random = SecureRandom.getInstanceStrong();
+    private final Random random;
 
     public GoogleController(UsuarioService usuarioService, JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService) throws NoSuchAlgorithmException {
         this.usuarioService = usuarioService;
         this.jwtUtil = jwtUtil;
         this.userDetailsService = userDetailsService;
+        this.random = SecureRandom.getInstanceStrong();
     }
 
     // Método POST para la verificación del token obtenido de la API de autenticación de Google.
