@@ -375,7 +375,7 @@ public class TareaController {
         }
         Optional<TareaDeUsuario> optionalTareaUsuario = this.tareaDeUsuarioService.findByUsuarioAndTarea(usuario, tarea);
         if (optionalTareaUsuario.isEmpty()) {
-            LOGGER.info("El usuario no es un colaborador");
+            LOGGER.info(US_NO_COLAB);
             return ResponseEntity.badRequest().body(new MessageResponse(US_NO_COLAB));
         }
         TareaDeUsuario tareaDeUsuario = optionalTareaUsuario.get();

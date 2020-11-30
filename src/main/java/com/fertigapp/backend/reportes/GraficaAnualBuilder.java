@@ -27,6 +27,8 @@ public class GraficaAnualBuilder implements GraficaBuilder{
         List<OffsetDateTime> fechas = new LinkedList<>();
         List<Integer> minutos = new LinkedList<>();
         List<Integer> tareas = new LinkedList<>();
+        List<Integer> minutosMes = new LinkedList<>();
+        List<Integer> tareasMes = new LinkedList<>();
         for (OffsetDateTime i = OffsetDateTime.from(inicio); i.isBefore(fin); i = i.plusDays(1)){
             fechas.add(i);
             Integer a = tiempoService.countTiempoTareaBetween(i,i.plusDays(1),usuario);
@@ -34,6 +36,12 @@ public class GraficaAnualBuilder implements GraficaBuilder{
             tareas.add(tareaService.countTareasBetween(i,i.plusDays(1),usuario)+completadaService.countCompletadasBetween(i,i.plusDays(1),usuario));
             minutos.add((b == null ? 0 : b) + (a == null ? 0 : a));
         }
-        return new GraficaAnual(fechas, minutos, tareas);
+        for(OffsetDateTime i = OffsetDateTime.from(inicio); i.isBefore(fin); i = inicio.plusMonths(1)){
+            Integer a = tiempoService.countTiempoTareaBetween(i,i.plusMonths(1),usuario);
+            Integer b = completadaService.countTiempoCompletadasBetween(i,i.plusMonths(1),usuario);
+            tareasMes.add(tareaService.countTareasBetween(i,i.plusMonths(1),usuario)+completadaService.countCompletadasBetween(i,i.plusMonths(1),usuario));
+            minutosMes.add((b == null ? 0 : b) + (a == null ? 0 : a));
+        }
+        return new GraficaAnual(fechas, minutos, tareas, minutosMes, tareasMes);
     }
 }

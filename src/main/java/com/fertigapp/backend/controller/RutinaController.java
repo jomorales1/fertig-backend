@@ -177,7 +177,7 @@ public class RutinaController {
 
         Completada completada = new Completada();
         completada.setRutinaC(rutina);
-        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(rutina.getFechaInicio()));
+        completada.setFecha(rutinaRecurrentEntityStrategy.findSiguiente(OffsetDateTime.now()));
         completada.setFechaAjustada(null);
         completada.setHecha(false);
         this.completadaService.save(completada);
@@ -342,7 +342,7 @@ public class RutinaController {
         Completada newCompletada = new Completada();
         newCompletada.setRutinaC(rutina);
 
-        newCompletada.setFecha( rutinaRecurrentEntityStrategy.findSiguiente(completada.getFecha()).plusMinutes(10));
+        newCompletada.setFecha( rutinaRecurrentEntityStrategy.findSiguiente(completada.getFecha().plusMinutes(10)));
         newCompletada.setHecha(false);
         if (rutina.getRecordatorio() != null) {
             this.notificationSystem.cancelScheduledRoutineNotification(rutina.getId());

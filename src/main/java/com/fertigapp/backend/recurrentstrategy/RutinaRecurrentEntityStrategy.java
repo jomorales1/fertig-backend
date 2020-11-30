@@ -109,19 +109,19 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
         if(rutina.getFranjaInicio() == null){
             nextDate = recurrenceStrategy.add(nextDate);
         } else {
-            OffsetDateTime franjaInico = currentDate.toLocalDate().atTime(rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC));
+            OffsetDateTime franjaInicio = currentDate.toLocalDate().atTime(rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC));
             OffsetDateTime franjaFin = currentDate.toLocalDate().atTime(rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC));
 
-            if(franjaInico.isAfter(franjaFin))
+            if(franjaInicio.isAfter(franjaFin))
                 franjaFin = franjaFin.plusDays(1);
 
             do{
                 nextDate = recurrenceStrategy.add(nextDate);
                 if(nextDate.isAfter(franjaFin)){
-                    franjaInico = franjaInico.plusDays(1);
+                    franjaInicio = franjaInicio.plusDays(1);
                     franjaFin = franjaFin.plusDays(1);
                 }
-            } while(nextDate.isBefore(franjaInico));
+            } while(nextDate.isBefore(franjaInicio));
         }
 
         if(!nextDate.isBefore(fechaFin)){
@@ -139,21 +139,21 @@ public class RutinaRecurrentEntityStrategy implements RecurrentEntityStrategy {
 
         OffsetDateTime previousDate = OffsetDateTime.from(currentDate);
         if(rutina.getFranjaInicio() == null){
-            previousDate = recurrenceStrategy.add(previousDate);
+            previousDate = recurrenceStrategy.minus(previousDate);
         } else {
             OffsetDateTime franjaFin = currentDate.toLocalDate().atTime(rutina.getFranjaFin().withOffsetSameLocal(ZoneOffset.UTC));
-            OffsetDateTime franjaInico = currentDate.toLocalDate().atTime(rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC));
+            OffsetDateTime franjaInicio = currentDate.toLocalDate().atTime(rutina.getFranjaInicio().withOffsetSameLocal(ZoneOffset.UTC));
 
-            if(franjaInico.isAfter(franjaFin))
+            if(franjaInicio.isAfter(franjaFin))
                 franjaFin = franjaFin.minusDays(1);
 
             do{
                 previousDate = recurrenceStrategy.minus(previousDate);
-                if(previousDate.isBefore(franjaInico)){
-                    franjaInico = franjaInico.minusDays(1);
+                if(previousDate.isBefore(franjaInicio)){
+                    franjaInicio = franjaInicio.minusDays(1);
                     franjaFin = franjaFin.minusDays(1);
                 }
-            } while(previousDate.isAfter(franjaFin));
+            } while(previousDate.isAfter(franjaInicio));
         }
 
         if(!previousDate.isAfter(firstValidDate)){
