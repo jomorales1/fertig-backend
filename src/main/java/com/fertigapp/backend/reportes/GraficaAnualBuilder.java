@@ -36,7 +36,7 @@ public class GraficaAnualBuilder implements GraficaBuilder{
             tareas.add(tareaService.countTareasBetween(i,i.plusDays(1),usuario)+completadaService.countCompletadasBetween(i,i.plusDays(1),usuario));
             minutos.add((b == null ? 0 : b) + (a == null ? 0 : a));
         }
-        for(OffsetDateTime i = OffsetDateTime.from(inicio); i.isBefore(fin); i = inicio.plusMonths(1)){
+        for(OffsetDateTime i = OffsetDateTime.from(inicio); i.isBefore(fin); i = i.plusMonths(1)){
             Integer a = tiempoService.countTiempoTareaBetween(i,i.plusMonths(1),usuario);
             Integer b = completadaService.countTiempoCompletadasBetween(i,i.plusMonths(1),usuario);
             tareasMes.add(tareaService.countTareasBetween(i,i.plusMonths(1),usuario)+completadaService.countCompletadasBetween(i,i.plusMonths(1),usuario));

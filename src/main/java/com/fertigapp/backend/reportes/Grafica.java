@@ -3,7 +3,7 @@ package com.fertigapp.backend.reportes;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public abstract class Grafica {
+public abstract class Grafica{
     List<OffsetDateTime> fechas;
     List<Integer> minutos;
     List<Integer> tareas;
