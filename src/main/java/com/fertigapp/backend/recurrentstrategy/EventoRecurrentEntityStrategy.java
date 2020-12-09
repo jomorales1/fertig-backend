@@ -19,38 +19,41 @@ public class EventoRecurrentEntityStrategy implements RecurrentEntityStrategy {
         this.evento = evento;
         if(evento.getRecurrencia() == null){
             recurrenceStrategy = new NullStrategy(evento.getFechaFin());
-        }
-        switch (evento.getRecurrencia().charAt(0)){
-            case 'H':
-                recurrenceStrategy = new HStrategy(evento.getRecurrencia());
-                firstValidDate = evento.getFechaInicio();
-                break;
-            case 'D':
-                recurrenceStrategy = new DStrategy(evento.getRecurrencia());
-                firstValidDate = evento.getFechaInicio();
-                break;
-            case 'S':
-                recurrenceStrategy = new WStrategy(evento.getRecurrencia());
-                firstValidDate = evento.getFechaInicio();
-                break;
-            case 'M':
-                recurrenceStrategy = new MStrategy(evento.getRecurrencia());
-                firstValidDate = evento.getFechaInicio();
-                break;
-            case 'A':
-                recurrenceStrategy = new YStrategy(evento.getRecurrencia());
-                firstValidDate = evento.getFechaInicio();
-                break;
-            default:
-                EStrategy eStrategy = new EStrategy(evento.getRecurrencia());
-                boolean []recurrenceDays = (eStrategy).getRecurrenceDays();
-                if (recurrenceDays[evento.getFechaInicio().getDayOfWeek().getValue() - 1]) {
+            firstValidDate = evento.getFechaInicio();
+            this.evento.setFechaFin(firstValidDate);
+        } else {
+            switch (evento.getRecurrencia().charAt(0)) {
+                case 'H':
+                    recurrenceStrategy = new HStrategy(evento.getRecurrencia());
                     firstValidDate = evento.getFechaInicio();
-                } else {
-                    firstValidDate = eStrategy.add(evento.getFechaInicio());
-                }
-                recurrenceStrategy = eStrategy;
-                break;
+                    break;
+                case 'D':
+                    recurrenceStrategy = new DStrategy(evento.getRecurrencia());
+                    firstValidDate = evento.getFechaInicio();
+                    break;
+                case 'S':
+                    recurrenceStrategy = new WStrategy(evento.getRecurrencia());
+                    firstValidDate = evento.getFechaInicio();
+                    break;
+                case 'M':
+                    recurrenceStrategy = new MStrategy(evento.getRecurrencia());
+                    firstValidDate = evento.getFechaInicio();
+                    break;
+                case 'A':
+                    recurrenceStrategy = new YStrategy(evento.getRecurrencia());
+                    firstValidDate = evento.getFechaInicio();
+                    break;
+                default:
+                    EStrategy eStrategy = new EStrategy(evento.getRecurrencia());
+                    boolean[] recurrenceDays = (eStrategy).getRecurrenceDays();
+                    if (recurrenceDays[evento.getFechaInicio().getDayOfWeek().getValue() - 1]) {
+                        firstValidDate = evento.getFechaInicio();
+                    } else {
+                        firstValidDate = eStrategy.add(evento.getFechaInicio());
+                    }
+                    recurrenceStrategy = eStrategy;
+                    break;
+            }
         }
     }
 
