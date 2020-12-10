@@ -30,7 +30,7 @@ import java.util.logging.Level;
 @RestController
 public class EventoController {
 
-    private static final Logger LOGGER= LoggerFactory.getLogger(EventoController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventoController.class);
 
     private static final String EV_NO_ENCONTRADO = "Evento no encontrado";
     private static final String EV_NO_PERTENECE = "El evento no pertenece al usuario";
@@ -127,9 +127,7 @@ public class EventoController {
     @PostMapping(path="/event/add")
     public @ResponseBody ResponseEntity<Void> addNewEvento(@RequestBody RequestEvento requestEvento) {
         Evento evento = new Evento();
-        Object principal =  SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        java.util.logging.Logger.getGlobal().log(Level.INFO,principal.toString());
-        UserDetails userDetails = (UserDetails) principal;
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Usuario> optUsuario = usuarioService.findById(userDetails.getUsername());
 
         evento.setUsuario(optUsuario.orElse(null));
