@@ -241,7 +241,7 @@ public class NotificationSystem {
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
-            if(evento.getRecurrencia()!=null){
+            if(evento.getRecurrencia()!=null && date.compareTo(Calendar.getInstance().getTime())>0){
                 NotificationEvent notificationEvent = new NotificationEvent(this.username, taskScheduler.schedule(new EventNotification(this.username, this.idEvento), date));
                 scheduledEvents.replace(evento.getId(), notificationEvent);
             }
