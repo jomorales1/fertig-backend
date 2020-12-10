@@ -34,9 +34,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew build sonarqube --info
-      - uses: actions/checkout@v2
-        with:
-          ref: development
       - name: Replace Action
         uses: datamonsters/replace-action@v2
         with: 
