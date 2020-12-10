@@ -241,8 +241,10 @@ public class NotificationSystem {
                 notificationRequest.setToken(token.getToken());
                 pushNotificationService.sendPushNotificationToToken(notificationRequest);
             }
-            NotificationEvent notificationEvent = new NotificationEvent(this.username, taskScheduler.schedule(new EventNotification(this.username, this.idEvento), date));
-            scheduledEvents.replace(evento.getId(), notificationEvent);
+            if(evento.getRecurrencia()!=null){
+                NotificationEvent notificationEvent = new NotificationEvent(this.username, taskScheduler.schedule(new EventNotification(this.username, this.idEvento), date));
+                scheduledEvents.replace(evento.getId(), notificationEvent);
+            }
         }
     }
 
