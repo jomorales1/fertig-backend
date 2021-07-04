@@ -49,7 +49,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                     "/user/add",
                     "/sign-in",
                     "/login/oauth2/code/google",
-                    "/login/oauth2/code/facebook"
+                    "/login/oauth2/code/facebook",
+                    "/user/reset-password/{email}",
             };
     //configuración de seguridad del servidor
     @Override

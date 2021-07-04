@@ -19,6 +19,8 @@ public class JwtUtil {
     private String jwtSecret;
     @Value("${fertigapp.app.jwtExpirationMs}")
     private int jwtExpirationMs;
+    @Value("${fertigapp.app.jwtResetPasswordExpirationMs}")
+    private int jwtResetPasswordExpirationMs;
 
     //metodo para generar tokens
     public String generateJwtToken(Authentication authentication) {
@@ -29,6 +31,17 @@ public class JwtUtil {
                 .setSubject((userPrincipal.getUsername()))
                 .setIssuedAt(new Date())
                 .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
+    public String generateJwtResetPasswordToken(Authentication authentication) {
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+
+        return Jwts.builder()
+                .setSubject((userPrincipal.getUsername()))
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + jwtResetPasswordExpirationMs))
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }

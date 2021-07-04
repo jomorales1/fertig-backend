@@ -2,12 +2,14 @@ package com.fertigapp.backend.controller;
 
 import com.fertigapp.backend.auth.jwt.JwtUtil;
 import com.fertigapp.backend.auth.services.UserDetailsImpl;
+import com.fertigapp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.JwtResponse;
 import com.fertigapp.backend.payload.response.MessageResponse;
 import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.requestmodels.RequestUsuario;
 import com.fertigapp.backend.services.UsuarioService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,17 +40,21 @@ public class UsuarioController {
     // Objeto responsable de la encriptación de contraseñas.
     private final PasswordEncoder passwordEncoder;
 
-    final
-    AuthenticationManager authenticationManager;
+    final AuthenticationManager authenticationManager;
 
-    final
-    JwtUtil jwtUtils;
+    final JwtUtil jwtUtils;
 
-    public UsuarioController(UsuarioService usuarioService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtils) {
+    private final UserDetailsServiceImpl userDetailsService;
+
+    @Value("${fertigapp.app.front}")
+    private String frontEnd;
+
+    public UsuarioController(UsuarioService usuarioService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtils, UserDetailsServiceImpl userDetailsService) {
         this.usuarioService = usuarioService;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
     }
 
     //Metodo POST para iniciar sesión
@@ -179,4 +185,21 @@ public class UsuarioController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @PostMapping(path = "/user/reset-password/{email}")
+    public ResponseEntity<String> resetPassword(@PathVariable String email) {
+        if (!usuarioService.existsByCorreo(email))
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Usuario usuario = this.usuarioService.findByCorreo(email);
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(usuario.getUsuario());
+
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                userDetails, null, userDetails.getAuthorities());
+        String nToken = jwtUtils.generateJwtResetPasswordToken(authentication);
+
+        StringBuilder path = new StringBuilder(frontEnd);
+        path.append("/").append(nToken);
+
+        return ResponseEntity.ok(path.toString());
+    }
 }
