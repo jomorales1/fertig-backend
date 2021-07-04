@@ -6,6 +6,7 @@ import com.fertigapp.backend.auth.services.UserDetailsServiceImpl;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.JwtResponse;
 import com.fertigapp.backend.payload.response.MessageResponse;
+import com.fertigapp.backend.requestmodels.ChangePasswordRequest;
 import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.requestmodels.RequestUsuario;
 import com.fertigapp.backend.services.UsuarioService;
@@ -201,5 +202,20 @@ public class UsuarioController {
         path.append("/").append(nToken);
 
         return ResponseEntity.ok(path.toString());
+    }
+
+    @PutMapping(path = "/user/change-password")
+    public ResponseEntity<String> changePassword (@RequestBody ChangePasswordRequest newPassword) {
+        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Usuario> optionalUsuario = usuarioService.findById(userDetails.getUsername());
+
+        if (optionalUsuario.isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Usuario usuario = optionalUsuario.get();
+        usuario.setPassword(passwordEncoder.encode(newPassword.getNewPassword()));
+        usuarioService.save(usuario);
+
+        return ResponseEntity.ok("Done");
     }
 }
