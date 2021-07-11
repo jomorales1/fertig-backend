@@ -38,7 +38,7 @@ jobs:
         uses: datamonsters/replace-action@v2
         with: 
           files: src/main/resources/application.properties
-          replacements: 'mysql://localhost:3306/mydb=mysql://104.196.180.57:3306/mydb, f3rtigApp!=fertigApp'
+          replacements: 'mysql://localhost:3306/mydb=mysql://remotemysql.com:3306/f8O6KP7AEC, f3rtigApp!=U3XUeTZ5Fq'
       - uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
