@@ -240,7 +240,7 @@ public class UsuarioController {
         email.setSubject(subject);
         email.setText(body);
         email.setTo(user.getCorreo());
-        email.setFrom("healthdiagnosis_rid@outlook.com");
+        email.setFrom("fertig_app@outlook.com");
         return email;
     }
 
