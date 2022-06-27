@@ -2,6 +2,9 @@ package com.fertigapp.backend.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fertigapp.backend.auth.jwt.AuthEntryPointJwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,6 +14,8 @@ import java.util.Set;
 @Entity// This tells Hibernate to make a table out of this class
 @Table(name = "usuario")
 public class Usuario implements Serializable {
+
+	private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
 	@Id
 	private String usuario;
@@ -67,6 +72,21 @@ public class Usuario implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "usuarioFL", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<FranjaActiva> franjasActivas;
+
+	@PrePersist
+	public void onPrePersist() {
+		logger.info("Usuario creada");
+	}
+
+	@PreUpdate
+	public void onPreUpdate() {
+		logger.info("Usuario actualizada");
+	}
+
+	@PreRemove
+	public void onPreRemove() {
+		logger.info("Usuario creada");
+	}
 
 	public Usuario() { }
 

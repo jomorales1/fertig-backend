@@ -2,6 +2,9 @@ package com.fertigapp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fertigapp.backend.auth.jwt.AuthEntryPointJwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -11,6 +14,8 @@ import java.util.*;
 @Entity
 @Table(name="tarea")
 public class Tarea implements Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     @Id
     @SequenceGenerator(name = "id_tarea_generator",
@@ -56,6 +61,21 @@ public class Tarea implements Serializable {
     @ManyToOne
     @JoinColumn(name = "id_rutina")
     private Rutina rutinaT;
+
+    @PrePersist
+    public void onPrePersist() {
+        logger.info("Tarea creada");
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        logger.info("Tarea actualizada");
+    }
+
+    @PreRemove
+    public void onPreRemove() {
+        logger.info("Tarea eliminada");
+    }
 
     public void addSubtarea(Tarea tarea) {
         if (this.subtareas == null) {
