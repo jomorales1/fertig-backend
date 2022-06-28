@@ -1,5 +1,6 @@
 package com.fertigapp.backend.controller;
 
+import java.net.URLEncoder;
 import com.fertigapp.backend.auth.jwt.JwtUtil;
 import com.fertigapp.backend.auth.services.UserDetailsImpl;
 import com.fertigapp.backend.model.PasswordResetToken;
@@ -10,6 +11,15 @@ import com.fertigapp.backend.repository.PasswordTokenRepository;
 import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.requestmodels.RequestUsuario;
 import com.fertigapp.backend.services.UsuarioService;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -23,6 +33,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,7 +139,32 @@ public class UsuarioController {
 
     // Método POST para añadir un registro de tipo "usuario" en la DB.
     @PostMapping(path="/user/add") // Map ONLY POST Requests
-    public @ResponseBody ResponseEntity<MessageResponse> addNewUsuario (@RequestBody RequestUsuario requestUsuario) {
+    public @ResponseBody ResponseEntity<MessageResponse> addNewUsuario (@RequestBody RequestUsuario requestUsuario) throws IOException, JSONException {
+        if (requestUsuario.getRecaptcha() == null) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: recaptchaToken is required"));
+        }
+
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+        try {
+            HttpPost request = new HttpPost("https://www.google.com/recaptcha/api/siteverify?secret=6Ld1wZ4gAAAAAG0YhFQlFjh6pFkd1edY2Li7_fsW&response="+requestUsuario.getRecaptcha());
+            HttpResponse response = httpClient.execute(request);
+            String json_string = EntityUtils.toString(response.getEntity());
+            JSONObject temp1 = new JSONObject(json_string);
+            boolean valid = temp1.getBoolean("success");
+            if (!valid){
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: recaptchaToken is required"));
+            }
+        } catch (Exception ex) {
+            // handle exception here
+        } finally {
+            httpClient.close();
+        }
+
         if (usuarioService.existsById(requestUsuario.getUsuario()))
             return ResponseEntity
                     .badRequest()
