@@ -1,6 +1,9 @@
 package com.fertigapp.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fertigapp.backend.auth.jwt.AuthEntryPointJwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -12,6 +15,8 @@ import java.util.Set;
 @Entity
 @Table(name="rutina")
 public class Rutina implements Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     @Id
     @SequenceGenerator(name = "id_rutina_generator",
@@ -50,6 +55,21 @@ public class Rutina implements Serializable {
 
     @Column(name="franja_fin",columnDefinition = "TIME")
     protected OffsetTime franjaFin;
+
+    @PrePersist
+    public void onPrePersist() {
+        logger.info("Rutina creada");
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        logger.info("Rutina actualizada");
+    }
+
+    @PreRemove
+    public void onPreRemove() {
+        logger.info("Rutina eliminada");
+    }
 
     @JsonIgnore
     @OneToMany(mappedBy = "rutinaC")

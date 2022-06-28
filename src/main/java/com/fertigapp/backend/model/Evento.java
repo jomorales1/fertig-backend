@@ -1,5 +1,9 @@
 package com.fertigapp.backend.model;
 
+import com.fertigapp.backend.auth.jwt.AuthEntryPointJwt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -7,6 +11,8 @@ import java.time.OffsetDateTime;
 @Entity
 @Table(name="evento")
 public class Evento implements Serializable {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     @Id
     @SequenceGenerator(name = "id_evento_generator",
@@ -38,6 +44,21 @@ public class Evento implements Serializable {
     protected String recurrencia;
 
     protected Integer recordatorio;
+
+    @PrePersist
+    public void onPrePersist() {
+        logger.info("Evento creado");
+    }
+
+    @PreUpdate
+    public void onPreUpdate() {
+        logger.info("Evento actualizado");
+    }
+
+    @PreRemove
+    public void onPreRemove() {
+        logger.info("Evento eliminado");
+    }
 
     public int getId() {
         return id;

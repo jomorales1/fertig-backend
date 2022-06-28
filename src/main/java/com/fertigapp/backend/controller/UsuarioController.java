@@ -3,9 +3,11 @@ package com.fertigapp.backend.controller;
 import java.net.URLEncoder;
 import com.fertigapp.backend.auth.jwt.JwtUtil;
 import com.fertigapp.backend.auth.services.UserDetailsImpl;
+import com.fertigapp.backend.model.PasswordResetToken;
 import com.fertigapp.backend.model.Usuario;
 import com.fertigapp.backend.payload.response.JwtResponse;
 import com.fertigapp.backend.payload.response.MessageResponse;
+import com.fertigapp.backend.repository.PasswordTokenRepository;
 import com.fertigapp.backend.requestmodels.LoginRequest;
 import com.fertigapp.backend.requestmodels.RequestUsuario;
 import com.fertigapp.backend.services.UsuarioService;
@@ -20,6 +22,8 @@ import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,6 +37,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +52,10 @@ public class UsuarioController {
     // Repositorio responsable del manejo de la tabla "usuario" en la DB.
     private final UsuarioService usuarioService;
 
+    private final JavaMailSender mailSender;
+
+    private final PasswordTokenRepository passwordTokenRepository;
+
     // Objeto responsable de la encriptación de contraseñas.
     private final PasswordEncoder passwordEncoder;
 
@@ -56,8 +65,10 @@ public class UsuarioController {
     final
     JwtUtil jwtUtils;
 
-    public UsuarioController(UsuarioService usuarioService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtils) {
+    public UsuarioController(UsuarioService usuarioService, JavaMailSender mailSender, PasswordTokenRepository passwordTokenRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager, JwtUtil jwtUtils) {
         this.usuarioService = usuarioService;
+        this.mailSender = mailSender;
+        this.passwordTokenRepository = passwordTokenRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
         this.jwtUtils = jwtUtils;
@@ -214,6 +225,80 @@ public class UsuarioController {
         if (!deleted) return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         this.usuarioService.save(usuario);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PostMapping(path = "/user/reset-password")
+    public ResponseEntity<MessageResponse> resetPassword(@RequestParam("email") String userEmail) {
+        Optional<Usuario> optionalUsuario = Optional.ofNullable(this.usuarioService.findByCorreo(userEmail));
+        if (optionalUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no existe"));
+        String token = UUID.randomUUID().toString();
+        this.usuarioService.createPasswordResetToken(optionalUsuario.get(), token);
+        this.mailSender.send(constructResetTokenEmail("https://localhost:8080", token, optionalUsuario.get()));
+        return ResponseEntity.ok().body(new MessageResponse("Correo electronico enviado"));
+    }
+
+    @PostMapping("/user/save-password")
+    public ResponseEntity<MessageResponse> savePassword(@RequestParam("email") String email, @RequestParam("password") String password,
+                                                        @RequestParam("token") String token) {
+        Optional<Usuario> optionalUsuario = Optional.ofNullable(this.usuarioService.findByCorreo(email));
+        if (optionalUsuario.isEmpty())
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el usuario no existe"));
+        Optional<PasswordResetToken> passwordResetToken = this.passwordTokenRepository.findByToken(token);
+        if (passwordResetToken.isEmpty()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el token ingresado no existe"));
+        }
+        if (passwordResetToken.get().getUsed()) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: el token ingresado ya ha sido utilizado"));
+        }
+        String result = validatePasswordResetToken(passwordResetToken.get().getToken());
+        System.out.println(passwordResetToken.get().getToken());
+        System.out.println(result);
+        if(result == null) {
+            Usuario user = optionalUsuario.get();
+            user.setPassword(passwordEncoder.encode(password));
+            this.usuarioService.save(user);
+            PasswordResetToken resetToken = passwordResetToken.get();
+            resetToken.setUsed(true);
+            this.passwordTokenRepository.save(resetToken);
+            return ResponseEntity.ok().body(new MessageResponse("Contraseña actualizada"));
+        }
+        return ResponseEntity.badRequest().body(new MessageResponse("Error: el token ingresado es invalido"));
+    }
+
+    private SimpleMailMessage constructResetTokenEmail(
+            String contextPath, String token, Usuario user) {
+        String url = contextPath + "/user/changePassword?token=" + token;
+        String message = "Acceda a la siguiente url para cambiar su contraseña:";
+        return constructEmail("Reset Password", message + " \r\n" + url, user);
+    }
+
+    private SimpleMailMessage constructEmail(String subject, String body,
+                                             Usuario user) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setSubject(subject);
+        email.setText(body);
+        email.setTo(user.getCorreo());
+        email.setFrom("fertig_app@outlook.com");
+        return email;
+    }
+
+    public String validatePasswordResetToken(String token) {
+        Optional<PasswordResetToken> passToken = this.passwordTokenRepository.findByToken(token);
+        System.out.println("Objeto token:");
+        System.out.println(passToken.orElse(null));
+        return !isTokenFound(passToken.orElse(null)) ? "invalidToken"
+                : isTokenExpired(passToken.orElse(null)) ? "expired"
+                : null;
+    }
+
+    private boolean isTokenFound(PasswordResetToken passToken) {
+        return passToken != null;
+    }
+
+    private boolean isTokenExpired(PasswordResetToken passToken) {
+        System.out.println(passToken.getExpiryDate().isBefore(OffsetDateTime.now()));
+        return passToken.getExpiryDate().isBefore(OffsetDateTime.now());
     }
 
 }

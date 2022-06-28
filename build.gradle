@@ -30,6 +30,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.springframework.session:spring-session-core'
+	implementation 'org.springframework.boot:spring-boot-starter-mail:2.7.1'
 	testImplementation 'io.projectreactor:reactor-test'
 	implementation 'com.google.firebase:firebase-admin:7.0.1'
 	compile 'com.google.api-client:google-api-client:1.30.10'
