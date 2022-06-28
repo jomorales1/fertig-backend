@@ -229,7 +229,7 @@ public class UsuarioController {
 
     private SimpleMailMessage constructResetTokenEmail(
             String contextPath, String token, Usuario user) {
-        String url = contextPath + "/user/changePassword?token=" + token;
+        String url = contextPath + "/ResetPassword?token=" + token + "&email=" + user.getCorreo();
         String message = "Acceda a la siguiente url para cambiar su contraseña:";
         return constructEmail("Reset Password", message + " \r\n" + url, user);
     }
