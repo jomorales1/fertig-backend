@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 public class RequestUsuario extends Usuario implements Serializable {
 	private String usuario;
-
+	private String recaptcha;
 	private String password;
 
 	public RequestUsuario(String correo, String nombre, String usuario, String password) {
@@ -15,6 +15,15 @@ public class RequestUsuario extends Usuario implements Serializable {
 		this.nombre = nombre;
 		this.usuario = usuario;
 		this.password = password;
+		this.recaptcha = " ";
+	}
+
+	public RequestUsuario(String correo, String nombre, String usuario, String password, String recaptcha) {
+		this.correo = correo;
+		this.nombre = nombre;
+		this.usuario = usuario;
+		this.password = password;
+		this.recaptcha = recaptcha;
 	}
 
     public RequestUsuario() {
@@ -39,5 +48,13 @@ public class RequestUsuario extends Usuario implements Serializable {
 	@Override
 	public void setUsuario(String usuario) {
 		this.usuario = usuario;
+	}
+
+	public String getRecaptcha() {
+		return recaptcha;
+	}
+
+	public void setRecaptcha(String reCaptcha) {
+		this.recaptcha = reCaptcha;
 	}
 }
